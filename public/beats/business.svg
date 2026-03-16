@@ -1,48 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
     <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#8a7d65" stroke-width="0.8" opacity="0.4"/>
     </pattern>
-    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
-      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
-      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
+    <pattern id="stipple" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.5" fill="#8a7d65" opacity="0.15"/>
     </pattern>
-    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(60)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#8a7d65" stroke-width="0.6" opacity="0.35"/>
+    </pattern>
+    <pattern id="engrave" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="3" stroke="#8a7d65" stroke-width="0.4" opacity="0.3"/>
     </pattern>
     
   </defs>
-  <!-- Background -->
-  <rect width="800" height="450" fill="#ece6d9"/>
+  <rect width="800" height="450" fill="#0f1419"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
-  <!-- Ground -->
-  <line x1="100" y1="370" x2="700" y2="370" stroke="#1a1a1a" stroke-width="2.5"/>
-  <!-- Building 1 - tall left -->
-  <rect x="160" y="140" width="70" height="230" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <rect x="168" y="155" width="12" height="18" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="188" y="155" width="12" height="18" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="208" y="155" width="12" height="18" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="168" y="185" width="12" height="18" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="188" y="185" width="12" height="18" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="208" y="185" width="12" height="18" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <!-- Building 2 - tallest center -->
-  <rect x="260" y="90" width="80" height="280" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="3"/>
-  <line x1="300" y1="90" x2="300" y2="370" stroke="#1a1a1a" stroke-width="1.5" opacity="0.4"/>
+  <!-- Ground line -->
+  <line x1="80" y1="378" x2="720" y2="378" stroke="#c8b88a" stroke-width="2"/>
+  <!-- Building 1 -->
+  <rect x="120" y="150" width="75" height="228" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2"/>
+  <rect x="130" y="168" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="152" y="168" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="174" y="168" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="130" y="198" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="152" y="198" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="174" y="198" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="130" y="228" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="152" y="228" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="174" y="228" width="14" height="18" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <!-- Building 2 (tallest) -->
+  <rect x="225" y="75" width="90" height="303" fill="url(#engrave)" stroke="#d4c5a9" stroke-width="2.5"/>
+  <line x1="270" y1="75" x2="270" y2="378" stroke="#c8b88a" stroke-width="1" opacity="0.3"/>
   <!-- Antenna -->
-  <line x1="300" y1="90" x2="300" y2="55" stroke="#1a1a1a" stroke-width="2.5"/>
-  <circle cx="300" cy="52" r="4" fill="#1a1a1a"/>
-  <!-- Building 3 - medium -->
-  <rect x="370" y="190" width="90" height="180" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <rect x="380" y="200" width="15" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="405" y="200" width="15" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="430" y="200" width="15" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <!-- Building 4 - shorter -->
-  <rect x="490" y="230" width="75" height="140" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <!-- Building 5 - tall right -->
-  <rect x="590" y="160" width="60" height="210" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <rect x="598" y="175" width="10" height="15" fill="none" stroke="#1a1a1a" stroke-width="1.2"/>
-  <rect x="615" y="175" width="10" height="15" fill="none" stroke="#1a1a1a" stroke-width="1.2"/>
-  <rect x="632" y="175" width="10" height="15" fill="none" stroke="#1a1a1a" stroke-width="1.2"/>
+  <line x1="270" y1="75" x2="270" y2="38" stroke="#d4c5a9" stroke-width="2.5"/>
+  <circle cx="270" cy="34" r="5" fill="#d4c5a9"/>
+  <!-- Building 3 -->
+  <rect x="345" y="180" width="100" height="198" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2"/>
+  <rect x="358" y="198" width="16" height="20" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="387" y="198" width="16" height="20" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="416" y="198" width="16" height="20" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="358" y="230" width="16" height="20" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="387" y="230" width="16" height="20" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <rect x="416" y="230" width="16" height="20" fill="none" stroke="#c8b88a" stroke-width="1"/>
+  <!-- Building 4 -->
+  <rect x="475" y="220" width="80" height="158" fill="url(#hatch)" stroke="#d4c5a9" stroke-width="2"/>
+  <rect x="488" y="238" width="12" height="16" fill="none" stroke="#c8b88a" stroke-width="0.8"/>
+  <rect x="508" y="238" width="12" height="16" fill="none" stroke="#c8b88a" stroke-width="0.8"/>
+  <rect x="528" y="238" width="12" height="16" fill="none" stroke="#c8b88a" stroke-width="0.8"/>
+  <!-- Building 5 -->
+  <rect x="585" y="130" width="65" height="248" fill="url(#engrave)" stroke="#d4c5a9" stroke-width="2"/>
+  <!-- Spire -->
+  <path d="M 610 130 L 617 90 L 624 130" fill="none" stroke="#d4c5a9" stroke-width="2"/>
+  <rect x="595" y="150" width="12" height="16" fill="none" stroke="#c8b88a" stroke-width="0.8"/>
+  <rect x="617" y="150" width="12" height="16" fill="none" stroke="#c8b88a" stroke-width="0.8"/>
+  <rect x="635" y="150" width="12" height="16" fill="none" stroke="#c8b88a" stroke-width="0.8"/>
+  <!-- Corner elements -->
+  <path d="M 40 40 L 80 40 M 40 40 L 40 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 40 L 720 40 M 760 40 L 760 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 40 410 L 80 410 M 40 410 L 40 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 410 L 720 410 M 760 410 L 760 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
 </svg>

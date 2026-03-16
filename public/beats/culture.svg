@@ -1,34 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
     <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#8a7d65" stroke-width="0.8" opacity="0.4"/>
     </pattern>
-    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
-      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
-      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
+    <pattern id="stipple" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.5" fill="#8a7d65" opacity="0.15"/>
     </pattern>
-    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(60)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#8a7d65" stroke-width="0.6" opacity="0.35"/>
+    </pattern>
+    <pattern id="engrave" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="3" stroke="#8a7d65" stroke-width="0.4" opacity="0.3"/>
     </pattern>
     
   </defs>
-  <!-- Background -->
-  <rect width="800" height="450" fill="#ece6d9"/>
+  <rect width="800" height="450" fill="#0f1419"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
   <!-- Happy mask -->
-  <ellipse cx="320" cy="220" rx="110" ry="130" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3" transform="rotate(-10,320,220)"/>
-  <ellipse cx="290" cy="185" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
-  <ellipse cx="360" cy="180" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
-  <path d="M 275 250 Q 320 300 370 250" fill="none" stroke="#1a1a1a" stroke-width="3"/>
-  <ellipse cx="325" cy="215" rx="15" ry="10" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
+  <ellipse cx="310" cy="220" rx="115" ry="135" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2.5" transform="rotate(-8,310,220)"/>
+  <ellipse cx="278" cy="182" rx="24" ry="17" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <ellipse cx="350" cy="178" rx="24" ry="17" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <path d="M 265 255 Q 312 310 365 255" fill="none" stroke="#d4c5a9" stroke-width="2.5"/>
+  <ellipse cx="315" cy="215" rx="16" ry="11" fill="#0f1419" stroke="#c8b88a" stroke-width="1.5"/>
   <!-- Sad mask -->
-  <ellipse cx="490" cy="225" rx="110" ry="130" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="3" transform="rotate(10,490,225)"/>
-  <ellipse cx="460" cy="190" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
-  <ellipse cx="530" cy="195" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
-  <path d="M 445 280 Q 490 240 540 280" fill="none" stroke="#1a1a1a" stroke-width="3"/>
-  <ellipse cx="495" cy="225" rx="15" ry="10" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
-  <!-- Ribbons -->
-  <path d="M 380 120 Q 400 80 420 120" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+  <ellipse cx="500" cy="225" rx="115" ry="135" fill="url(#hatch)" stroke="#d4c5a9" stroke-width="2.5" transform="rotate(8,500,225)"/>
+  <ellipse cx="468" cy="188" rx="24" ry="17" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <ellipse cx="540" cy="192" rx="24" ry="17" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <path d="M 455 285 Q 500 245 550 285" fill="none" stroke="#d4c5a9" stroke-width="2.5"/>
+  <ellipse cx="504" cy="225" rx="16" ry="11" fill="#0f1419" stroke="#c8b88a" stroke-width="1.5"/>
+  <!-- Ribbon -->
+  <path d="M 375 110 Q 400 70 425 110" fill="none" stroke="#d4c5a9" stroke-width="2.5"/>
+  <!-- Corner elements -->
+  <path d="M 40 40 L 80 40 M 40 40 L 40 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 40 L 720 40 M 760 40 L 760 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 40 410 L 80 410 M 40 410 L 40 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 410 L 720 410 M 760 410 L 760 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
 </svg>

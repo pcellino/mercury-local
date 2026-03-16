@@ -1,35 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
     <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#8a7d65" stroke-width="0.8" opacity="0.4"/>
     </pattern>
-    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
-      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
-      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
+    <pattern id="stipple" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.5" fill="#8a7d65" opacity="0.15"/>
     </pattern>
-    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(60)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#8a7d65" stroke-width="0.6" opacity="0.35"/>
+    </pattern>
+    <pattern id="engrave" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="3" stroke="#8a7d65" stroke-width="0.4" opacity="0.3"/>
     </pattern>
     
   </defs>
-  <!-- Background -->
-  <rect width="800" height="450" fill="#ece6d9"/>
+  <rect width="800" height="450" fill="#0f1419"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
   <!-- Plate -->
-  <ellipse cx="400" cy="280" rx="180" ry="120" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3"/>
-  <ellipse cx="400" cy="280" rx="140" ry="90" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
-  <ellipse cx="400" cy="280" rx="100" ry="65" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="1.5" opacity="0.5"/>
-  <!-- Fork (left) -->
-  <line x1="180" y1="100" x2="200" y2="380" stroke="#1a1a1a" stroke-width="3"/>
-  <line x1="170" y1="100" x2="174" y2="170" stroke="#1a1a1a" stroke-width="2.5"/>
-  <line x1="180" y1="100" x2="182" y2="170" stroke="#1a1a1a" stroke-width="2.5"/>
-  <line x1="190" y1="100" x2="190" y2="170" stroke="#1a1a1a" stroke-width="2.5"/>
-  <line x1="200" y1="100" x2="198" y2="170" stroke="#1a1a1a" stroke-width="2.5"/>
-  <!-- Fork tine connections -->
-  <path d="M 174 170 Q 187 185 198 170" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-  <!-- Knife (right) -->
-  <line x1="610" y1="120" x2="590" y2="380" stroke="#1a1a1a" stroke-width="3"/>
-  <path d="M 610 120 L 630 120 Q 640 200 600 250 L 600 250" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="2.5"/>
+  <ellipse cx="400" cy="280" rx="185" ry="125" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2.5"/>
+  <ellipse cx="400" cy="280" rx="145" ry="95" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <ellipse cx="400" cy="280" rx="105" ry="68" fill="url(#engrave)" stroke="#c8b88a" stroke-width="1" opacity="0.5"/>
+  <!-- Fork -->
+  <line x1="168" y1="88" x2="190" y2="395" stroke="#d4c5a9" stroke-width="2.5"/>
+  <line x1="156" y1="88" x2="162" y2="168" stroke="#d4c5a9" stroke-width="2"/>
+  <line x1="168" y1="88" x2="172" y2="168" stroke="#d4c5a9" stroke-width="2"/>
+  <line x1="180" y1="88" x2="180" y2="168" stroke="#d4c5a9" stroke-width="2"/>
+  <line x1="192" y1="88" x2="188" y2="168" stroke="#d4c5a9" stroke-width="2"/>
+  <path d="M 162 168 Q 175 188 188 168" fill="none" stroke="#c8b88a" stroke-width="1.5"/>
+  <!-- Knife -->
+  <line x1="622" y1="108" x2="600" y2="395" stroke="#d4c5a9" stroke-width="2.5"/>
+  <path d="M 622 108 L 645 108 Q 656 195 612 255" fill="url(#hatch)" stroke="#d4c5a9" stroke-width="2"/>
+  <!-- Corner elements -->
+  <path d="M 40 40 L 80 40 M 40 40 L 40 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 40 L 720 40 M 760 40 L 760 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 40 410 L 80 410 M 40 410 L 40 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 410 L 720 410 M 760 410 L 760 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
 </svg>

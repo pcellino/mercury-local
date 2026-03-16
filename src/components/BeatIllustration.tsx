@@ -1,6 +1,6 @@
 /**
  * Fallback editorial illustration for posts without hero images.
- * Shows a beat-specific pen-and-ink SVG in the style of WSJ/Atlantic hedcuts.
+ * Dark engraving-style SVGs with gold line art on navy background.
  */
 
 interface BeatIllustrationProps {
@@ -20,15 +20,15 @@ export default function BeatIllustration({ beat, className = "" }: BeatIllustrat
     : "/beats/default.svg";
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative overflow-hidden ${className}`}>
       <img
         src={src}
         alt=""
         role="presentation"
         loading="lazy"
         decoding="async"
-        className="w-full h-auto border border-gray-300"
-        style={{ minHeight: "120px" }}
+        className="w-full h-auto"
+        style={{ minHeight: "100px" }}
       />
     </div>
   );

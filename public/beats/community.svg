@@ -1,49 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
     <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#8a7d65" stroke-width="0.8" opacity="0.4"/>
     </pattern>
-    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
-      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
-      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
+    <pattern id="stipple" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.5" fill="#8a7d65" opacity="0.15"/>
     </pattern>
-    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(60)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#8a7d65" stroke-width="0.6" opacity="0.35"/>
+    </pattern>
+    <pattern id="engrave" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="3" stroke="#8a7d65" stroke-width="0.4" opacity="0.3"/>
     </pattern>
     
   </defs>
-  <!-- Background -->
-  <rect width="800" height="450" fill="#ece6d9"/>
+  <rect width="800" height="450" fill="#0f1419"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
   <!-- Ground -->
-  <line x1="80" y1="330" x2="720" y2="330" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="60" y1="340" x2="740" y2="340" stroke="#c8b88a" stroke-width="1.5"/>
   <!-- House 1 -->
-  <rect x="140" y="240" width="120" height="90" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <polygon points="140,240 200,170 260,240" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <rect x="180" y="275" width="30" height="55" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
-  <rect x="150" y="260" width="22" height="22" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="161" y1="260" x2="161" y2="282" stroke="#1a1a1a" stroke-width="1"/>
-  <line x1="150" y1="271" x2="172" y2="271" stroke="#1a1a1a" stroke-width="1"/>
-  <!-- House 2 (center, taller) -->
-  <rect x="290" y="210" width="140" height="120" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3"/>
-  <polygon points="290,210 360,130 430,210" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="3"/>
-  <rect x="340" y="260" width="35" height="70" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
-  <rect x="300" y="230" width="28" height="28" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="314" y1="230" x2="314" y2="258" stroke="#1a1a1a" stroke-width="1"/>
-  <line x1="300" y1="244" x2="328" y2="244" stroke="#1a1a1a" stroke-width="1"/>
-  <rect x="395" y="230" width="28" height="28" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="409" y1="230" x2="409" y2="258" stroke="#1a1a1a" stroke-width="1"/>
-  <line x1="395" y1="244" x2="423" y2="244" stroke="#1a1a1a" stroke-width="1"/>
+  <rect x="120" y="245" width="130" height="95" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2.5"/>
+  <polygon points="120,245 185,170 250,245" fill="url(#engrave)" stroke="#d4c5a9" stroke-width="2.5"/>
+  <rect x="165" y="280" width="32" height="60" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <rect x="132" y="265" width="24" height="24" fill="none" stroke="#c8b88a" stroke-width="1.5"/>
+  <line x1="144" y1="265" x2="144" y2="289" stroke="#c8b88a" stroke-width="0.8"/>
+  <line x1="132" y1="277" x2="156" y2="277" stroke="#c8b88a" stroke-width="0.8"/>
+  <!-- House 2 (center) -->
+  <rect x="285" y="215" width="150" height="125" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="3"/>
+  <polygon points="285,215 360,125 435,215" fill="url(#engrave)" stroke="#d4c5a9" stroke-width="3"/>
+  <rect x="338" y="265" width="38" height="75" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <!-- Semicircle window above door -->
+  <path d="M 340 265 Q 357 245 374 265" fill="none" stroke="#c8b88a" stroke-width="1.5"/>
+  <rect x="298" y="238" width="28" height="28" fill="none" stroke="#c8b88a" stroke-width="1.5"/>
+  <line x1="312" y1="238" x2="312" y2="266" stroke="#c8b88a" stroke-width="0.8"/>
+  <line x1="298" y1="252" x2="326" y2="252" stroke="#c8b88a" stroke-width="0.8"/>
+  <rect x="395" y="238" width="28" height="28" fill="none" stroke="#c8b88a" stroke-width="1.5"/>
+  <line x1="409" y1="238" x2="409" y2="266" stroke="#c8b88a" stroke-width="0.8"/>
+  <line x1="395" y1="252" x2="423" y2="252" stroke="#c8b88a" stroke-width="0.8"/>
   <!-- Chimney -->
-  <rect x="380" y="140" width="18" height="40" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="385" y="138" width="18" height="48" fill="url(#hatch)" stroke="#c8b88a" stroke-width="1.5"/>
   <!-- House 3 -->
-  <rect x="460" y="250" width="120" height="80" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <polygon points="460,250 520,185 580,250" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="2.5"/>
-  <rect x="500" y="278" width="28" height="52" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
-  <rect x="468" y="265" width="22" height="22" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="470" y="255" width="120" height="85" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2.5"/>
+  <polygon points="470,255 530,185 590,255" fill="url(#engrave)" stroke="#d4c5a9" stroke-width="2.5"/>
+  <rect x="510" y="285" width="28" height="55" fill="#0f1419" stroke="#c8b88a" stroke-width="2"/>
+  <rect x="478" y="272" width="22" height="22" fill="none" stroke="#c8b88a" stroke-width="1.5"/>
   <!-- Tree -->
-  <line x1="650" y1="280" x2="650" y2="330" stroke="#1a1a1a" stroke-width="3"/>
-  <circle cx="650" cy="255" r="35" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="670" y1="285" x2="670" y2="340" stroke="#c8b88a" stroke-width="3"/>
+  <circle cx="670" cy="258" r="38" fill="url(#crosshatch)" stroke="#d4c5a9" stroke-width="2"/>
+  <!-- Fence -->
+  <line x1="60" y1="340" x2="60" y2="318" stroke="#8a7d65" stroke-width="1" opacity="0.5"/>
+  <line x1="80" y1="340" x2="80" y2="318" stroke="#8a7d65" stroke-width="1" opacity="0.5"/>
+  <line x1="100" y1="340" x2="100" y2="318" stroke="#8a7d65" stroke-width="1" opacity="0.5"/>
+  <line x1="55" y1="325" x2="105" y2="325" stroke="#8a7d65" stroke-width="0.8" opacity="0.5"/>
+  <!-- Corner elements -->
+  <path d="M 40 40 L 80 40 M 40 40 L 40 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 40 L 720 40 M 760 40 L 760 80" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 40 410 L 80 410 M 40 410 L 40 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 760 410 L 720 410 M 760 410 L 760 370" stroke="#8a7d65" stroke-width="1.5" opacity="0.5"/>
 </svg>
