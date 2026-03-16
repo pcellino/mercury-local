@@ -12,7 +12,7 @@ import {
 import { generateArticleJsonLd, generateBreadcrumbJsonLd } from "@/lib/jsonld";
 import BeatIllustration from "@/components/BeatIllustration";
 
-export const revalidate = 600; // ISR: 10 min
+export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
 interface PostPageProps {
   params: Promise<{ beat: string; slug: string }>;

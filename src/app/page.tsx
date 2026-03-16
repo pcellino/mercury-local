@@ -9,7 +9,7 @@ import Link from "next/link";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
 import BeatIllustration from "@/components/BeatIllustration";
 
-export const revalidate = 300; // ISR: revalidate every 5 minutes
+export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
 function stripHtml(html: string): string {
   return decodeHtmlEntities(html.replace(/<[^>]*>/g, ""));

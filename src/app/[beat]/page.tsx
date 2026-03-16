@@ -4,7 +4,7 @@ import { getPublicationFromRequest } from "@/lib/publication";
 import { getPostsByBeatWithAuthors, getBeatsForPublication } from "@/lib/queries";
 import PostCard from "@/components/PostCard";
 
-export const revalidate = 300; // ISR: 5 min
+export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
 interface BeatPageProps {
   params: Promise<{ beat: string }>;
