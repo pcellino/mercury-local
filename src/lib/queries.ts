@@ -1,5 +1,5 @@
 import { createServerClient } from "./supabase";
-import type { Post, PostWithAuthor, Publication, Author, BeatConfig } from "./types";
+import type { Post, PostWithAuthor, Publication, Author, Page, BeatConfig } from "./types";
 import { BEATS_BY_PUBLICATION } from "./types";
 
 const supabase = createServerClient();
@@ -238,6 +238,45 @@ export async function searchPosts(
 
   if (error) {
     console.error("searchPosts error:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// -------------------------------------------------------
+// Pages
+// -------------------------------------------------------
+
+export async function getPageBySlug(
+  publicationId: string,
+  slug: string
+): Promise<Page | null> {
+  const { data, error } = await supabase
+    .from("pages")
+    .select("*")
+    .eq("publication_id", publicationId)
+    .eq("slug", slug)
+    .eq("status", "published")
+    .single();
+
+  if (error) {
+    console.error("getPageBySlug error:", error);
+    return null;
+  }
+  return data as Page;
+}
+
+export async function getAllPublishedPages(
+  publicationId: string
+): Promise<Pick<Page, "slug" | "updated_at">[]> {
+  const { data, error } = await supabase
+    .from("pages")
+    .select("slug, updated_at")
+    .eq("publication_id", publicationId)
+    .eq("status", "published");
+
+  if (error) {
+    console.error("getAllPublishedPages error:", error);
     return [];
   }
   return data || [];

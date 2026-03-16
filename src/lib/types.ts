@@ -93,6 +93,19 @@ export interface Tag {
   slug: string;
 }
 
+export interface Page {
+  id: string;
+  publication_id: string | null;
+  title: string;
+  slug: string;
+  content: string | null;
+  status: string | null;
+  pub_date: string | null;
+  updated_at: string;
+  source: string | null;
+  original_url: string | null;
+}
+
 // -------------------------------------------------------
 // Joined / enriched types for page rendering
 // -------------------------------------------------------
