@@ -78,13 +78,16 @@ function sanitizeHtml(html: string): string {
 export function sanitizeContent(content: string | null): string {
   if (!content) return "";
 
-  if (isHtmlContent(content)) {
+  // Fix Postgres double-quote escaping: '' → '
+  let cleaned = content.replace(/''/g, "'");
+
+  if (isHtmlContent(cleaned)) {
     // Legacy HTML content (WordPress imports)
-    return sanitizeHtml(content);
+    return sanitizeHtml(cleaned);
   }
 
   // Markdown content → convert to HTML, then sanitize
-  const html = renderMarkdown(content);
+  const html = renderMarkdown(cleaned);
   return sanitizeHtml(html);
 }
 
@@ -129,6 +132,7 @@ export function estimateReadingTime(html: string | null): number {
 
 export function decodeHtmlEntities(text: string): string {
   return text
+    .replace(/''/g, "'")            // Postgres double-quote escaping
     .replace(/&#8217;/g, "\u2019")
     .replace(/&#8216;/g, "\u2018")
     .replace(/&#8220;/g, "\u201C")
