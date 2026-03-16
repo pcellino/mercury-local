@@ -1,43 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
-    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
     </pattern>
-    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
-      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
+      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
     </pattern>
-    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
     </pattern>
+    
   </defs>
-  <rect width="800" height="450" fill="#f5f0e8"/>
+  <!-- Background -->
+  <rect width="800" height="450" fill="#ece6d9"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  
-  <!-- Book spine -->
-  <path d="M 400 320 L 400 150" stroke="#2d2d2d" stroke-width="2"/>
-  <!-- Left page -->
-  <path d="M 400 160 Q 350 155 280 180 L 280 320 Q 340 300 400 320" 
-        fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
-  <path d="M 400 160 Q 350 155 280 180 L 280 320 Q 340 300 400 320" fill="url(#crosshatch)"/>
-  <!-- Right page -->
-  <path d="M 400 160 Q 450 155 520 180 L 520 320 Q 460 300 400 320" 
-        fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
-  <!-- Text lines on left page -->
-  <line x1="300" y1="210" x2="380" y2="200" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="300" y1="225" x2="380" y2="215" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="300" y1="240" x2="375" y2="230" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="300" y1="255" x2="370" y2="248" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="300" y1="270" x2="365" y2="263" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <!-- Text lines on right page -->
-  <line x1="420" y1="200" x2="500" y2="210" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="420" y1="215" x2="500" y2="225" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="420" y1="230" x2="500" y2="240" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <!-- Knowledge rays -->
-  <line x1="400" y1="145" x2="400" y2="100" stroke="#2d2d2d" stroke-width="0.8" opacity="0.4"/>
-  <line x1="400" y1="145" x2="360" y2="105" stroke="#2d2d2d" stroke-width="0.8" opacity="0.3"/>
-  <line x1="400" y1="145" x2="440" y2="105" stroke="#2d2d2d" stroke-width="0.8" opacity="0.3"/>
-  <line x1="400" y1="145" x2="330" y2="115" stroke="#2d2d2d" stroke-width="0.6" opacity="0.2"/>
-  <line x1="400" y1="145" x2="470" y2="115" stroke="#2d2d2d" stroke-width="0.6" opacity="0.2"/>
+  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
+  <!-- Book spine -->
+  <line x1="400" y1="120" x2="400" y2="360" stroke="#1a1a1a" stroke-width="3"/>
+  <!-- Left page -->
+  <path d="M 400 130 Q 350 120 200 140 L 200 350 Q 350 330 400 350 Z" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3"/>
+  <!-- Right page -->
+  <path d="M 400 130 Q 450 120 600 140 L 600 350 Q 450 330 400 350 Z" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3"/>
+  <!-- Left text lines -->
+  <line x1="240" y1="185" x2="370" y2="175" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="240" y1="210" x2="370" y2="200" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="240" y1="235" x2="370" y2="225" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="240" y1="260" x2="350" y2="250" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="240" y1="285" x2="370" y2="275" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <!-- Right text lines -->
+  <line x1="430" y1="175" x2="560" y2="185" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="430" y1="200" x2="560" y2="210" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="430" y1="225" x2="560" y2="235" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="430" y1="250" x2="540" y2="260" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <line x1="430" y1="275" x2="560" y2="285" stroke="#1a1a1a" stroke-width="1.5" opacity="0.6"/>
+  <!-- Bookmark ribbon -->
+  <path d="M 395 120 L 395 90 L 380 105 L 395 120" fill="none" stroke="#1a1a1a" stroke-width="2"/>
 </svg>

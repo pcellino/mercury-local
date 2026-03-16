@@ -1,35 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
-    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
     </pattern>
-    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
-      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
+      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
     </pattern>
-    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
     </pattern>
+    
   </defs>
-  <rect width="800" height="450" fill="#f5f0e8"/>
+  <!-- Background -->
+  <rect width="800" height="450" fill="#ece6d9"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  
-  <!-- Ballot box -->
-  <rect x="300" y="200" width="200" height="160" rx="3" fill="none" stroke="#2d2d2d" stroke-width="2"/>
-  <rect x="300" y="200" width="200" height="160" rx="3" fill="url(#hatch-dense)"/>
-  <!-- Slot -->
-  <rect x="365" y="195" width="70" height="10" rx="2" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.5"/>
-  <!-- Ballot paper going in -->
-  <rect x="375" y="120" width="50" height="85" rx="1" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.2"/>
-  <!-- Checkmark on ballot -->
-  <polyline points="388,150 395,162 410,140" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
-  <!-- Lines on ballot -->
-  <line x1="385" y1="170" x2="415" y2="170" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <line x1="385" y1="180" x2="415" y2="180" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
-  <!-- Stars decoration -->
-  <circle cx="320" cy="220" r="3" fill="none" stroke="#2d2d2d" stroke-width="0.8"/>
-  <circle cx="480" cy="220" r="3" fill="none" stroke="#2d2d2d" stroke-width="0.8"/>
-  <!-- Lid -->
-  <path d="M 295 200 L 505 200" stroke="#2d2d2d" stroke-width="2.5"/>
+  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
+  <!-- Ballot box -->
+  <rect x="270" y="180" width="260" height="210" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3.5"/>
+  <!-- Box lid -->
+  <path d="M 255 180 L 545 180 L 560 155 L 240 155 Z" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- Slot -->
+  <rect x="350" y="162" width="100" height="8" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- Ballot paper going in -->
+  <rect x="365" y="100" width="70" height="70" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5" transform="rotate(-5,400,135)"/>
+  <!-- Checkmark on ballot -->
+  <polyline points="380,130 395,145 420,115" fill="none" stroke="#1a1a1a" stroke-width="3" transform="rotate(-5,400,135)"/>
+  <!-- Stars decoration -->
+  <circle cx="320" cy="280" r="6" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="400" cy="280" r="6" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="480" cy="280" r="6" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Stripe lines -->
+  <line x1="290" y1="320" x2="510" y2="320" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="290" y1="340" x2="510" y2="340" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="290" y1="360" x2="510" y2="360" stroke="#1a1a1a" stroke-width="2"/>
 </svg>

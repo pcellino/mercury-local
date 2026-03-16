@@ -20,13 +20,16 @@ export default function BeatIllustration({ beat, className = "" }: BeatIllustrat
     : "/beats/default.svg";
 
   return (
-    <img
-      src={src}
-      alt=""
-      role="presentation"
-      loading="lazy"
-      decoding="async"
-      className={className}
-    />
+    <div className={`relative ${className}`}>
+      <img
+        src={src}
+        alt=""
+        role="presentation"
+        loading="lazy"
+        decoding="async"
+        className="w-full h-auto border border-gray-300"
+        style={{ minHeight: "120px" }}
+      />
+    </div>
   );
 }

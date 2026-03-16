@@ -1,36 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
-    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
     </pattern>
-    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
-      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
+      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
     </pattern>
-    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
     </pattern>
+    
   </defs>
-  <rect width="800" height="450" fill="#f5f0e8"/>
+  <!-- Background -->
+  <rect width="800" height="450" fill="#ece6d9"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  
-  <!-- Happy mask -->
-  <ellipse cx="330" cy="210" rx="80" ry="95" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
-  <ellipse cx="330" cy="210" rx="80" ry="95" fill="url(#crosshatch)"/>
-  <!-- Happy eyes -->
-  <ellipse cx="305" cy="185" rx="12" ry="8" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
-  <ellipse cx="355" cy="185" rx="12" ry="8" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
-  <!-- Happy mouth -->
-  <path d="M 300 240 Q 330 275 360 240" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
-  <!-- Sad mask (overlapping) -->
-  <ellipse cx="470" cy="220" rx="80" ry="95" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.8"/>
-  <ellipse cx="470" cy="220" rx="80" ry="95" fill="url(#hatch-dense)"/>
-  <!-- Sad eyes -->
-  <path d="M 433 190 Q 445 180 457 190" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
-  <path d="M 483 190 Q 495 180 507 190" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
-  <!-- Sad mouth -->
-  <path d="M 440 265 Q 470 245 500 265" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
-  <!-- Ribbons -->
-  <path d="M 330 115 Q 400 90 470 125" fill="none" stroke="#2d2d2d" stroke-width="1" stroke-dasharray="3,2"/>
+  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
+  <!-- Happy mask -->
+  <ellipse cx="320" cy="220" rx="110" ry="130" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3" transform="rotate(-10,320,220)"/>
+  <ellipse cx="290" cy="185" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
+  <ellipse cx="360" cy="180" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
+  <path d="M 275 250 Q 320 300 370 250" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+  <ellipse cx="325" cy="215" rx="15" ry="10" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Sad mask -->
+  <ellipse cx="490" cy="225" rx="110" ry="130" fill="url(#hatch)" stroke="#1a1a1a" stroke-width="3" transform="rotate(10,490,225)"/>
+  <ellipse cx="460" cy="190" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
+  <ellipse cx="530" cy="195" rx="22" ry="16" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2.5"/>
+  <path d="M 445 280 Q 490 240 540 280" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+  <ellipse cx="495" cy="225" rx="15" ry="10" fill="#ece6d9" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Ribbons -->
+  <path d="M 380 120 Q 400 80 420 120" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
 </svg>

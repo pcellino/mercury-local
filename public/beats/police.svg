@@ -1,34 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
-    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    <pattern id="crosshatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width="1" opacity="0.3"/>
     </pattern>
-    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
-      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.7" fill="#1a1a1a" opacity="0.25"/>
+      <circle cx="4" cy="4" r="0.5" fill="#1a1a1a" opacity="0.2"/>
     </pattern>
-    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
     </pattern>
+    
   </defs>
-  <rect width="800" height="450" fill="#f5f0e8"/>
+  <!-- Background -->
+  <rect width="800" height="450" fill="#ece6d9"/>
   <rect width="800" height="450" fill="url(#stipple)"/>
-  
-  <!-- Shield outline -->
-  <path d="M 400 100 L 480 140 L 490 220 L 450 300 L 400 340 L 350 300 L 310 220 L 320 140 Z" 
-        fill="none" stroke="#2d2d2d" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M 400 100 L 480 140 L 490 220 L 450 300 L 400 340 L 350 300 L 310 220 L 320 140 Z" 
-        fill="url(#crosshatch)"/>
-  <!-- Inner shield -->
-  <path d="M 400 130 L 460 158 L 468 220 L 435 280 L 400 310 L 365 280 L 332 220 L 340 158 Z" 
-        fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
-  <!-- Star -->
-  <polygon points="400,160 408,190 440,190 414,208 423,238 400,220 377,238 386,208 360,190 392,190" 
-           fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
-  <polygon points="400,160 408,190 440,190 414,208 423,238 400,220 377,238 386,208 360,190 392,190" 
-           fill="url(#stipple)"/>
-  <!-- Decorative lines -->
-  <line x1="350" y1="260" x2="450" y2="260" stroke="#2d2d2d" stroke-width="0.8"/>
-  <line x1="360" y1="270" x2="440" y2="270" stroke="#2d2d2d" stroke-width="0.6"/>
+  <rect x="1" y="1" width="798" height="448" fill="none" stroke="#1a1a1a" stroke-width="2" opacity="0.3"/>
 
+  <!-- Shield shape -->
+  <path d="M 400 90 L 480 140 L 500 250 L 400 370 L 300 250 L 320 140 Z" fill="url(#crosshatch)" stroke="#1a1a1a" stroke-width="3.5"/>
+  <!-- Inner shield -->
+  <path d="M 400 120 L 460 158 L 475 245 L 400 340 L 325 245 L 340 158 Z" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Star -->
+  <polygon points="400,155 415,205 465,205 425,235 440,285 400,258 360,285 375,235 335,205 385,205" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+  <polygon points="400,155 415,205 465,205 425,235 440,285 400,258 360,285 375,235 335,205 385,205" fill="url(#hatch)"/>
+  <!-- Inner star circle -->
+  <circle cx="400" cy="225" r="25" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Badge text lines -->
+  <line x1="375" y1="310" x2="425" y2="310" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="382" y1="322" x2="418" y2="322" stroke="#1a1a1a" stroke-width="1.5"/>
 </svg>
