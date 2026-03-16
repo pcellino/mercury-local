@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Stem -->
+  <path d="M 400 350 Q 400 280 380 220 Q 365 170 400 130" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
+  <!-- Left leaf -->
+  <path d="M 380 220 Q 300 180 280 140 Q 320 140 380 220" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <path d="M 380 220 Q 300 180 280 140 Q 320 140 380 220" fill="url(#crosshatch)"/>
+  <path d="M 380 220 Q 340 190 280 140" fill="none" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <!-- Right leaf -->
+  <path d="M 390 190 Q 470 140 500 110 Q 460 150 390 190" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <path d="M 390 190 Q 470 140 500 110 Q 460 150 390 190" fill="url(#hatch-dense)"/>
+  <!-- Top leaf -->
+  <path d="M 400 130 Q 370 80 400 50 Q 430 80 400 130" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <path d="M 400 130 Q 370 80 400 50 Q 430 80 400 130" fill="url(#stipple)"/>
+  <line x1="400" y1="50" x2="400" y2="130" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <!-- Small right leaf -->
+  <path d="M 395 260 Q 440 240 460 220 Q 430 250 395 260" fill="none" stroke="#2d2d2d" stroke-width="1"/>
+  <!-- Root area -->
+  <ellipse cx="400" cy="360" rx="30" ry="8" fill="none" stroke="#2d2d2d" stroke-width="0.8" opacity="0.4"/>
+
+</svg>

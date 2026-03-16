@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Stadium bowl -->
+  <path d="M 200 300 Q 200 180 400 160 Q 600 180 600 300" fill="none" stroke="#2d2d2d" stroke-width="2"/>
+  <path d="M 200 300 Q 200 180 400 160 Q 600 180 600 300" fill="url(#crosshatch)"/>
+  <!-- Upper rim -->
+  <path d="M 180 290 Q 180 160 400 140 Q 620 160 620 290" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <!-- Field -->
+  <ellipse cx="400" cy="310" rx="160" ry="40" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Field lines -->
+  <line x1="400" y1="270" x2="400" y2="350" stroke="#2d2d2d" stroke-width="0.6" opacity="0.3"/>
+  <ellipse cx="400" cy="310" rx="40" ry="10" fill="none" stroke="#2d2d2d" stroke-width="0.6" opacity="0.3"/>
+  <!-- Floodlights -->
+  <line x1="220" y1="190" x2="220" y2="120" stroke="#2d2d2d" stroke-width="1.5"/>
+  <rect x="210" y="110" width="20" height="12" fill="none" stroke="#2d2d2d" stroke-width="1"/>
+  <line x1="580" y1="190" x2="580" y2="120" stroke="#2d2d2d" stroke-width="1.5"/>
+  <rect x="570" y="110" width="20" height="12" fill="none" stroke="#2d2d2d" stroke-width="1"/>
+  <!-- Light rays -->
+  <line x1="220" y1="122" x2="300" y2="250" stroke="#2d2d2d" stroke-width="0.3" opacity="0.2"/>
+  <line x1="580" y1="122" x2="500" y2="250" stroke="#2d2d2d" stroke-width="0.3" opacity="0.2"/>
+
+</svg>

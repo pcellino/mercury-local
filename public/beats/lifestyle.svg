@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Cup body -->
+  <path d="M 310 200 L 320 330 Q 400 350 480 330 L 490 200" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
+  <path d="M 310 200 L 320 330 Q 400 350 480 330 L 490 200" fill="url(#crosshatch)"/>
+  <!-- Cup rim -->
+  <ellipse cx="400" cy="200" rx="90" ry="18" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Handle -->
+  <path d="M 490 230 Q 540 230 540 270 Q 540 310 490 310" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Steam -->
+  <path d="M 370 170 Q 365 150 375 130 Q 385 110 375 90" fill="none" stroke="#2d2d2d" stroke-width="0.8" opacity="0.4"/>
+  <path d="M 400 165 Q 395 140 405 120 Q 415 100 405 80" fill="none" stroke="#2d2d2d" stroke-width="0.8" opacity="0.4"/>
+  <path d="M 430 170 Q 425 150 435 130 Q 445 110 435 90" fill="none" stroke="#2d2d2d" stroke-width="0.8" opacity="0.4"/>
+  <!-- Saucer -->
+  <ellipse cx="400" cy="350" rx="110" ry="20" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+
+</svg>

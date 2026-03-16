@@ -7,6 +7,7 @@ import {
 } from "@/lib/queries";
 import Link from "next/link";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
+import BeatIllustration from "@/components/BeatIllustration";
 
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 
@@ -42,7 +43,7 @@ export default async function HomePage() {
         <section className="pb-6 mb-6 border-b border-mercury-rule">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Lead headline + excerpt */}
-            <div className={lead.hero_image_url ? "md:col-span-7" : "md:col-span-12"}>
+            <div className="md:col-span-7">
               {lead.beat && (
                 <Link
                   href={`/${lead.beat}`}
@@ -75,18 +76,20 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* Lead image */}
-            {lead.hero_image_url && (
-              <div className="md:col-span-5">
-                <Link href={`/${lead.beat}/${lead.slug}`}>
+            {/* Lead image or beat illustration */}
+            <div className="md:col-span-5">
+              <Link href={`/${lead.beat}/${lead.slug}`}>
+                {lead.hero_image_url ? (
                   <img
                     src={lead.hero_image_url}
                     alt={lead.hero_image_alt || ""}
                     className="w-full h-64 md:h-80 object-cover"
                   />
-                </Link>
-              </div>
-            )}
+                ) : (
+                  <BeatIllustration beat={lead.beat} className="w-full h-64 md:h-80 object-cover" />
+                )}
+              </Link>
+            </div>
           </div>
         </section>
       )}
@@ -142,16 +145,18 @@ export default async function HomePage() {
               key={post.id}
               className={`pb-5 mb-5 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
-              {post.hero_image_url && (
-                <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
+              <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
+                {post.hero_image_url ? (
                   <img
                     src={post.hero_image_url}
                     alt={post.hero_image_alt || ""}
                     className="w-full h-40 object-cover"
                     loading="lazy"
                   />
-                </Link>
-              )}
+                ) : (
+                  <BeatIllustration beat={post.beat} className="w-full h-40 object-cover" />
+                )}
+              </Link>
               {post.beat && (
                 <Link
                   href={`/${post.beat}`}
@@ -189,16 +194,18 @@ export default async function HomePage() {
               key={post.id}
               className={`pb-5 mb-5 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
-              {post.hero_image_url && (
-                <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
+              <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
+                {post.hero_image_url ? (
                   <img
                     src={post.hero_image_url}
                     alt={post.hero_image_alt || ""}
                     className="w-full h-40 object-cover"
                     loading="lazy"
                   />
-                </Link>
-              )}
+                ) : (
+                  <BeatIllustration beat={post.beat} className="w-full h-40 object-cover" />
+                )}
+              </Link>
               {post.beat && (
                 <Link
                   href={`/${post.beat}`}

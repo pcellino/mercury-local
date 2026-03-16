@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Inkwell -->
+  <ellipse cx="350" cy="310" rx="50" ry="18" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+  <path d="M 300 310 L 300 280 Q 300 260 350 260 Q 400 260 400 280 L 400 310" 
+        fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+  <path d="M 300 310 L 300 280 Q 300 260 350 260 Q 400 260 400 280 L 400 310" 
+        fill="url(#hatch-dense)"/>
+  <!-- Quill feather -->
+  <path d="M 370 280 Q 420 200 500 110" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
+  <path d="M 500 110 Q 510 100 520 95 Q 500 115 490 140 Q 485 150 480 145 
+           Q 490 130 495 115 Q 480 135 470 155 Q 465 160 460 158 
+           Q 475 140 485 120 Q 465 145 455 170" 
+        fill="none" stroke="#2d2d2d" stroke-width="0.8"/>
+  <!-- Feather spine -->
+  <line x1="370" y1="280" x2="510" y2="105" stroke="#2d2d2d" stroke-width="1"/>
+  <!-- Feather barbs -->
+  <line x1="420" y1="230" x2="440" y2="215" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <line x1="435" y1="210" x2="455" y2="195" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <line x1="450" y1="190" x2="470" y2="175" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <line x1="460" y1="175" x2="480" y2="160" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <line x1="420" y1="230" x2="400" y2="220" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <line x1="440" y1="205" x2="420" y2="200" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <line x1="455" y1="185" x2="435" y2="182" stroke="#2d2d2d" stroke-width="0.5" opacity="0.4"/>
+  <!-- Ink drops -->
+  <circle cx="360" cy="340" r="4" fill="none" stroke="#2d2d2d" stroke-width="0.8"/>
+  <circle cx="375" cy="348" r="2.5" fill="#2d2d2d" opacity="0.3"/>
+
+</svg>

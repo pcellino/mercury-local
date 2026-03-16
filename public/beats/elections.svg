@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Ballot box -->
+  <rect x="300" y="200" width="200" height="160" rx="3" fill="none" stroke="#2d2d2d" stroke-width="2"/>
+  <rect x="300" y="200" width="200" height="160" rx="3" fill="url(#hatch-dense)"/>
+  <!-- Slot -->
+  <rect x="365" y="195" width="70" height="10" rx="2" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Ballot paper going in -->
+  <rect x="375" y="120" width="50" height="85" rx="1" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.2"/>
+  <!-- Checkmark on ballot -->
+  <polyline points="388,150 395,162 410,140" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
+  <!-- Lines on ballot -->
+  <line x1="385" y1="170" x2="415" y2="170" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
+  <line x1="385" y1="180" x2="415" y2="180" stroke="#2d2d2d" stroke-width="0.6" opacity="0.5"/>
+  <!-- Stars decoration -->
+  <circle cx="320" cy="220" r="3" fill="none" stroke="#2d2d2d" stroke-width="0.8"/>
+  <circle cx="480" cy="220" r="3" fill="none" stroke="#2d2d2d" stroke-width="0.8"/>
+  <!-- Lid -->
+  <path d="M 295 200 L 505 200" stroke="#2d2d2d" stroke-width="2.5"/>
+
+</svg>

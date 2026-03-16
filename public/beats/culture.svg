@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Happy mask -->
+  <ellipse cx="330" cy="210" rx="80" ry="95" fill="none" stroke="#2d2d2d" stroke-width="1.8"/>
+  <ellipse cx="330" cy="210" rx="80" ry="95" fill="url(#crosshatch)"/>
+  <!-- Happy eyes -->
+  <ellipse cx="305" cy="185" rx="12" ry="8" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <ellipse cx="355" cy="185" rx="12" ry="8" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <!-- Happy mouth -->
+  <path d="M 300 240 Q 330 275 360 240" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Sad mask (overlapping) -->
+  <ellipse cx="470" cy="220" rx="80" ry="95" fill="#f5f0e8" stroke="#2d2d2d" stroke-width="1.8"/>
+  <ellipse cx="470" cy="220" rx="80" ry="95" fill="url(#hatch-dense)"/>
+  <!-- Sad eyes -->
+  <path d="M 433 190 Q 445 180 457 190" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <path d="M 483 190 Q 495 180 507 190" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <!-- Sad mouth -->
+  <path d="M 440 265 Q 470 245 500 265" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Ribbons -->
+  <path d="M 330 115 Q 400 90 470 125" fill="none" stroke="#2d2d2d" stroke-width="1" stroke-dasharray="3,2"/>
+
+</svg>

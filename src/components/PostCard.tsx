@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Post, PostWithAuthor } from "@/lib/types";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
+import BeatIllustration from "./BeatIllustration";
 
 interface PostCardProps {
   post: Post | PostWithAuthor;
@@ -82,9 +83,9 @@ export default function PostCard({ post, showBeat = false, compact = false }: Po
           </p>
         </div>
 
-        {/* Thumbnail */}
-        {post.hero_image_url && (
-          <Link href={href} className="flex-shrink-0 hidden sm:block">
+        {/* Thumbnail — hero image or beat illustration */}
+        <Link href={href} className="flex-shrink-0 hidden sm:block">
+          {post.hero_image_url ? (
             <img
               src={post.hero_image_url}
               alt={post.hero_image_alt || ""}
@@ -92,8 +93,10 @@ export default function PostCard({ post, showBeat = false, compact = false }: Po
               decoding="async"
               className="w-32 h-24 object-cover"
             />
-          </Link>
-        )}
+          ) : (
+            <BeatIllustration beat={post.beat} className="w-32 h-24 object-cover" />
+          )}
+        </Link>
       </div>
     </article>
   );

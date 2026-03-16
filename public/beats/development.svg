@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <pattern id="crosshatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#2d2d2d" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+    <pattern id="stipple" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#2d2d2d" opacity="0.2"/>
+      <circle cx="4" cy="4" r="0.3" fill="#2d2d2d" opacity="0.15"/>
+    </pattern>
+    <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#2d2d2d" stroke-width="0.4" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#f5f0e8"/>
+  <rect width="800" height="450" fill="url(#stipple)"/>
+  
+  <!-- Main tower -->
+  <rect x="310" y="100" width="30" height="280" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+  <!-- Cross bracing in tower -->
+  <line x1="310" y1="100" x2="340" y2="150" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="340" y1="100" x2="310" y2="150" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="310" y1="150" x2="340" y2="200" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="340" y1="150" x2="310" y2="200" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="310" y1="200" x2="340" y2="250" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="340" y1="200" x2="310" y2="250" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="310" y1="250" x2="340" y2="300" stroke="#2d2d2d" stroke-width="0.6"/>
+  <line x1="340" y1="250" x2="310" y2="300" stroke="#2d2d2d" stroke-width="0.6"/>
+  <!-- Boom arm -->
+  <line x1="325" y1="105" x2="560" y2="105" stroke="#2d2d2d" stroke-width="2"/>
+  <!-- Counter arm -->
+  <line x1="325" y1="105" x2="220" y2="105" stroke="#2d2d2d" stroke-width="2"/>
+  <!-- Counterweight -->
+  <rect x="205" y="105" width="30" height="25" fill="url(#hatch-dense)" stroke="#2d2d2d" stroke-width="1.2"/>
+  <!-- Cables -->
+  <line x1="325" y1="85" x2="560" y2="105" stroke="#2d2d2d" stroke-width="0.8"/>
+  <line x1="325" y1="85" x2="220" y2="105" stroke="#2d2d2d" stroke-width="0.8"/>
+  <!-- Cab -->
+  <rect x="315" y="300" width="20" height="20" fill="none" stroke="#2d2d2d" stroke-width="1"/>
+  <!-- Hook cable -->
+  <line x1="520" y1="105" x2="520" y2="220" stroke="#2d2d2d" stroke-width="0.8"/>
+  <!-- Hook -->
+  <path d="M 515 220 L 525 220 L 525 240 Q 520 250 515 240 Z" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
+  <!-- Building under construction -->
+  <rect x="440" y="280" width="120" height="100" fill="none" stroke="#2d2d2d" stroke-width="1" stroke-dasharray="4,3"/>
+  <rect x="440" y="280" width="120" height="100" fill="url(#stipple)"/>
+  <!-- Ground -->
+  <line x1="190" y1="380" x2="600" y2="380" stroke="#2d2d2d" stroke-width="1"/>
+
+</svg>

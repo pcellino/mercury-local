@@ -10,6 +10,7 @@ import {
   decodeHtmlEntities,
 } from "@/lib/content";
 import { generateArticleJsonLd, generateBreadcrumbJsonLd } from "@/lib/jsonld";
+import BeatIllustration from "@/components/BeatIllustration";
 
 export const revalidate = 600; // ISR: 10 min
 
@@ -159,9 +160,9 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
         </header>
 
-        {/* ---- HERO IMAGE ---- */}
-        {post.hero_image_url && (
-          <figure className="mb-8">
+        {/* ---- HERO IMAGE OR EDITORIAL ILLUSTRATION ---- */}
+        <figure className="mb-8">
+          {post.hero_image_url ? (
             <img
               src={post.hero_image_url}
               alt={post.hero_image_alt || ""}
@@ -169,13 +170,15 @@ export default async function PostPage({ params }: PostPageProps) {
               loading="eager"
               decoding="async"
             />
-            {post.hero_image_alt && (
-              <figcaption className="text-xs text-mercury-muted mt-2 font-sans">
-                {post.hero_image_alt}
-              </figcaption>
-            )}
-          </figure>
-        )}
+          ) : (
+            <BeatIllustration beat={post.beat} className="w-full max-h-80 object-contain" />
+          )}
+          {post.hero_image_alt && (
+            <figcaption className="text-xs text-mercury-muted mt-2 font-sans">
+              {post.hero_image_alt}
+            </figcaption>
+          )}
+        </figure>
 
         {/* ---- ARTICLE BODY ---- */}
         <div
