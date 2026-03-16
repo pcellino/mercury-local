@@ -131,11 +131,11 @@ export default async function RootLayout({
             <div className="mt-8 pt-4 border-t border-mercury-rule text-xs text-mercury-muted font-sans flex flex-col md:flex-row justify-between">
               <p>&copy; {new Date().getFullYear()} Mercury Local, LLC. All rights reserved.</p>
               <p className="mt-1 md:mt-0">
-                <Link href="/about" className="hover:text-mercury-ink">About</Link>
+                <Link href="/page/about" className="hover:text-mercury-ink">About</Link>
                 <span className="mx-2">|</span>
-                <Link href="/contact" className="hover:text-mercury-ink">Contact</Link>
+                <Link href="/page/contact" className="hover:text-mercury-ink">Contact</Link>
                 <span className="mx-2">|</span>
-                <Link href="/privacy" className="hover:text-mercury-ink">Privacy</Link>
+                <Link href="/page/privacy" className="hover:text-mercury-ink">Privacy</Link>
               </p>
             </div>
           </div>
