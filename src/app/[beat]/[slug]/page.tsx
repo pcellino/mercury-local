@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPostByBeatAndSlug, getBeatsForPublication, getPostsByBeatWithAuthors } from "@/lib/queries";
+import {
+  getPostByBeatAndSlug,
+  getBeatsForPublication,
+  getPostsByBeatWithAuthors
+} from "@/lib/queries";
 import {
   sanitizeContent,
   formatDate,
@@ -37,10 +41,14 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   return {
     title: decodeHtmlEntities(title),
     description: decodeHtmlEntities(description),
+    alternates: {
+      canonical: `/${beat}/${slug}`,
+    },
     openGraph: {
       title: decodeHtmlEntities(title),
       description: decodeHtmlEntities(description),
       type: "article",
+      url: `/${beat}/${slug}`,
       publishedTime: post.pub_date || undefined,
       authors: post.author?.name ? [post.author.name] : undefined,
       images: post.hero_image_url ? [post.hero_image_url] : undefined,
@@ -97,7 +105,10 @@ export default async function PostPage({ params }: PostPageProps) {
 
       <article className="max-w-3xl mx-auto">
         {/* ---- BREADCRUMBS ---- */}
-        <nav className="text-xs text-mercury-muted mb-6 font-sans uppercase tracking-wide" aria-label="Breadcrumb">
+        <nav
+          className="text-xs text-mercury-muted mb-6 font-sans uppercase tracking-wide"
+          aria-label="Breadcrumb"
+        >
           <Link href="/" className="hover:text-mercury-ink">
             Home
           </Link>
@@ -115,17 +126,14 @@ export default async function PostPage({ params }: PostPageProps) {
           >
             {beatConfig?.label || beat}
           </Link>
-
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-3 leading-[1.1] tracking-tight">
             {decodeHtmlEntities(post.title)}
           </h1>
-
           {post.excerpt && (
             <p className="text-lg text-mercury-muted mt-4 font-serif leading-relaxed">
               {decodeHtmlEntities(post.excerpt.replace(/<[^>]*>/g, "").slice(0, 300))}
             </p>
           )}
-
           <div className="flex items-center gap-3 mt-5 pt-4 border-t border-mercury-rule text-sm text-mercury-muted font-sans">
             {post.author && (
               <>
@@ -171,7 +179,10 @@ export default async function PostPage({ params }: PostPageProps) {
               decoding="async"
             />
           ) : (
-            <BeatIllustration beat={post.beat} className="w-full max-h-80 object-contain" />
+            <BeatIllustration
+              beat={post.beat}
+              className="w-full max-h-80 object-contain"
+            />
           )}
           {post.hero_image_alt && (
             <figcaption className="text-xs text-mercury-muted mt-2 font-sans">
