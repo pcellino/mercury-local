@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------------------------------
+   Mercury Local — Base typography
+   ------------------------------------------------------- */
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-mercury-paper text-mercury-ink;
+  }
+
+  /* Article content styling */
+  .article-content {
+    @apply leading-relaxed text-lg;
+  }
+
+  .article-content p {
+    @apply mb-5;
+  }
+
+  .article-content h2 {
+    @apply text-2xl font-bold font-serif mt-10 mb-4;
+  }
+
+  .article-content h3 {
+    @apply text-xl font-bold font-serif mt-8 mb-3;
+  }
+
+  .article-content a {
+    @apply text-mercury-accent underline underline-offset-2 hover:no-underline;
+  }
+
+  .article-content img {
+    @apply rounded-lg my-6 w-full;
+  }
+
+  .article-content blockquote {
+    @apply border-l-4 border-mercury-accent pl-4 italic my-6 text-mercury-muted;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    @apply mb-5 pl-6;
+  }
+
+  .article-content li {
+    @apply mb-2;
+  }
+
+  .article-content figure {
+    @apply my-6;
+  }
+
+  .article-content figcaption {
+    @apply text-sm text-mercury-muted mt-2 text-center;
+  }
+}
