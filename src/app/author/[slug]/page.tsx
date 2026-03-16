@@ -5,7 +5,7 @@ import { getAuthorBySlug, getPostsByAuthor } from "@/lib/queries";
 import { generatePersonJsonLd } from "@/lib/jsonld";
 import PostCard from "@/components/PostCard";
 
-export const revalidate = 3600; // ISR: 1 hour
+export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
 interface AuthorPageProps {
   params: Promise<{ slug: string }>;
@@ -14,11 +14,22 @@ interface AuthorPageProps {
 export async function generateMetadata({ params }: AuthorPageProps): Promise<Metadata> {
   const { slug } = await params;
   const author = await getAuthorBySlug(slug);
+
   if (!author) return {};
 
   return {
     title: author.name,
     description: author.bio || `Articles by ${author.name}`,
+    alternates: {
+      canonical: `/author/${slug}`,
+    },
+    openGraph: {
+      title: author.name,
+      description: author.bio || `Articles by ${author.name}`,
+      url: `/author/${slug}`,
+      type: "profile",
+      images: author.avatar_url ? [author.avatar_url] : undefined,
+    },
   };
 }
 
@@ -30,7 +41,6 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
   if (!author) notFound();
 
   const posts = await getPostsByAuthor(author.id, publication.id, 100);
-
   const personJsonLd = generatePersonJsonLd(author, publication);
 
   return (
