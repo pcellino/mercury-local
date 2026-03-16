@@ -10,7 +10,7 @@ import {
   decodeHtmlEntities,
 } from "@/lib/content";
 
-export const revalidate = 600; // ISR: 10 min
+export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -28,9 +28,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: decodeHtmlEntities(page.title),
+    alternates: {
+      canonical: `/page/${slug}`,
+    },
     openGraph: {
       title: decodeHtmlEntities(page.title),
       type: "website",
+      url: `/page/${slug}`,
     },
   };
 }
@@ -67,7 +71,6 @@ export default async function StaticPage({ params }: PageProps) {
         <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
           {decodeHtmlEntities(page.title)}
         </h1>
-
         {(page.pub_date || readingTime > 1) && (
           <div className="flex items-center gap-3 mt-5 pt-4 border-t border-mercury-rule text-sm text-mercury-muted font-sans">
             {page.pub_date && (
