@@ -7,6 +7,7 @@
  * When adding a new publication or domain, update this map and both
  * consumers will pick it up automatically.
  */
+
 export const DOMAIN_MAP: Record<string, string> = {
   // Production domains
   "cltmercury.com": "charlotte-mercury",
@@ -34,4 +35,23 @@ export const DEFAULT_SLUG = "charlotte-mercury";
 export function resolveSlug(hostname: string): string {
   const cleanHost = hostname.replace(/:\d+$/, "");
   return DOMAIN_MAP[hostname] || DOMAIN_MAP[cleanHost] || DEFAULT_SLUG;
+}
+
+/**
+ * Canonical domain for each publication slug.
+ * Used to generate canonical URLs and OG meta tags.
+ */
+export const CANONICAL_DOMAINS: Record<string, string> = {
+  "charlotte-mercury": "cltmercury.com",
+  "farmington-mercury": "farmingtonmercury.com",
+  "strolling-ballantyne": "strollingballantyne.com",
+};
+
+/**
+ * Get the canonical base URL for a publication.
+ * Falls back to the Vercel deployment URL for unknown slugs.
+ */
+export function getBaseUrl(slug: string): string {
+  const domain = CANONICAL_DOMAINS[slug];
+  return domain ? `https://${domain}` : "https://mercury-local.vercel.app";
 }
