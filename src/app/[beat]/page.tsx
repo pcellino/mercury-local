@@ -18,9 +18,20 @@ export async function generateMetadata({ params }: BeatPageProps): Promise<Metad
 
   if (!beatConfig) return {};
 
+  const description = `${beatConfig.description}. Coverage from ${publication.name}.`;
+
   return {
     title: beatConfig.label,
-    description: `${beatConfig.description}. Coverage from ${publication.name}.`,
+    description,
+    alternates: {
+      canonical: `/${beat}`,
+    },
+    openGraph: {
+      title: `${beatConfig.label} | ${publication.name}`,
+      description,
+      url: `/${beat}`,
+      type: "website",
+    },
   };
 }
 
