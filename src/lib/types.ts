@@ -34,8 +34,9 @@ export interface Publication {
   slug: string;
   domain: string | null;
   tagline: string | null;
-  description: string | null;
+  region: string | null;
   logo_url: string | null;
+  status: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -49,14 +50,18 @@ export interface Post {
   content: string | null;
   excerpt: string | null;
   status: string;
-  featured_image_url: string | null;
+  featured: boolean | null;
+  hero_image_url: string | null;
+  hero_image_alt: string | null;
   beat: string | null;
   seo_title: string | null;
   meta_description: string | null;
-  hero_image_alt: string | null;
-  published_at: string | null;
+  pub_date: string | null;
   created_at: string;
   updated_at: string;
+  source: string | null;
+  original_url: string | null;
+  wp_post_id: number | null;
 }
 
 export interface Author {
@@ -67,25 +72,25 @@ export interface Author {
   bio: string | null;
   credentials: string | null;
   avatar_url: string | null;
+  email: string | null;
   beat_description: string | null;
   created_at: string;
-  updated_at: string;
 }
 
 export interface Category {
   id: string;
-  publication_id: string;
+  publication_id: string | null;
   name: string;
   slug: string;
-  created_at: string;
+  description: string | null;
+  parent_id: string | null;
 }
 
 export interface Tag {
   id: string;
-  publication_id: string;
+  publication_id: string | null;
   name: string;
   slug: string;
-  created_at: string;
 }
 
 // -------------------------------------------------------
@@ -94,16 +99,6 @@ export interface Tag {
 
 export interface PostWithAuthor extends Post {
   author: Author | null;
-}
-
-export interface PostCard {
-  title: string;
-  slug: string;
-  beat: string;
-  excerpt: string | null;
-  featured_image_url: string | null;
-  published_at: string | null;
-  author_name: string | null;
 }
 
 // -------------------------------------------------------

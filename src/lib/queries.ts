@@ -62,7 +62,7 @@ export async function getPostsByBeat(
     .eq("publication_id", publicationId)
     .eq("beat", beat)
     .eq("status", "published")
-    .order("published_at", { ascending: false })
+    .order("pub_date", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) {
@@ -81,7 +81,7 @@ export async function getLatestPosts(
     .select("*")
     .eq("publication_id", publicationId)
     .eq("status", "published")
-    .order("published_at", { ascending: false })
+    .order("pub_date", { ascending: false })
     .limit(limit);
 
   if (error) {
@@ -89,6 +89,52 @@ export async function getLatestPosts(
     return [];
   }
   return data || [];
+}
+
+export async function getLatestPostsWithAuthors(
+  publicationId: string,
+  limit = 15
+): Promise<PostWithAuthor[]> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      author:authors(*)
+    `)
+    .eq("publication_id", publicationId)
+    .eq("status", "published")
+    .order("pub_date", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("getLatestPostsWithAuthors error:", error);
+    return [];
+  }
+  return (data || []) as PostWithAuthor[];
+}
+
+export async function getPostsByBeatWithAuthors(
+  publicationId: string,
+  beat: string,
+  limit = 25
+): Promise<PostWithAuthor[]> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      author:authors(*)
+    `)
+    .eq("publication_id", publicationId)
+    .eq("beat", beat)
+    .eq("status", "published")
+    .order("pub_date", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("getPostsByBeatWithAuthors error:", error);
+    return [];
+  }
+  return (data || []) as PostWithAuthor[];
 }
 
 export async function getPostCountByBeat(
@@ -163,7 +209,7 @@ export async function getPostsByAuthor(
     .eq("author_id", authorId)
     .eq("publication_id", publicationId)
     .eq("status", "published")
-    .order("published_at", { ascending: false })
+    .order("pub_date", { ascending: false })
     .limit(limit);
 
   if (error) {

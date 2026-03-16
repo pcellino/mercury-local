@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* -------------------------------------------------------
-   Mercury Local — Base typography
+   Mercury Local — Washington Post-inspired typography
    ------------------------------------------------------- */
 
 @layer base {
@@ -13,12 +13,20 @@
   }
 
   body {
-    @apply bg-mercury-paper text-mercury-ink;
+    @apply bg-white text-mercury-ink;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
   }
 
-  /* Article content styling */
+  /* No-underline utility for links */
+  a {
+    text-decoration: none;
+  }
+
+  /* Article content styling — classic newspaper feel */
   .article-content {
-    @apply leading-relaxed text-lg;
+    @apply leading-[1.75] text-lg;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #1a1a1a;
   }
 
   .article-content p {
@@ -26,11 +34,13 @@
   }
 
   .article-content h2 {
-    @apply text-2xl font-bold font-serif mt-10 mb-4;
+    font-family: "Playfair Display", Georgia, serif;
+    @apply text-2xl font-black mt-10 mb-4 tracking-tight;
   }
 
   .article-content h3 {
-    @apply text-xl font-bold font-serif mt-8 mb-3;
+    font-family: "Playfair Display", Georgia, serif;
+    @apply text-xl font-bold mt-8 mb-3;
   }
 
   .article-content a {
@@ -38,11 +48,13 @@
   }
 
   .article-content img {
-    @apply rounded-lg my-6 w-full;
+    @apply my-6 w-full;
   }
 
   .article-content blockquote {
-    @apply border-l-4 border-mercury-accent pl-4 italic my-6 text-mercury-muted;
+    @apply border-l-4 border-mercury-ink pl-5 italic my-6;
+    color: #374151;
+    font-family: "Playfair Display", Georgia, serif;
   }
 
   .article-content ul,
@@ -59,6 +71,19 @@
   }
 
   .article-content figcaption {
-    @apply text-sm text-mercury-muted mt-2 text-center;
+    @apply text-xs text-mercury-muted mt-2;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  /* Drop cap for first paragraph */
+  .article-content > p:first-of-type::first-letter {
+    float: left;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 4rem;
+    line-height: 0.8;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    font-weight: 900;
+    color: #1a1a1a;
   }
 }

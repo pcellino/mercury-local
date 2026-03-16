@@ -30,9 +30,9 @@ export function generateArticleJsonLd(
     description: post.meta_description
       ? decodeHtmlEntities(post.meta_description)
       : undefined,
-    image: post.featured_image_url ? [post.featured_image_url] : undefined,
-    datePublished: post.published_at || post.created_at,
-    dateModified: post.updated_at || post.published_at || post.created_at,
+    image: post.hero_image_url ? [post.hero_image_url] : undefined,
+    datePublished: post.pub_date || post.created_at,
+    dateModified: post.updated_at || post.pub_date || post.created_at,
     author: post.author
       ? {
           "@type": "Person",

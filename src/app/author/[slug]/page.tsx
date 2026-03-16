@@ -42,7 +42,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
 
       <div className="max-w-3xl mx-auto">
         {/* ---- AUTHOR HEADER ---- */}
-        <header className="mb-10 pb-8 border-b border-mercury-border">
+        <header className="mb-8 pb-6 border-b-2 border-mercury-ink">
           <div className="flex items-start gap-5">
             {author.avatar_url && (
               <img
@@ -52,14 +52,14 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
               />
             )}
             <div>
-              <h1 className="font-serif text-3xl font-bold">{author.name}</h1>
+              <h1 className="font-display text-3xl font-black tracking-tight">{author.name}</h1>
               {author.credentials && (
-                <p className="text-sm text-mercury-accent font-sans mt-1">
+                <p className="text-sm text-mercury-accent font-sans mt-1 font-semibold">
                   {author.credentials}
                 </p>
               )}
               {author.bio && (
-                <p className="text-mercury-muted mt-3 leading-relaxed">
+                <p className="text-mercury-muted mt-3 leading-relaxed font-serif">
                   {author.bio}
                 </p>
               )}
@@ -68,7 +68,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
         </header>
 
         {/* ---- ARTICLES BY THIS AUTHOR ---- */}
-        <h2 className="font-sans text-sm font-bold uppercase tracking-wider text-mercury-muted mb-6">
+        <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink mb-6">
           {posts.length} {posts.length === 1 ? "Article" : "Articles"}
         </h2>
 

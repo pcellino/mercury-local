@@ -8,18 +8,21 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        display: ['"Playfair Display"', "Georgia", "Cambria", "Times New Roman", "serif"],
         serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
         sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+        mono: ['"JetBrains Mono"', '"Fira Code"', "monospace"],
       },
       colors: {
         mercury: {
           ink: "#1a1a1a",
-          paper: "#fafaf8",
+          paper: "#ffffff",
           accent: "#c41e3a",
           muted: "#6b7280",
-          border: "#e5e5e5",
+          rule: "#d1d5db",
+          border: "#e5e7eb",
           highlight: "#fef3c7",
+          dark: "#111827",
         },
       },
       typography: {

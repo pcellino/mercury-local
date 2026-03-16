@@ -6,10 +6,6 @@ import { NextRequest, NextResponse } from "next/server";
  * Resolves the incoming hostname to a publication slug and injects it
  * as a request header (`x-publication-slug`) so every page/layout can
  * fetch the correct publication context without redundant lookups.
- *
- * Architecture:
- *   hostname → publication slug → header injection → App Router
- *   e.g. cltmercury.com → charlotte-mercury → x-publication-slug: charlotte-mercury
  */
 
 const DOMAIN_MAP: Record<string, string> = {
@@ -20,6 +16,9 @@ const DOMAIN_MAP: Record<string, string> = {
   "www.thefarmingtonmercury.com": "farmington-mercury",
   "strollingballantyne.com": "strolling-ballantyne",
   "www.strollingballantyne.com": "strolling-ballantyne",
+
+  // Vercel deployment
+  "mercury-local.vercel.app": "charlotte-mercury",
 
   // Local development — default to Charlotte Mercury
   "localhost": "charlotte-mercury",
