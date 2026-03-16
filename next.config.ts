@@ -14,13 +14,13 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         has: [{ type: "host", value: "wearefarmington.com" }],
-        destination: "https://thefarmingtonmercury.com/:path*",
+        destination: "https://farmingtonmercury.com/:path*",
         permanent: true,
       },
       {
         source: "/:path*",
         has: [{ type: "host", value: "www.wearefarmington.com" }],
-        destination: "https://thefarmingtonmercury.com/:path*",
+        destination: "https://farmingtonmercury.com/:path*",
         permanent: true,
       },
     ];
