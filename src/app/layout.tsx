@@ -1,18 +1,32 @@
 import type { Metadata } from "next";
 import { getPublicationFromRequest } from "@/lib/publication";
 import { getBeatsForPublication } from "@/lib/queries";
+import { getBaseUrl } from "@/lib/domains";
 import Link from "next/link";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { publication } = await getPublicationFromRequest();
+  const { publication, slug } = await getPublicationFromRequest();
+  const baseUrl = getBaseUrl(slug);
 
   return {
+    metadataBase: new URL(baseUrl),
     title: {
       default: publication.name,
       template: `%s | ${publication.name}`,
     },
     description: publication.tagline || `Local news from ${publication.name}`,
+    alternates: {
+      canonical: "/",
+    },
+    openGraph: {
+      siteName: publication.name,
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
   };
 }
 
@@ -77,9 +91,7 @@ export default async function RootLayout({
                   {i > 0 && <span className="text-mercury-rule mx-1 text-xs">|</span>}
                   <Link
                     href={`/${beat.slug}`}
-                    className="px-2 py-1 text-sm font-sans font-semibold text-mercury-ink
-                               hover:text-mercury-accent transition-colors
-                               whitespace-nowrap uppercase tracking-wide"
+                    className="px-2 py-1 text-sm font-sans font-semibold text-mercury-ink hover:text-mercury-accent transition-colors whitespace-nowrap uppercase tracking-wide"
                   >
                     {beat.label}
                   </Link>
@@ -104,7 +116,6 @@ export default async function RootLayout({
                   A Mercury Local publication. Independent, local journalism.
                 </p>
               </div>
-
               <div>
                 <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">Sections</p>
                 <div className="grid grid-cols-2 gap-1">
@@ -119,15 +130,14 @@ export default async function RootLayout({
                   ))}
                 </div>
               </div>
-
               <div>
                 <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">About</p>
                 <p className="text-sm text-mercury-muted font-sans leading-relaxed">
-                  Covering what matters in {publication.region || "your community"}. Built on shoe-leather reporting, not algorithms.
+                  Covering what matters in {publication.region || "your community"}.
+                  Built on shoe-leather reporting, not algorithms.
                 </p>
               </div>
             </div>
-
             <div className="mt-8 pt-4 border-t border-mercury-rule text-xs text-mercury-muted font-sans flex flex-col md:flex-row justify-between">
               <p>&copy; {new Date().getFullYear()} Mercury Local, LLC. All rights reserved.</p>
               <p className="mt-1 md:mt-0">
