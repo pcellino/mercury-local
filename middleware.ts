@@ -12,8 +12,8 @@ const DOMAIN_MAP: Record<string, string> = {
   // Production domains
   "cltmercury.com": "charlotte-mercury",
   "www.cltmercury.com": "charlotte-mercury",
-  "thefarmingtonmercury.com": "farmington-mercury",
-  "www.thefarmingtonmercury.com": "farmington-mercury",
+  "farmingtonmercury.com": "farmington-mercury",
+  "www.farmingtonmercury.com": "farmington-mercury",
   "strollingballantyne.com": "strolling-ballantyne",
   "www.strollingballantyne.com": "strolling-ballantyne",
 
