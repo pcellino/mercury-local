@@ -1,18 +1,43 @@
 /**
  * Content rendering pipeline.
  *
- * WordPress HTML → sanitized, optimized HTML for Next.js rendering.
- * Handles: image URL rewriting, lazy loading, link cleanup,
- * WordPress shortcode removal, and basic XSS prevention.
+ * Supports two content formats:
+ *   1. Markdown (new workflow) → converted to HTML via `marked`
+ *   2. WordPress HTML (legacy) → sanitized for safe rendering
+ *
+ * Auto-detects format based on presence of HTML block tags.
  */
 
+import { marked } from "marked";
+
 // -------------------------------------------------------
-// Sanitize WordPress HTML for safe rendering
+// Detect whether content is Markdown or HTML
 // -------------------------------------------------------
 
-export function sanitizeContent(html: string | null): string {
-  if (!html) return "";
+function isHtmlContent(content: string): boolean {
+  // If it contains block-level HTML tags, treat as HTML
+  return /<(p|h[1-6]|div|ul|ol|table|blockquote|figure|section|article)\b/i.test(content);
+}
 
+// -------------------------------------------------------
+// Convert Markdown → HTML
+// -------------------------------------------------------
+
+function renderMarkdown(md: string): string {
+  // Configure marked for editorial content
+  marked.setOptions({
+    gfm: true,       // GitHub-flavored markdown (tables, strikethrough, etc.)
+    breaks: false,    // Don't convert single newlines to <br> (editorial style)
+  });
+
+  return marked.parse(md) as string;
+}
+
+// -------------------------------------------------------
+// Sanitize HTML (legacy WordPress or post-markdown)
+// -------------------------------------------------------
+
+function sanitizeHtml(html: string): string {
   let clean = html;
 
   // Remove WordPress shortcodes [shortcode attr="val"]...[/shortcode]
@@ -37,10 +62,6 @@ export function sanitizeContent(html: string | null): string {
     '<img decoding="async" $1>'
   );
 
-  // Rewrite wp.com CDN image URLs if needed
-  // (Keeps them working but could swap to Supabase storage later)
-  // clean = clean.replace(/https:\/\/i\d\.wp\.com\//g, "/images/");
-
   // Strip script tags (XSS prevention)
   clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
 
@@ -48,6 +69,23 @@ export function sanitizeContent(html: string | null): string {
   clean = clean.replace(/\s*on\w+="[^"]*"/gi, "");
 
   return clean.trim();
+}
+
+// -------------------------------------------------------
+// Main entry point: auto-detect format and render to HTML
+// -------------------------------------------------------
+
+export function sanitizeContent(content: string | null): string {
+  if (!content) return "";
+
+  if (isHtmlContent(content)) {
+    // Legacy HTML content (WordPress imports)
+    return sanitizeHtml(content);
+  }
+
+  // Markdown content → convert to HTML, then sanitize
+  const html = renderMarkdown(content);
+  return sanitizeHtml(html);
 }
 
 // -------------------------------------------------------

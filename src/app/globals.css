@@ -62,8 +62,47 @@
     @apply mb-5 pl-6;
   }
 
+  .article-content ul {
+    list-style-type: disc;
+  }
+
+  .article-content ol {
+    list-style-type: decimal;
+  }
+
   .article-content li {
     @apply mb-2;
+  }
+
+  .article-content hr {
+    @apply my-10 border-t border-mercury-rule;
+  }
+
+  .article-content h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    @apply text-3xl font-black mt-10 mb-5 tracking-tight;
+  }
+
+  .article-content strong {
+    @apply font-bold;
+  }
+
+  .article-content em {
+    @apply italic;
+  }
+
+  .article-content table {
+    @apply w-full mb-6 text-base;
+    border-collapse: collapse;
+  }
+
+  .article-content th,
+  .article-content td {
+    @apply border border-mercury-rule px-3 py-2 text-left;
+  }
+
+  .article-content th {
+    @apply bg-gray-50 font-sans font-semibold text-sm uppercase tracking-wide;
   }
 
   .article-content figure {
