@@ -1,6 +1,19 @@
 import type { MetadataRoute } from "next";
+import { getPublicationFromRequest } from "@/lib/publication";
 
-export default function robots(): MetadataRoute.Robots {
+/**
+ * Domain-aware robots.txt.
+ *
+ * Reads the current publication context from middleware headers
+ * and generates the correct sitemap URL for each domain.
+ *
+ * Route: /robots.txt
+ */
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const { publication } = await getPublicationFromRequest();
+  const domain = publication.domain || "mercury-local.vercel.app";
+  const base = `https://${domain}`;
+
   return {
     rules: [
       {
@@ -13,8 +26,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://cltmercury.com/sitemap.xml",
-    // Note: Each domain gets its own sitemap URL resolved at runtime.
-    // This static value is a fallback; the real sitemap is domain-aware.
+    sitemap: `${base}/sitemap.xml`,
   };
 }
