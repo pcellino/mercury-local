@@ -21,13 +21,6 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const segments = pathname.split("/").filter(Boolean);
 
-  // DIAGNOSTIC TEST: hardcoded redirect for one known slug
-  if (segments.length === 1 && segments[0] === "about") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/page/about";
-    return NextResponse.redirect(url, 301);
-  }
-
   if (segments.length === 1) {
     const segment = segments[0];
 
