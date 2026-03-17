@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
-      // === CLT MERCURY — old page slugs ===
+      // === CLT MERCURY — old page slugs (WordPress used flat URLs, we use /page/) ===
       { source: "/about-us", destination: "/page/about", permanent: true },
       { source: "/contact-us", destination: "/page/contact", permanent: true },
       { source: "/privacy-policy", destination: "/page/privacy", permanent: true },
@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
       { source: "/news", destination: "/", permanent: true },
       { source: "/newsletter", destination: "/", permanent: true },
 
-      // === CLT MERCURY — /election-2025/ hub ===
+      // === CLT MERCURY — /election-2025/ hub and nested paths ===
       { source: "/election-2025", destination: "/page/election-2025", permanent: true },
       { source: "/election-2025/:slug", destination: "/page/:slug", permanent: true },
       { source: "/election-2025/:district/:slug", destination: "/page/:slug", permanent: true },
@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
       { source: "/district-6", destination: "/page/district-6", permanent: true },
       { source: "/district-7", destination: "/page/district-7", permanent: true },
 
-      // === CLT MERCURY — /category/charlotte/ taxonomy ===
+      // === CLT MERCURY — /category/charlotte/ WordPress taxonomy ===
       { source: "/category/charlotte", destination: "/", permanent: true },
       { source: "/category/charlotte/business", destination: "/business", permanent: true },
       { source: "/category/charlotte/politics", destination: "/government", permanent: true },
@@ -149,7 +149,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
-      // === STROLLING BALLANTYNE — /category/ taxonomy ===
+      // === STROLLING BALLANTYNE — /category/ WordPress taxonomy ===
       {
         source: "/category/ballantyne",
         destination: "/",
@@ -223,76 +223,9 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
-      // === CATCH-ALL — remaining /category/ and /tag/ paths ===
+      // === CATCH-ALL — remaining /category/ and /tag/ paths to homepage ===
       { source: "/category/:path*", destination: "/", permanent: true },
       { source: "/tag/:path*", destination: "/", permanent: true },
-    ];
-  },
-
-  // -------------------------------------------------------
-  // IMAGE OPTIMIZATION
-  // -------------------------------------------------------
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "uyxqtfnijwhebryuauaf.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "**.wp.com",
-      },
-      {
-        protocol: "https",
-        hostname: "i0.wp.com",
-      },
-    ],
-  },
-
-  // -------------------------------------------------------
-  // HEADERS — security + caching
-  // -------------------------------------------------------
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        ],
-      },
-    ];
-  },
-};
-
-export default nextConfig;
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  // -------------------------------------------------------
-  // 301 REDIRECTS — wearefarmington.com migration
-  // These are generated at build time. For dynamic redirects
-  // from Supabase, see middleware.ts.
-  // -------------------------------------------------------
-  async redirects() {
-    return [
-      // Catch-all: any wearefarmington.com path → farmington mercury
-      // Individual post redirects (old flat URL → /beat/slug) are
-      // handled in middleware.ts from a Supabase lookup.
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "wearefarmington.com" }],
-        destination: "https://farmingtonmercury.com/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.wearefarmington.com" }],
-        destination: "https://farmingtonmercury.com/:path*",
-        permanent: true,
-      },
     ];
   },
 
