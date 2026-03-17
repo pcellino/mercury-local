@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveSlug } from "./src/lib/domains";
+import { resolveSlug } from "./lib/domains";
 
 const ALL_BEATS = new Set([
   "elections", "government", "opinion", "business", "community",
