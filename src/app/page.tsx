@@ -17,6 +17,13 @@ function stripHtml(html: string): string {
   return decodeHtmlEntities(html.replace(/<[^>]*>/g, ""));
 }
 
+function cleanExcerpt(html: string, maxLen: number): string {
+  const text = stripHtml(html).replace(/\*{1,2}/g, "").replace(/#{1,6}\s/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  if (text.length <= maxLen) return text;
+  const cut = text.lastIndexOf(" ", maxLen);
+  return text.slice(0, cut > 0 ? cut : maxLen) + "\u2026";
+}
+
 export default async function HomePage() {
   const { publication, slug } = await getPublicationFromRequest();
 
@@ -59,7 +66,7 @@ export default async function HomePage() {
     <>
       {/* ---- LEAD STORY (full width) ---- */}
       {lead && (
-        <section className="pb-6 mb-6 border-b border-mercury-rule">
+        <section className="pb-8 mb-8 border-b border-mercury-rule">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Lead headline + excerpt */}
             <div className="md:col-span-7">
@@ -115,10 +122,10 @@ export default async function HomePage() {
 
       {/* ---- SECONDARY STORIES (2-col) ---- */}
       {secondary.length > 0 && (
-        <section className="pb-6 mb-6 border-b border-mercury-rule">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:divide-x md:divide-mercury-rule">
+        <section className="pb-8 mb-8 border-b border-mercury-rule">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:divide-x md:divide-mercury-rule">
             {secondary.map((post) => (
-              <article key={post.id} className="md:first:pr-6 md:last:pl-6">
+              <article key={post.id} className="md:first:pr-8 md:last:pl-8">
                 {post.beat && (
                   <Link
                     href={`/${post.beat}`}
@@ -127,7 +134,7 @@ export default async function HomePage() {
                     {post.beat}
                   </Link>
                 )}
-                <h3 className="font-display text-xl md:text-2xl font-bold mt-1 leading-tight">
+                <h3 className="font-display text-xl md:text-2xl font-bold mt-2 leading-snugt">
                   <Link
                     href={`/${post.beat}/${post.slug}`}
                     className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
@@ -137,7 +144,7 @@ export default async function HomePage() {
                 </h3>
                 {post.excerpt && (
                   <p className="text-mercury-muted text-sm mt-2 leading-relaxed font-serif line-clamp-3">
-                    {stripHtml(post.excerpt).slice(0, 200)}
+                    {cleanExcerpt(post.excerpt, 220)}
                   </p>
                 )}
                 <p className="text-xs text-mercury-muted mt-2 font-sans">
@@ -156,13 +163,13 @@ export default async function HomePage() {
       )}
 
       {/* ---- THREE-COLUMN GRID ---- */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {/* Left column */}
-        <div className="md:col-span-4 md:pr-6 md:border-r md:border-mercury-rule">
+        <div className="md:col-span-4 md:pr-8 md:border-r md:border-mercury-rule">
           {columnLeft.map((post, i) => (
             <article
               key={post.id}
-              className={`pb-5 mb-5 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
+              className={`pb-6 mb-6 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
               <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
                 {post.hero_image_url ? (
@@ -194,7 +201,7 @@ export default async function HomePage() {
               </h3>
               {post.excerpt && (
                 <p className="text-mercury-muted text-sm mt-1.5 leading-relaxed font-serif line-clamp-2">
-                  {stripHtml(post.excerpt).slice(0, 150)}
+                  {cleanExcerpt(post.excerpt, 160)}
                 </p>
               )}
               <p className="text-[11px] text-mercury-muted mt-1.5 font-sans">
@@ -211,7 +218,7 @@ export default async function HomePage() {
           {columnRight.map((post, i) => (
             <article
               key={post.id}
-              className={`pb-5 mb-5 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
+              className={`pb-6 mb-6 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
               <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
                 {post.hero_image_url ? (
@@ -243,7 +250,7 @@ export default async function HomePage() {
               </h3>
               {post.excerpt && (
                 <p className="text-mercury-muted text-sm mt-1.5 leading-relaxed font-serif line-clamp-2">
-                  {stripHtml(post.excerpt).slice(0, 150)}
+                  {cleanExcerpt(post.excerpt, 160)}
                 </p>
               )}
               <p className="text-[11px] text-mercury-muted mt-1.5 font-sans">
@@ -315,7 +322,7 @@ export default async function HomePage() {
           <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink mb-6">
             More Stories
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-mercury-rule">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x md:divide-mercury-rule">
             {moreStories.slice(0, 6).map((post, i) => (
               <article key={post.id} className={`${i > 0 ? "md:pl-6" : ""}`}>
                 <h3 className="font-display text-base font-bold leading-snug">
