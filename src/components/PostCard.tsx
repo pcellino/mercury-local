@@ -18,7 +18,7 @@ export default function PostCard({ post, showBeat = false, compact = false }: Po
 
   if (compact) {
     return (
-      <article className="group pb-4 mb-4 border-b border-mercury-rule last:border-b-0">
+      <article className="group pb-6 mb-6 border-b border-mercury-rule last:border-b-0 last:mb-0 last:mb-0">
         {showBeat && post.beat && (
           <Link
             href={`/${post.beat}`}
@@ -44,7 +44,7 @@ export default function PostCard({ post, showBeat = false, compact = false }: Po
 
   return (
     <article className="group pb-5 mb-5 border-b border-mercury-rule last:border-b-0">
-      <div className="flex gap-5">
+      <div className="flex gap-6">
         {/* Text content */}
         <div className="flex-1 min-w-0">
           {showBeat && post.beat && (
@@ -91,10 +91,10 @@ export default function PostCard({ post, showBeat = false, compact = false }: Po
               alt={post.hero_image_alt || ""}
               loading="lazy"
               decoding="async"
-              className="w-32 h-24 object-cover"
+              className="w-36 h-28 object-cover"
             />
           ) : (
-            <BeatIllustration beat={post.beat} className="w-32 h-24 object-cover" />
+            <BeatIllustration beat={post.beat} className="w-36 h-28 object-cover" />
           )}
         </Link>
       </div>
