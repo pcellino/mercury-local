@@ -88,7 +88,7 @@ export default async function HomePage() {
               </h2>
               {lead.excerpt && (
                 <p className="text-mercury-muted text-lg mt-3 leading-relaxed font-serif">
-                  {stripHtml(lead.excerpt).slice(0, 300)}
+                  {cleanExcerpt(lead.excerpt, 280).slice(0, 300)}
                 </p>
               )}
               <p className="text-xs text-mercury-muted mt-3 font-sans">
