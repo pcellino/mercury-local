@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
     },
     verification: {
-      google: "uEoSucAtdDcwXrXvnETJpI8BAUheG0LbN5-yckVPi4s",
+      google: ["uEoSucAtdDcwXrXvnETJpI8BAUheG0LbN5-yckVPi4s", "XI4IwX4RzQoSZnpllpQBAzZsPxf8A0a7yOt2OyaJS_E"],
     },
   };
 }
