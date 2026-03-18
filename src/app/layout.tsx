@@ -234,6 +234,7 @@ export default async function RootLayout({
             </div>
           </div>
         </footer>
+      <script src="https://cdn.usefathom.com/script.js" data-site="GBFVBSGG" defer></script>
       </body>
     </html>
   );
