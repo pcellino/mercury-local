@@ -69,7 +69,7 @@ export default async function RootLayout({
               )}
               <span className="text-gray-500">|</span>
               <span className="text-gray-400 font-sans">
-                {isCustomLayout ? "Mercury Local" : "Independent Local News"}
+                {slug === "mercury-local" ? "Mercury Local" : !isCustomLayout ? "Independent Local News" : ""}
               </span>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default async function RootLayout({
                 </p>
                 <p className="text-sm text-mercury-muted mt-2 font-sans">
                   {isCustomLayout
-                    ? "A Mercury Local property."
+                    ? (slug === "peter-cellino" ? "" : "A Mercury Local property.")
                     : "A Mercury Local publication. Independent, local journalism."}
                 </p>
               </div>
@@ -183,7 +183,7 @@ export default async function RootLayout({
               {isCustomLayout && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
-                    Mercury Local Network
+                    {slug === "peter-cellino" ? "Publications" : "Mercury Local Network"}
                   </p>
                   <div className="grid grid-cols-1 gap-1">
                     <a href="https://cltmercury.com" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
@@ -205,7 +205,7 @@ export default async function RootLayout({
                 </p>
                 <p className="text-sm text-mercury-muted font-sans leading-relaxed">
                   {isCustomLayout
-                    ? "Mercury Local helps communities stay informed through independent, locally-owned journalism."
+                    ? (slug === "peter-cellino" ? "" : "Mercury Local helps communities stay informed through independent, locally-owned journalism.")
                     : `Covering what matters in ${publication.region || "your community"}. Built on shoe-leather reporting, not algorithms.`}
                 </p>
               </div>
