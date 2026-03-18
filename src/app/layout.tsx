@@ -93,7 +93,7 @@ export default async function RootLayout({
 
             {/* Beat navigation — only for news publications */}
             {!isCustomLayout && beats.length > 0 && (
-              <nav className="flex items-center justify-center gap-0 py-2 overflow-x-auto border-b border-mercury-rule">
+              <nav className="flex items-center justify-center gap-0 py-3 overflow-x-auto border-b-2 border-mercury-ink">
                 {beats.map((beat, i) => (
                   <span key={beat.slug} className="flex items-center">
                     {i > 0 && (
@@ -114,7 +114,7 @@ export default async function RootLayout({
 
             {/* Simplified nav for custom-layout publications */}
             {isCustomLayout && (
-              <nav className="flex items-center justify-center gap-6 py-2 border-b border-mercury-rule">
+              <nav className="flex items-center justify-center gap-6 py-3 border-b-2 border-mercury-ink">
                 {beats.map((beat) => (
                   <Link
                     key={beat.slug}
@@ -147,8 +147,8 @@ export default async function RootLayout({
         </main>
 
         {/* ---- FOOTER ---- */}
-        <footer className="border-t-2 border-mercury-ink bg-white mt-auto">
-          <div className="max-w-7xl mx-auto px-4 py-10">
+        <footer className="bg-stone-50 border-t border-mercury-rule mt-16">
+          <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div>
                 <p className="font-display font-black text-2xl">
@@ -210,7 +210,7 @@ export default async function RootLayout({
                 </p>
               </div>
             </div>
-            <div className="mt-8 pt-4 border-t border-mercury-rule text-xs text-mercury-muted font-sans flex flex-col md:flex-row justify-between">
+            <div className="mt-10 pt-6 border-t border-mercury-rule text-xs text-mercury-muted font-sans flex flex-col md:flex-row justify-between">
               <p>
                 &copy; {new Date().getFullYear()} Mercury Local, LLC. All rights
                 reserved.
