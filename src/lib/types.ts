@@ -1,5 +1,5 @@
 // -------------------------------------------------------
-// Database types — mirrors Supabase schema
+// Database types â mirrors Supabase schema
 // -------------------------------------------------------
 
 export interface Database {
@@ -94,6 +94,11 @@ export interface Page {
   updated_at: string;
   source: string | null;
   original_url: string | null;
+  // Hub fields
+  hub_beat: string | null;
+  hub_tag: string | null;
+  hub_limit: number | null;
+  hub_heading: string | null;
 }
 
 // -------------------------------------------------------
@@ -158,28 +163,3 @@ export const BEATS_BY_PUBLICATION: Record<string, BeatConfig[]> = {
   "mercury-local": MERCURY_LOCAL_BEATS,
   "peter-cellino": PETER_CELLINO_BEATS,
 };
-// -------------------------------------------------------
-// Database types — mirrors Supabase schema
-// -------------------------------------------------------
-
-export interface Database {
-  public: {
-    Tables: {
-      publications: {
-        Row: Publication;
-      };
-      posts: {
-        Row: Post;
-      };
-      authors: {
-        Row: Author;
-      };
-      categories: {
-        Row: Category;
-      };
-      tags: {
-        Row: Tag;
-      };
-    };
-  };
-}
