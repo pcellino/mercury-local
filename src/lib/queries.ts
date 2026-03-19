@@ -302,6 +302,107 @@ export async function getAllPublishedPages(
 }
 
 // -------------------------------------------------------
+// Hub queries â fetch posts for hub pages
+// -------------------------------------------------------
+
+export async function getHubPosts(
+  publicationId: string,
+  hubBeat: string | null,
+  hubTag: string | null,
+  limit = 20
+): Promise<PostWithAuthor[]> {
+  // Beat-based hub: pull posts from the specified beat
+  if (hubBeat) {
+    return getPostsByBeatWithAuthors(publicationId, hubBeat, limit);
+  }
+
+  // Tag-based hub: pull posts that have the specified tag
+  if (hubTag) {
+    const { data, error } = await supabase
+      .from("post_tags")
+      .select(`
+        post_id,
+        posts:post_id (
+          *,
+          author:authors(*)
+        )
+      `)
+      .eq("posts.publication_id", publicationId)
+      .eq("posts.status", "published")
+      .eq(
+        "tag_id",
+        supabase
+          .from("tags")
+          .select("id")
+          .eq("slug", hubTag)
+          .eq("publication_id", publicationId)
+          .single()
+      )
+      .order("posts.pub_date", { ascending: false })
+      .limit(limit);
+
+    // Fallback approach: two queries if the nested filter doesn't work
+    if (error) {
+      console.error("getHubPosts tag join error, falling back:", error);
+      return getHubPostsByTag(publicationId, hubTag, limit);
+    }
+
+    return ((data || [])
+      .map((row: Record<string, unknown>) => row.posts)
+      .filter(Boolean) as PostWithAuthor[]);
+  }
+
+  return [];
+}
+
+// Fallback: two-step tag-based hub query
+async function getHubPostsByTag(
+  publicationId: string,
+  tagSlug: string,
+  limit: number
+): Promise<PostWithAuthor[]> {
+  // Step 1: Find the tag ID
+  const { data: tagData } = await supabase
+    .from("tags")
+    .select("id")
+    .eq("slug", tagSlug)
+    .eq("publication_id", publicationId)
+    .single();
+
+  if (!tagData) return [];
+
+  // Step 2: Get post IDs with this tag
+  const { data: ptData } = await supabase
+    .from("post_tags")
+    .select("post_id")
+    .eq("tag_id", tagData.id);
+
+  if (!ptData || ptData.length === 0) return [];
+
+  const postIds = ptData.map((pt: { post_id: string }) => pt.post_id);
+
+  // Step 3: Fetch the posts with authors
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      author:authors(*)
+    `)
+    .in("id", postIds)
+    .eq("publication_id", publicationId)
+    .eq("status", "published")
+    .order("pub_date", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("getHubPostsByTag error:", error);
+    return [];
+  }
+
+  return (data || []) as PostWithAuthor[];
+}
+
+// -------------------------------------------------------
 // Helpers
 // -------------------------------------------------------
 
