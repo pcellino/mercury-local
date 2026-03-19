@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getBeatsForPublication } from "@/lib/queries";
+import { getBeatsForPublication, getHubPages } from "@/lib/queries";
 import { getBaseUrl, CUSTOM_LAYOUT_SLUGS } from "@/lib/domains";
 import Link from "next/link";
+import { decodeHtmlEntities } from "@/lib/content";
+import BeatDropdownNav from "@/components/BeatDropdownNav";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -43,6 +45,17 @@ export default async function RootLayout({
   const beats = getBeatsForPublication(slug);
   const isCustomLayout = CUSTOM_LAYOUT_SLUGS.has(slug);
 
+  // Fetch hub pages for nav and footer
+  const hubPages = isCustomLayout ? [] : await getHubPages(publication.id);
+
+  // Group hub pages by beat for dropdown nav
+  const hubsByBeat: Record<string, Array<{ slug: string; title: string }>> = {};
+  for (const hub of hubPages) {
+    const beat = hub.hub_beat || "_none";
+    if (!hubsByBeat[beat]) hubsByBeat[beat] = [];
+    hubsByBeat[beat].push({ slug: hub.slug, title: hub.title });
+  }
+
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -59,7 +72,6 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-white text-mercury-ink">
-
         {/* ---- DARK UTILITY BAR ---- */}
         <div className="bg-mercury-ink text-white">
           <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between text-xs">
@@ -72,7 +84,11 @@ export default async function RootLayout({
               )}
               <span className="text-gray-500">|</span>
               <span className="text-gray-400 font-sans">
-                {slug === "mercury-local" ? "Mercury Local" : !isCustomLayout ? "Independent Local News" : ""}
+                {slug === "mercury-local"
+                  ? "Mercury Local"
+                  : !isCustomLayout
+                  ? "Independent Local News"
+                  : ""}
               </span>
             </div>
           </div>
@@ -94,25 +110,9 @@ export default async function RootLayout({
               )}
             </div>
 
-            {/* Beat navigation — only for news publications */}
+            {/* Beat navigation with hub dropdowns â news publications */}
             {!isCustomLayout && beats.length > 0 && (
-              <nav className="flex items-center justify-center gap-0 py-3 overflow-x-auto border-b-2 border-mercury-ink">
-                {beats.map((beat, i) => (
-                  <span key={beat.slug} className="flex items-center">
-                    {i > 0 && (
-                      <span className="text-mercury-rule mx-1 text-xs">
-                        |
-                      </span>
-                    )}
-                    <Link
-                      href={`/${beat.slug}`}
-                      className="px-2 py-1 text-sm font-sans font-semibold text-mercury-ink hover:text-mercury-accent transition-colors whitespace-nowrap uppercase tracking-wide"
-                    >
-                      {beat.label}
-                    </Link>
-                  </span>
-                ))}
-              </nav>
+              <BeatDropdownNav beats={beats} hubsByBeat={hubsByBeat} />
             )}
 
             {/* Simplified nav for custom-layout publications */}
@@ -152,14 +152,16 @@ export default async function RootLayout({
         {/* ---- FOOTER ---- */}
         <footer className="bg-stone-50 border-t border-mercury-rule mt-16">
           <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? "md:grid-cols-4" : "md:grid-cols-3"} gap-8`}>
               <div>
                 <p className="font-display font-black text-2xl">
                   {publication.name}
                 </p>
                 <p className="text-sm text-mercury-muted mt-2 font-sans">
                   {isCustomLayout
-                    ? (slug === "peter-cellino" ? "" : "A Mercury Local property.")
+                    ? slug === "peter-cellino"
+                      ? ""
+                      : "A Mercury Local property."
                     : "A Mercury Local publication. Independent, local journalism."}
                 </p>
               </div>
@@ -183,19 +185,50 @@ export default async function RootLayout({
                 </div>
               )}
 
+              {/* Guides column â hub pages */}
+              {!isCustomLayout && hubPages.length > 0 && (
+                <div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
+                    Guides
+                  </p>
+                  <div className="grid grid-cols-1 gap-1">
+                    {hubPages.map((hub) => (
+                      <Link
+                        key={hub.slug}
+                        href={`/page/${hub.slug}`}
+                        className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
+                      >
+                        {decodeHtmlEntities(hub.title)}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {isCustomLayout && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
-                    {slug === "peter-cellino" ? "Publications" : "Mercury Local Network"}
+                    {slug === "peter-cellino"
+                      ? "Publications"
+                      : "Mercury Local Network"}
                   </p>
                   <div className="grid grid-cols-1 gap-1">
-                    <a href="https://cltmercury.com" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                    <a
+                      href="https://cltmercury.com"
+                      className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
+                    >
                       The Charlotte Mercury
                     </a>
-                    <a href="https://farmingtonmercury.com" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                    <a
+                      href="https://farmingtonmercury.com"
+                      className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
+                    >
                       The Farmington Mercury
                     </a>
-                    <a href="https://strollingballantyne.com" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                    <a
+                      href="https://strollingballantyne.com"
+                      className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
+                    >
                       Strolling Ballantyne
                     </a>
                   </div>
@@ -208,11 +241,14 @@ export default async function RootLayout({
                 </p>
                 <p className="text-sm text-mercury-muted font-sans leading-relaxed">
                   {isCustomLayout
-                    ? (slug === "peter-cellino" ? "" : "Mercury Local helps communities stay informed through independent, locally-owned journalism.")
+                    ? slug === "peter-cellino"
+                      ? ""
+                      : "Mercury Local helps communities stay informed through independent, locally-owned journalism."
                     : `Covering what matters in ${publication.region || "your community"}. Built on shoe-leather reporting, not algorithms.`}
                 </p>
               </div>
             </div>
+
             <div className="mt-10 pt-6 border-t border-mercury-rule text-xs text-mercury-muted font-sans flex flex-col md:flex-row justify-between">
               <p>
                 &copy; {new Date().getFullYear()} Mercury Local, LLC. All rights
@@ -234,7 +270,12 @@ export default async function RootLayout({
             </div>
           </div>
         </footer>
-      <script src="https://cdn.usefathom.com/script.js" data-site="GBFVBSGG" defer></script>
+
+        <script
+          src="https://cdn.usefathom.com/script.js"
+          data-site="GBFVBSGG"
+          defer
+        ></script>
       </body>
     </html>
   );
