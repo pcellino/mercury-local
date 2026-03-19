@@ -294,6 +294,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "i0.wp.com",
       },
+      {
+                protocol: "https",
+                hostname: "directus-production-0598.up.railway.app",
+                pathname: "/assets/**",
+      },
     ],
   },
 
