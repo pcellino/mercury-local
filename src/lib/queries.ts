@@ -406,6 +406,28 @@ async function getHubPostsByTag(
 }
 
 // -------------------------------------------------------
+// Hub page navigation â fetch hub pages for nav/sidebar
+// -------------------------------------------------------
+
+export async function getHubPages(
+  publicationId: string
+): Promise<Pick<Page, "slug" | "title" | "hub_beat" | "hub_tag" | "hub_heading">[]> {
+  const { data, error } = await supabase
+    .from("pages")
+    .select("slug, title, hub_beat, hub_tag, hub_heading")
+    .eq("publication_id", publicationId)
+    .eq("status", "published")
+    .or("hub_beat.not.is.null,hub_tag.not.is.null")
+    .order("title");
+
+  if (error) {
+    console.error("getHubPages error:", error);
+    return [];
+  }
+  return (data || []) as Pick<Page, "slug" | "title" | "hub_beat" | "hub_tag" | "hub_heading">[];
+}
+
+// -------------------------------------------------------
 // Helpers
 // -------------------------------------------------------
 
