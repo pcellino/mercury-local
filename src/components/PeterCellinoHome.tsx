@@ -7,9 +7,9 @@ interface Props {
   posts: PostWithAuthor[];
 }
 
-const PUBLICATIONS = 
+const PUBLICATIONS =  [
   {
-    name: "The Charlotte Mercury"
+    name: "The Charlotte Mercury",
     domain: "cltmercury.com",
     description: "Independent local news for Charlotte, NC",
     color: "text-mercury-accent",
