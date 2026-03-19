@@ -28,7 +28,7 @@ export default function BeatDropdownNav({ beats, hubsByBeat }: BeatDropdownNavPr
   return (
     <nav
       ref={navRef}
-      className="flex items-center justify-center gap-0 py-3 overflow-x-auto border-b-2 border-mercury-ink"
+      className="relative z-40 flex items-center justify-center gap-0 py-3 border-b-2 border-mercury-ink"
     >
       {beats.map((beat, i) => {
         const hubs = hubsByBeat[beat.slug];
