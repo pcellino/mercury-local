@@ -4,6 +4,7 @@ import {
   getBeatsForPublication,
   getPostCountByBeat,
   getPostsByBeatWithAuthors,
+  getHubPages,
 } from "@/lib/queries";
 import Link from "next/link";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
@@ -43,10 +44,11 @@ export default async function HomePage() {
   // -------------------------------------------------------
   // Default newspaper homepage (Charlotte Mercury, Farmington, etc.)
   // -------------------------------------------------------
-  const [posts, beats, beatCounts] = await Promise.all([
+  const [posts, beats, beatCounts, hubPages] = await Promise.all([
     getLatestPostsWithAuthors(publication.id, 20),
     Promise.resolve(getBeatsForPublication(slug)),
     getPostCountByBeat(publication.id),
+    getHubPages(publication.id),
   ]);
 
   // Get opinion posts for sidebar
@@ -78,14 +80,14 @@ export default async function HomePage() {
                   {lead.beat}
                 </Link>
               )}
-              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
+              <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
                 <Link
                   href={`/${lead.beat}/${lead.slug}`}
                   className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
                 >
                   {decodeHtmlEntities(lead.title)}
                 </Link>
-              </h2>
+              </h3>
               {lead.excerpt && (
                 <p className="text-mercury-muted text-lg mt-3 leading-relaxed font-serif">
                   {cleanExcerpt(lead.excerpt, 280).slice(0, 300)}
@@ -112,7 +114,10 @@ export default async function HomePage() {
                     className="w-full h-64 md:h-80 object-cover"
                   />
                 ) : (
-                  <BeatIllustration beat={lead.beat} className="w-full h-64 md:h-80 object-cover" />
+                  <BeatIllustration
+                    beat={lead.beat}
+                    className="w-full h-64 md:h-80 object-cover"
+                  />
                 )}
               </Link>
             </div>
@@ -180,7 +185,10 @@ export default async function HomePage() {
                     loading="lazy"
                   />
                 ) : (
-                  <BeatIllustration beat={post.beat} className="w-full h-40 object-cover" />
+                  <BeatIllustration
+                    beat={post.beat}
+                    className="w-full h-40 object-cover"
+                  />
                 )}
               </Link>
               {post.beat && (
@@ -229,7 +237,10 @@ export default async function HomePage() {
                     loading="lazy"
                   />
                 ) : (
-                  <BeatIllustration beat={post.beat} className="w-full h-40 object-cover" />
+                  <BeatIllustration
+                    beat={post.beat}
+                    className="w-full h-40 object-cover"
+                  />
                 )}
               </Link>
               {post.beat && (
@@ -262,7 +273,7 @@ export default async function HomePage() {
           ))}
         </div>
 
-        {/* Right sidebar — Opinion + Sections */}
+        {/* Right sidebar â Opinion + Guides + Sections */}
         <aside className="md:col-span-4 md:pl-6">
           {/* Opinion section */}
           {opinionPosts.length > 0 && (
@@ -290,6 +301,33 @@ export default async function HomePage() {
                   </p>
                 </article>
               ))}
+            </div>
+          )}
+
+          {/* Guides & Hubs section */}
+          {hubPages.length > 0 && (
+            <div className="mb-8">
+              <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
+                Guides &amp; Hubs
+              </h2>
+              <nav className="space-y-0">
+                {hubPages.map((hub, i) => (
+                  <Link
+                    key={hub.slug}
+                    href={`/page/${hub.slug}`}
+                    className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < hubPages.length - 1 ? "border-b border-mercury-rule" : ""}`}
+                  >
+                    <span className="font-sans text-sm font-medium text-mercury-ink">
+                      {decodeHtmlEntities(hub.title)}
+                    </span>
+                    {hub.hub_beat && (
+                      <span className="text-[10px] text-mercury-muted font-sans uppercase tracking-wider">
+                        {hub.hub_beat}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </nav>
             </div>
           )}
 
