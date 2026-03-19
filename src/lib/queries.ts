@@ -362,24 +362,27 @@ async function getHubPostsByTag(
   limit: number
 ): Promise<PostWithAuthor[]> {
   // Step 1: Find the tag ID
-  const { data: tagData } = await supabase
+  const { data: tagRow } = await supabase
     .from("tags")
     .select("id")
     .eq("slug", tagSlug)
     .eq("publication_id", publicationId)
     .single();
 
+  const tagData = tagRow as { id: string } | null;
   if (!tagData) return [];
 
   // Step 2: Get post IDs with this tag
-  const { data: ptData } = await supabase
+  const { data: ptRows } = await supabase
     .from("post_tags")
     .select("post_id")
     .eq("tag_id", tagData.id);
 
-  if (!ptData || ptData.length === 0) return [];
+  const ptData = (ptRows || []) as Array<{ post_id: string }>;
 
-  const postIds = ptData.map((pt: { post_id: string }) => pt.post_id);
+  if (ptData.length === 0) return [];
+
+  const postIds = ptData.map((pt) => pt.post_id);
 
   // Step 3: Fetch the posts with authors
   const { data, error } = await supabase
