@@ -1,25 +1,15 @@
 // -------------------------------------------------------
-// Database types — mirrors Supabase schema
+// Database types â mirrors Supabase schema
 // -------------------------------------------------------
 
 export interface Database {
   public: {
     Tables: {
-      publications: {
-        Row: Publication;
-      };
-      posts: {
-        Row: Post;
-      };
-      authors: {
-        Row: Author;
-      };
-      categories: {
-        Row: Category;
-      };
-      tags: {
-        Row: Tag;
-      };
+      publications: { Row: Publication };
+      posts: { Row: Post };
+      authors: { Row: Author };
+      categories: { Row: Category };
+      tags: { Row: Tag };
     };
   };
 }
@@ -104,6 +94,7 @@ export interface Page {
   updated_at: string;
   source: string | null;
   original_url: string | null;
+  // Hub fields
   hub_beat: string | null;
   hub_tag: string | null;
   hub_limit: number | null;
@@ -157,8 +148,18 @@ export const BALLANTYNE_BEATS: BeatConfig[] = [
   { slug: "dining", label: "Dining", description: "Restaurants, recipes, and the Ballantyne food scene" },
 ];
 
+export const MERCURY_LOCAL_BEATS: BeatConfig[] = [
+  { slug: "dispatches", label: "Dispatches", description: "Notes on building local media in Charlotte" },
+];
+
+export const PETER_CELLINO_BEATS: BeatConfig[] = [
+  { slug: "notes", label: "Notes", description: "Thoughts on media, AI, and local journalism" },
+];
+
 export const BEATS_BY_PUBLICATION: Record<string, BeatConfig[]> = {
   "farmington-mercury": FARMINGTON_BEATS,
   "charlotte-mercury": CHARLOTTE_BEATS,
   "strolling-ballantyne": BALLANTYNE_BEATS,
+  "mercury-local": MERCURY_LOCAL_BEATS,
+  "peter-cellino": PETER_CELLINO_BEATS,
 };

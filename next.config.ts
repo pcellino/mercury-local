@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // -------------------------------------------------------
   // 301 REDIRECTS
-  // Catch external/SEO traffic still hitting old WordPress URLs.
+  // Catch external/SEO traffic still hitting old WordPress URLs
+  // and old Lovable SPA URL patterns.
   // Internal content links were fixed at the database level
   // (see _admin/sql/ for migration scripts).
   // -------------------------------------------------------
@@ -20,6 +21,52 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         has: [{ type: "host", value: "www.wearefarmington.com" }],
         destination: "https://farmingtonmercury.com/:path*",
+        permanent: true,
+      },
+
+      // === MERCURY LOCAL — old Lovable URL patterns ===
+      {
+        source: "/blog/post/:slug",
+        destination: "/dispatches/:slug",
+        has: [{ type: "host", value: "mercurylocal.com" }],
+        permanent: true,
+      },
+      {
+        source: "/blog",
+        destination: "/dispatches",
+        has: [{ type: "host", value: "mercurylocal.com" }],
+        permanent: true,
+      },
+      {
+        source: "/about",
+        destination: "/page/about",
+        has: [{ type: "host", value: "mercurylocal.com" }],
+        permanent: true,
+      },
+      {
+        source: "/contact",
+        destination: "/page/contact",
+        has: [{ type: "host", value: "mercurylocal.com" }],
+        permanent: true,
+      },
+
+      // === PETER CELLINO — old Lovable URL patterns ===
+      {
+        source: "/blog/:slug",
+        destination: "/notes/:slug",
+        has: [{ type: "host", value: "petercellino.com" }],
+        permanent: true,
+      },
+      {
+        source: "/blog",
+        destination: "/notes",
+        has: [{ type: "host", value: "petercellino.com" }],
+        permanent: true,
+      },
+      {
+        source: "/working-with-me",
+        destination: "/page/working-with-me",
+        has: [{ type: "host", value: "petercellino.com" }],
         permanent: true,
       },
 
@@ -87,7 +134,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
-      // === FARMINGTON MERCURY — /tag/ to beats ===
+      // === FARMINGTON MERCURY — /tag/ → beats ===
       {
         source: "/tag/editorial",
         destination: "/community",
@@ -223,7 +270,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
-      // === CATCH-ALL — remaining /category/ and /tag/ paths to homepage ===
+      // === CATCH-ALL — remaining /category/ and /tag/ paths → homepage ===
       { source: "/category/:path*", destination: "/", permanent: true },
       { source: "/tag/:path*", destination: "/", permanent: true },
     ];
@@ -246,6 +293,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "i0.wp.com",
+      },
+      {
+                protocol: "https",
+                hostname: "directus-production-0598.up.railway.app",
+                pathname: "/assets/**",
       },
     ],
   },

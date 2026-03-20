@@ -1,24 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveSlug } from "./lib/domains";
 
+// -------------------------------------------------------
+// KNOWN BEATS (all publications combined).
+// If a single-segment path matches a beat, it is a beat
+// index page and should NOT be treated as a legacy slug.
+// -------------------------------------------------------
 const ALL_BEATS = new Set([
   "elections", "government", "opinion", "business", "community",
   "education", "culture", "sports", "police", "development",
   "wellness", "lifestyle", "dining",
+  "dispatches", "notes",
 ]);
 
+// System routes that are never legacy slugs.
 const SYSTEM_ROUTES = new Set([
   "page", "author", "api", "_next", "favicon.ico",
   "sitemap.xml", "robots.txt", "beats", "search",
 ]);
 
-const SUPABASE_URL = "https://uyxqtfnijwhebryuauaf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5eHF0Zm5pandoZWJyeXVhdWFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTkzNzAsImV4cCI6MjA4ODU3NTM3MH0.JVz1Gj1KKgJFNioVRWYSol472Of1UzN2lIf9pbwE-xQ";
-
+/**
+ * Domain-based publication routing middleware.
+ *
+ * 1. Resolves the incoming hostname to a publication slug.
+ * 2. Redirects legacy flat URLs (/{slug}) to /page/{slug}
+ *    or /{beat}/{slug} by querying Supabase's PostgREST API.
+ * 3. Sets cookies + request headers for downstream pages.
+ */
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") || "localhost:3000";
   const publicationSlug = resolveSlug(hostname);
   const pathname = request.nextUrl.pathname;
+
+  // ---------------------------------------------------------
+  // LEGACY SLUG REDIRECT
+  // Catches flat URLs like /{slug} that should be /page/{slug}
+  // or /{beat}/{slug}. Only fires for single-segment paths
+  // that are not beats, system routes, or file requests.
+  // ---------------------------------------------------------
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length === 1) {
@@ -30,12 +49,16 @@ export async function middleware(request: NextRequest) {
       !segment.includes(".")
     ) {
       try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+        // Look up the publication id for this domain
         const pubRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/publications?slug=eq.${publicationSlug}&select=id&limit=1`,
+          `${supabaseUrl}/rest/v1/publications?slug=eq.${publicationSlug}&select=id&limit=1`,
           {
             headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
             },
           }
         );
@@ -43,12 +66,13 @@ export async function middleware(request: NextRequest) {
         const pubId = pubs?.[0]?.id;
 
         if (pubId) {
+          // First: check the pages table
           const pageRes = await fetch(
-            `${SUPABASE_URL}/rest/v1/pages?slug=eq.${segment}&publication_id=eq.${pubId}&status=eq.published&select=slug&limit=1`,
+            `${supabaseUrl}/rest/v1/pages?slug=eq.${segment}&publication_id=eq.${pubId}&status=eq.published&select=slug&limit=1`,
             {
               headers: {
-                apikey: SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
               },
             }
           );
@@ -60,12 +84,13 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(url, 301);
           }
 
+          // Second: check the posts table
           const postRes = await fetch(
-            `${SUPABASE_URL}/rest/v1/posts?slug=eq.${segment}&publication_id=eq.${pubId}&status=eq.published&select=slug,beat&limit=1`,
+            `${supabaseUrl}/rest/v1/posts?slug=eq.${segment}&publication_id=eq.${pubId}&status=eq.published&select=slug,beat&limit=1`,
             {
               headers: {
-                apikey: SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
               },
             }
           );
@@ -78,11 +103,15 @@ export async function middleware(request: NextRequest) {
           }
         }
       } catch (e) {
+        // Lookup failed — fall through to normal routing (will 404)
         console.error("Legacy slug redirect lookup failed:", e);
       }
     }
   }
 
+  // ---------------------------------------------------------
+  // DEFAULT: set publication context and continue
+  // ---------------------------------------------------------
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-publication-slug", publicationSlug);
   requestHeaders.set("x-hostname", hostname);
@@ -91,12 +120,14 @@ export async function middleware(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
+  // Set cookie for server components that read cookies()
   response.cookies.set("publication-slug", publicationSlug, {
     path: "/",
     httpOnly: false,
     sameSite: "lax",
   });
 
+  // Debug headers - visible in browser DevTools Network tab
   response.headers.set("x-debug-hostname", hostname);
   response.headers.set("x-debug-slug", publicationSlug);
 

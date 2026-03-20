@@ -7,15 +7,20 @@
  * When adding a new publication or domain, update this map and both
  * consumers will pick it up automatically.
  */
-
 export const DOMAIN_MAP: Record<string, string> = {
-  // Production domains
+  // Production domains — news publications
   "cltmercury.com": "charlotte-mercury",
   "www.cltmercury.com": "charlotte-mercury",
   "farmingtonmercury.com": "farmington-mercury",
   "www.farmingtonmercury.com": "farmington-mercury",
   "strollingballantyne.com": "strolling-ballantyne",
   "www.strollingballantyne.com": "strolling-ballantyne",
+
+  // Production domains — non-news publications
+  "mercurylocal.com": "mercury-local",
+  "www.mercurylocal.com": "mercury-local",
+  "petercellino.com": "peter-cellino",
+  "www.petercellino.com": "peter-cellino",
 
   // Vercel deployment
   "mercury-local.vercel.app": "charlotte-mercury",
@@ -45,6 +50,8 @@ export const CANONICAL_DOMAINS: Record<string, string> = {
   "charlotte-mercury": "cltmercury.com",
   "farmington-mercury": "farmingtonmercury.com",
   "strolling-ballantyne": "strollingballantyne.com",
+  "mercury-local": "mercurylocal.com",
+  "peter-cellino": "petercellino.com",
 };
 
 /**
@@ -55,3 +62,12 @@ export function getBaseUrl(slug: string): string {
   const domain = CANONICAL_DOMAINS[slug];
   return domain ? `https://${domain}` : "https://mercury-local.vercel.app";
 }
+
+/**
+ * Publications that use a custom (non-newspaper) layout.
+ * These get a simplified masthead, no beat nav bar, and a different footer.
+ */
+export const CUSTOM_LAYOUT_SLUGS = new Set([
+  "mercury-local",
+  "peter-cellino",
+]);

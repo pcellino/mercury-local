@@ -4,10 +4,13 @@ import {
   getBeatsForPublication,
   getPostCountByBeat,
   getPostsByBeatWithAuthors,
+  getHubPages,
 } from "@/lib/queries";
 import Link from "next/link";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
 import BeatIllustration from "@/components/BeatIllustration";
+import MercuryLocalHome from "@/components/MercuryLocalHome";
+import PeterCellinoHome from "@/components/PeterCellinoHome";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
@@ -15,12 +18,37 @@ function stripHtml(html: string): string {
   return decodeHtmlEntities(html.replace(/<[^>]*>/g, ""));
 }
 
+function cleanExcerpt(html: string, maxLen: number): string {
+  const text = stripHtml(html).replace(/\*{1,2}/g, "").replace(/#{1,6}\s/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  if (text.length <= maxLen) return text;
+  const cut = text.lastIndexOf(" ", maxLen);
+  return text.slice(0, cut > 0 ? cut : maxLen) + "\u2026";
+}
+
 export default async function HomePage() {
   const { publication, slug } = await getPublicationFromRequest();
-  const [posts, beats, beatCounts] = await Promise.all([
+
+  // -------------------------------------------------------
+  // Custom homepages for non-news publications
+  // -------------------------------------------------------
+  if (slug === "mercury-local") {
+    const posts = await getLatestPostsWithAuthors(publication.id, 6);
+    return <MercuryLocalHome publication={publication} posts={posts} />;
+  }
+
+  if (slug === "peter-cellino") {
+    const posts = await getLatestPostsWithAuthors(publication.id, 5);
+    return <PeterCellinoHome publication={publication} posts={posts} />;
+  }
+
+  // -------------------------------------------------------
+  // Default newspaper homepage (Charlotte Mercury, Farmington, etc.)
+  // -------------------------------------------------------
+  const [posts, beats, beatCounts, hubPages] = await Promise.all([
     getLatestPostsWithAuthors(publication.id, 20),
     Promise.resolve(getBeatsForPublication(slug)),
     getPostCountByBeat(publication.id),
+    getHubPages(publication.id),
   ]);
 
   // Get opinion posts for sidebar
@@ -40,7 +68,7 @@ export default async function HomePage() {
     <>
       {/* ---- LEAD STORY (full width) ---- */}
       {lead && (
-        <section className="pb-6 mb-6 border-b border-mercury-rule">
+        <section className="pb-8 mb-8 border-b border-mercury-rule">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Lead headline + excerpt */}
             <div className="md:col-span-7">
@@ -52,17 +80,17 @@ export default async function HomePage() {
                   {lead.beat}
                 </Link>
               )}
-              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
+              <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
                 <Link
                   href={`/${lead.beat}/${lead.slug}`}
                   className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
                 >
                   {decodeHtmlEntities(lead.title)}
                 </Link>
-              </h2>
+              </h3>
               {lead.excerpt && (
                 <p className="text-mercury-muted text-lg mt-3 leading-relaxed font-serif">
-                  {stripHtml(lead.excerpt).slice(0, 300)}
+                  {cleanExcerpt(lead.excerpt, 280).slice(0, 300)}
                 </p>
               )}
               <p className="text-xs text-mercury-muted mt-3 font-sans">
@@ -86,7 +114,10 @@ export default async function HomePage() {
                     className="w-full h-64 md:h-80 object-cover"
                   />
                 ) : (
-                  <BeatIllustration beat={lead.beat} className="w-full h-64 md:h-80 object-cover" />
+                  <BeatIllustration
+                    beat={lead.beat}
+                    className="w-full h-64 md:h-80 object-cover"
+                  />
                 )}
               </Link>
             </div>
@@ -96,10 +127,10 @@ export default async function HomePage() {
 
       {/* ---- SECONDARY STORIES (2-col) ---- */}
       {secondary.length > 0 && (
-        <section className="pb-6 mb-6 border-b border-mercury-rule">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:divide-x md:divide-mercury-rule">
+        <section className="pb-8 mb-8 border-b border-mercury-rule">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:divide-x md:divide-mercury-rule">
             {secondary.map((post) => (
-              <article key={post.id} className="md:first:pr-6 md:last:pl-6">
+              <article key={post.id} className="md:first:pr-8 md:last:pl-8">
                 {post.beat && (
                   <Link
                     href={`/${post.beat}`}
@@ -108,7 +139,7 @@ export default async function HomePage() {
                     {post.beat}
                   </Link>
                 )}
-                <h3 className="font-display text-xl md:text-2xl font-bold mt-1 leading-tight">
+                <h3 className="font-display text-xl md:text-2xl font-bold mt-2 leading-snugt">
                   <Link
                     href={`/${post.beat}/${post.slug}`}
                     className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
@@ -118,7 +149,7 @@ export default async function HomePage() {
                 </h3>
                 {post.excerpt && (
                   <p className="text-mercury-muted text-sm mt-2 leading-relaxed font-serif line-clamp-3">
-                    {stripHtml(post.excerpt).slice(0, 200)}
+                    {cleanExcerpt(post.excerpt, 220)}
                   </p>
                 )}
                 <p className="text-xs text-mercury-muted mt-2 font-sans">
@@ -137,13 +168,13 @@ export default async function HomePage() {
       )}
 
       {/* ---- THREE-COLUMN GRID ---- */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {/* Left column */}
-        <div className="md:col-span-4 md:pr-6 md:border-r md:border-mercury-rule">
+        <div className="md:col-span-4 md:pr-8 md:border-r md:border-mercury-rule">
           {columnLeft.map((post, i) => (
             <article
               key={post.id}
-              className={`pb-5 mb-5 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
+              className={`pb-6 mb-6 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
               <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
                 {post.hero_image_url ? (
@@ -154,7 +185,10 @@ export default async function HomePage() {
                     loading="lazy"
                   />
                 ) : (
-                  <BeatIllustration beat={post.beat} className="w-full h-40 object-cover" />
+                  <BeatIllustration
+                    beat={post.beat}
+                    className="w-full h-40 object-cover"
+                  />
                 )}
               </Link>
               {post.beat && (
@@ -175,7 +209,7 @@ export default async function HomePage() {
               </h3>
               {post.excerpt && (
                 <p className="text-mercury-muted text-sm mt-1.5 leading-relaxed font-serif line-clamp-2">
-                  {stripHtml(post.excerpt).slice(0, 150)}
+                  {cleanExcerpt(post.excerpt, 160)}
                 </p>
               )}
               <p className="text-[11px] text-mercury-muted mt-1.5 font-sans">
@@ -192,7 +226,7 @@ export default async function HomePage() {
           {columnRight.map((post, i) => (
             <article
               key={post.id}
-              className={`pb-5 mb-5 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
+              className={`pb-6 mb-6 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
               <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
                 {post.hero_image_url ? (
@@ -203,7 +237,10 @@ export default async function HomePage() {
                     loading="lazy"
                   />
                 ) : (
-                  <BeatIllustration beat={post.beat} className="w-full h-40 object-cover" />
+                  <BeatIllustration
+                    beat={post.beat}
+                    className="w-full h-40 object-cover"
+                  />
                 )}
               </Link>
               {post.beat && (
@@ -224,7 +261,7 @@ export default async function HomePage() {
               </h3>
               {post.excerpt && (
                 <p className="text-mercury-muted text-sm mt-1.5 leading-relaxed font-serif line-clamp-2">
-                  {stripHtml(post.excerpt).slice(0, 150)}
+                  {cleanExcerpt(post.excerpt, 160)}
                 </p>
               )}
               <p className="text-[11px] text-mercury-muted mt-1.5 font-sans">
@@ -236,7 +273,7 @@ export default async function HomePage() {
           ))}
         </div>
 
-        {/* Right sidebar — Opinion + Sections */}
+        {/* Right sidebar â Opinion + Guides + Sections */}
         <aside className="md:col-span-4 md:pl-6">
           {/* Opinion section */}
           {opinionPosts.length > 0 && (
@@ -267,6 +304,33 @@ export default async function HomePage() {
             </div>
           )}
 
+          {/* Guides & Hubs section */}
+          {hubPages.length > 0 && (
+            <div className="mb-8">
+              <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
+                Guides &amp; Hubs
+              </h2>
+              <nav className="space-y-0">
+                {hubPages.map((hub, i) => (
+                  <Link
+                    key={hub.slug}
+                    href={`/page/${hub.slug}`}
+                    className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < hubPages.length - 1 ? "border-b border-mercury-rule" : ""}`}
+                  >
+                    <span className="font-sans text-sm font-medium text-mercury-ink">
+                      {decodeHtmlEntities(hub.title)}
+                    </span>
+                    {hub.hub_beat && (
+                      <span className="text-[10px] text-mercury-muted font-sans uppercase tracking-wider">
+                        {hub.hub_beat}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          )}
+
           {/* Sections nav */}
           <div>
             <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
@@ -277,9 +341,7 @@ export default async function HomePage() {
                 <Link
                   key={beat.slug}
                   href={`/${beat.slug}`}
-                  className={`flex items-center justify-between py-2.5 
-                             hover:text-mercury-accent transition-colors no-underline
-                             ${i < beats.length - 1 ? "border-b border-mercury-rule" : ""}`}
+                  className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < beats.length - 1 ? "border-b border-mercury-rule" : ""}`}
                 >
                   <span className="font-sans text-sm font-medium text-mercury-ink">{beat.label}</span>
                   <span className="text-xs text-mercury-muted font-sans tabular-nums">
@@ -298,7 +360,7 @@ export default async function HomePage() {
           <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink mb-6">
             More Stories
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-mercury-rule">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x md:divide-mercury-rule">
             {moreStories.slice(0, 6).map((post, i) => (
               <article key={post.id} className={`${i > 0 ? "md:pl-6" : ""}`}>
                 <h3 className="font-display text-base font-bold leading-snug">

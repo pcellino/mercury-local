@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPostsByBeatWithAuthors, getBeatsForPublication, getHubPageByBeat } from "@/lib/queries";
+import { getPostsByBeatWithAuthors, getBeatsForPublication, getHubPageByBeat, getHubPages } from "@/lib/queries";
 import { sanitizeContent, decodeHtmlEntities } from "@/lib/content";
 import PostCard from "@/components/PostCard";
 
@@ -11,7 +12,9 @@ interface BeatPageProps {
   params: Promise<{ beat: string }>;
 }
 
-export async function generateMetadata({ params }: BeatPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: BeatPageProps): Promise<Metadata> {
   const { beat } = await params;
   const { publication, slug } = await getPublicationFromRequest();
   const beats = getBeatsForPublication(slug);
@@ -53,6 +56,10 @@ export default async function BeatPage({ params }: BeatPageProps) {
 
   // Check if a hub page exists for this beat
   const hubPage = await getHubPageByBeat(publication.id, beat);
+
+  // Also fetch all hub pages to show links in the plain beat index
+  const hubPages = await getHubPages(publication.id);
+  const beatHubs = hubPages.filter((h) => h.hub_beat === beat);
 
   const postLimit = hubPage?.hub_limit ?? 50;
   const posts = await getPostsByBeatWithAuthors(publication.id, beat, postLimit);
@@ -105,12 +112,40 @@ export default async function BeatPage({ params }: BeatPageProps) {
   return (
     <>
       <header className="mb-6 pb-4 border-b-2 border-mercury-ink">
-        <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight">{beatConfig.label}</h1>
-        <p className="text-mercury-muted mt-2 font-serif">{beatConfig.description}</p>
+        <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight">
+          {beatConfig.label}
+        </h1>
+        <p className="text-mercury-muted mt-2 font-serif">
+          {beatConfig.description}
+        </p>
       </header>
 
+      {/* Hub page links for this beat */}
+      {beatHubs.length > 0 && (
+        <nav className="mb-6 pb-4 border-b border-mercury-rule flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-mercury-muted">
+            Guides:
+          </span>
+          {beatHubs.map((hub, i) => (
+            <span key={hub.slug} className="flex items-center">
+              {i > 0 && (
+                <span className="text-mercury-rule mr-4 text-xs">|</span>
+              )}
+              <Link
+                href={`/page/${hub.slug}`}
+                className="text-sm font-sans font-semibold text-mercury-accent hover:underline"
+              >
+                {decodeHtmlEntities(hub.title)}
+              </Link>
+            </span>
+          ))}
+        </nav>
+      )}
+
       {posts.length === 0 ? (
-        <p className="text-mercury-muted font-serif">No stories yet in this section.</p>
+        <p className="text-mercury-muted font-serif">
+          No stories yet in this section.
+        </p>
       ) : (
         <>
           {/* Lead story */}

@@ -2,13 +2,14 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPageBySlug, getBeatsForPublication } from "@/lib/queries";
+import { getPageBySlug, getBeatsForPublication, getHubPosts } from "@/lib/queries";
 import {
   sanitizeContent,
   formatDate,
   estimateReadingTime,
   decodeHtmlEntities,
 } from "@/lib/content";
+import PostCard from "@/components/PostCard";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
@@ -43,6 +44,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // -------------------------------------------------------
+// Helper: detect if a page is a hub
+// -------------------------------------------------------
+function isHubPage(page: { hub_beat: string | null; hub_tag: string | null }): boolean {
+  return !!(page.hub_beat || page.hub_tag);
+}
+
+// -------------------------------------------------------
 // Page component
 // -------------------------------------------------------
 export default async function StaticPage({ params }: PageProps) {
@@ -63,6 +71,16 @@ export default async function StaticPage({ params }: PageProps) {
 
   const contentHtml = sanitizeContent(page.content);
   const readingTime = estimateReadingTime(page.content);
+
+  // If this page is a hub, fetch related posts
+  const hubPosts = isHubPage(page)
+    ? await getHubPosts(
+        publication.id,
+        page.hub_beat,
+        page.hub_tag,
+        page.hub_limit || 20
+      )
+    : [];
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -103,6 +121,31 @@ export default async function StaticPage({ params }: PageProps) {
         className="article-content font-serif"
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />
+
+      {/* ---- HUB POST FEED ---- */}
+      {hubPosts.length > 0 && (
+        <section className="mt-12 pt-8 border-t-2 border-mercury-ink">
+          <h2 className="font-display text-2xl font-black tracking-tight mb-6">
+            {page.hub_heading || "Related Coverage"}
+          </h2>
+          <div className="max-w-3xl">
+            {hubPosts.map((post) => (
+              <PostCard key={post.id} post={post} showBeat={!page.hub_beat} />
+            ))}
+          </div>
+          {/* Link to the full beat page if this is a beat-based hub */}
+          {page.hub_beat && (
+            <div className="mt-6 pt-4 border-t border-mercury-rule">
+              <Link
+                href={`/${page.hub_beat}`}
+                className="text-sm font-sans font-semibold text-mercury-accent hover:underline uppercase tracking-wide"
+              >
+                View all {page.hub_beat} coverage â
+              </Link>
+            </div>
+          )}
+        </section>
+      )}
     </article>
   );
 }
