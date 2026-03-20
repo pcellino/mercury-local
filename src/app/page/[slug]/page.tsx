@@ -1,8 +1,8 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPageBySlug } from "@/lib/queries";
+import { getPageBySlug, getBeatsForPublication } from "@/lib/queries";
 import {
   sanitizeContent,
   formatDate,
@@ -26,6 +26,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!page) return {};
 
+  // If this is a hub page, don't generate metadata — it will redirect
+  if (page.hub_beat) return {};
+
   return {
     title: decodeHtmlEntities(page.title),
     alternates: {
@@ -44,10 +47,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // -------------------------------------------------------
 export default async function StaticPage({ params }: PageProps) {
   const { slug } = await params;
-  const { publication } = await getPublicationFromRequest();
+  const { publication, slug: pubSlug } = await getPublicationFromRequest();
 
   const page = await getPageBySlug(publication.id, slug);
   if (!page) notFound();
+
+  // If this page has hub_beat set and it's a valid beat, 301 redirect to /{hub_beat}
+  if (page.hub_beat) {
+    const beats = getBeatsForPublication(pubSlug);
+    const isValidBeat = beats.some((b) => b.slug === page.hub_beat);
+    if (isValidBeat) {
+      redirect(`/${page.hub_beat}`);
+    }
+  }
 
   const contentHtml = sanitizeContent(page.content);
   const readingTime = estimateReadingTime(page.content);

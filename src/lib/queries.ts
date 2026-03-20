@@ -287,10 +287,10 @@ export async function getPageBySlug(
 
 export async function getAllPublishedPages(
   publicationId: string
-): Promise<Pick<Page, "slug" | "updated_at">[]> {
+): Promise<Pick<Page, "slug" | "updated_at" | "hub_beat">[]> {
   const { data, error } = await supabase
     .from("pages")
-    .select("slug, updated_at")
+    .select("slug, updated_at, hub_beat")
     .eq("publication_id", publicationId)
     .eq("status", "published");
 
@@ -299,6 +299,28 @@ export async function getAllPublishedPages(
     return [];
   }
   return data || [];
+}
+
+export async function getHubPageByBeat(
+  publicationId: string,
+  beat: string
+): Promise<Page | null> {
+  const { data, error } = await supabase
+    .from("pages")
+    .select("*")
+    .eq("publication_id", publicationId)
+    .eq("hub_beat", beat)
+    .eq("status", "published")
+    .single();
+
+  if (error) {
+    if (error.code !== "PGRST116") {
+      // PGRST116 = no rows found, which is expected
+      console.error("getHubPageByBeat error:", error);
+    }
+    return null;
+  }
+  return data as Page;
 }
 
 // -------------------------------------------------------

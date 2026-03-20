@@ -42,8 +42,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // All published pages
+  // All published pages (exclude hub pages — they're covered by beat URLs)
   for (const page of pages) {
+    if (page.hub_beat) continue;
     entries.push({
       url: `${base}/page/${page.slug}`,
       lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),

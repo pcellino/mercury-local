@@ -104,6 +104,10 @@ export interface Page {
   updated_at: string;
   source: string | null;
   original_url: string | null;
+  hub_beat: string | null;
+  hub_tag: string | null;
+  hub_limit: number | null;
+  hub_heading: string | null;
 }
 
 // -------------------------------------------------------

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPostsByBeatWithAuthors, getBeatsForPublication } from "@/lib/queries";
+import { getPostsByBeatWithAuthors, getBeatsForPublication, getHubPageByBeat } from "@/lib/queries";
+import { sanitizeContent, decodeHtmlEntities } from "@/lib/content";
 import PostCard from "@/components/PostCard";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
@@ -18,16 +19,22 @@ export async function generateMetadata({ params }: BeatPageProps): Promise<Metad
 
   if (!beatConfig) return {};
 
-  const description = `${beatConfig.description}. Coverage from ${publication.name}.`;
+  // Check for hub page to use its title/description if available
+  const hubPage = await getHubPageByBeat(publication.id, beat);
+
+  const title = hubPage ? decodeHtmlEntities(hubPage.title) : beatConfig.label;
+  const description = hubPage
+    ? `${decodeHtmlEntities(hubPage.title)} — coverage from ${publication.name}.`
+    : `${beatConfig.description}. Coverage from ${publication.name}.`;
 
   return {
-    title: beatConfig.label,
+    title,
     description,
     alternates: {
       canonical: `/${beat}`,
     },
     openGraph: {
-      title: `${beatConfig.label} | ${publication.name}`,
+      title: `${title} | ${publication.name}`,
       description,
       url: `/${beat}`,
       type: "website",
@@ -44,9 +51,54 @@ export default async function BeatPage({ params }: BeatPageProps) {
   const beatConfig = beats.find((b) => b.slug === beat);
   if (!beatConfig) notFound();
 
-  const posts = await getPostsByBeatWithAuthors(publication.id, beat, 50);
+  // Check if a hub page exists for this beat
+  const hubPage = await getHubPageByBeat(publication.id, beat);
 
-  // Split into lead + rest for visual hierarchy
+  const postLimit = hubPage?.hub_limit ?? 50;
+  const posts = await getPostsByBeatWithAuthors(publication.id, beat, postLimit);
+
+  if (hubPage) {
+    // ---- Hub page: editorial content + dynamic post feed ----
+    const contentHtml = sanitizeContent(hubPage.content);
+    const feedHeading = hubPage.hub_heading || `Latest in ${beatConfig.label}`;
+
+    return (
+      <>
+        {/* Editorial content */}
+        <article className="max-w-3xl mx-auto">
+          <header className="mb-8">
+            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
+              {decodeHtmlEntities(hubPage.title)}
+            </h1>
+          </header>
+
+          <div
+            className="article-content font-serif"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
+        </article>
+
+        {/* Dynamic post feed */}
+        <section className="max-w-3xl mx-auto mt-12 pt-6 border-t-2 border-mercury-ink">
+          <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink mb-6">
+            {feedHeading}
+          </h2>
+
+          {posts.length === 0 ? (
+            <p className="text-mercury-muted font-serif">No stories yet in this section.</p>
+          ) : (
+            <div>
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} showBeat={false} />
+              ))}
+            </div>
+          )}
+        </section>
+      </>
+    );
+  }
+
+  // ---- Plain beat index (no hub page) ----
   const lead = posts[0];
   const rest = posts.slice(1);
 
