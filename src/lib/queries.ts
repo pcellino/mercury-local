@@ -242,7 +242,7 @@ export interface AuthorWithCount {
 export async function getAuthorsByPublication(
   publicationId: string
 ): Promise<AuthorWithCount[]> {
-  // Step 1: Find all author IDs who have published on this site
+  // Step 1: Find which authors have published posts on this publication
   const { data: postData, error: postError } = await supabase
     .from("posts")
     .select("author_id")
@@ -250,22 +250,21 @@ export async function getAuthorsByPublication(
     .eq("status", "published");
 
   if (postError) {
-    console.error("getAuthorsByPublication posts error:", postError);
+    console.error("getAuthorsByPublication error:", postError);
     return [];
   }
 
-  // Deduplicate author IDs and tally post counts in one pass
+  // Build post counts per author
   const counts: Record<string, number> = {};
-  for (const row of (postData || []) as Array<{ author_id: string | null }>) {
-    if (row.author_id) {
-      counts[row.author_id] = (counts[row.author_id] || 0) + 1;
-    }
+  for (const row of postData ?? []) {
+    const aid = row.author_id;
+    if (aid) counts[aid] = (counts[aid] ?? 0) + 1;
   }
 
   const authorIds = Object.keys(counts);
   if (authorIds.length === 0) return [];
 
-  // Step 2: Fetch full author records for those IDs
+  // Step 2: Fetch author records for those IDs
   const { data: authorRows, error } = await supabase
     .from("authors")
     .select("id, name, slug, bio, credentials, avatar_url, beat_description")
@@ -273,16 +272,22 @@ export async function getAuthorsByPublication(
     .order("name");
 
   if (error) {
-    console.error("getAuthorsByPublication error:", error);
+    console.error("getAuthorsByPublication fetch error:", error);
     return [];
   }
 
-  return ((authorRows || []) as Omit<AuthorWithCount, "published_count">[]).map(
-    (a) => ({ ...a, published_count: counts[a.id] || 0 })
-  );
+  return (authorRows ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    bio: row.bio ?? null,
+    credentials: row.credentials ?? null,
+    avatar_url: row.avatar_url ?? null,
+    beat_description: row.beat_description ?? null,
+    published_count: counts[row.id] ?? 0,
+  }));
 }
 
-// All authors (for sitemap generation)
 export async function getAllAuthors(): Promise<{ slug: string }[]> {
   const { data, error } = await supabase
     .from("authors")
