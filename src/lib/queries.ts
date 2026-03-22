@@ -282,6 +282,21 @@ export async function getAuthorsByPublication(
   );
 }
 
+// All authors (for sitemap generation)
+export async function getAllAuthors(): Promise<{ slug: string }[]> {
+  const { data, error } = await supabase
+    .from("authors")
+    .select("slug")
+    .order("name");
+
+  if (error) {
+    console.error("getAllAuthors error:", error);
+    return [];
+  }
+
+  return (data || []) as { slug: string }[];
+}
+
 // -------------------------------------------------------
 // Search (uses existing tsvector search_vector column)
 // -------------------------------------------------------
