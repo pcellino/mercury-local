@@ -256,7 +256,8 @@ export async function getAuthorsByPublication(
 
   // Build post counts per author
   const counts: Record<string, number> = {};
-  for (const row of postData ?? []) {
+  const rows = (postData ?? []) as Array<{ author_id: string | null }>;
+  for (const row of rows) {
     const aid = row.author_id;
     if (aid) counts[aid] = (counts[aid] ?? 0) + 1;
   }
@@ -276,7 +277,8 @@ export async function getAuthorsByPublication(
     return [];
   }
 
-  return (authorRows ?? []).map((row) => ({
+  type AuthorRow = Pick<Author, "id" | "name" | "slug" | "bio" | "credentials" | "avatar_url" | "beat_description">;
+  return ((authorRows ?? []) as AuthorRow[]).map((row) => ({
     id: row.id,
     name: row.name,
     slug: row.slug,
