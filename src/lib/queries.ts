@@ -222,6 +222,10 @@ export async function getPostsByAuthor(
 // -------------------------------------------------------
 // -------------------------------------------------------
 // Authors — full roster for staff directory page
+// Syndication-aware: returns authors who have published
+// on this specific site, regardless of their home publication.
+// Charlotte Mercury authors who syndicate to Farmington or
+// Strolling Ballantyne will appear on those /authors pages too.
 // -------------------------------------------------------
 
 export interface AuthorWithCount {
@@ -238,11 +242,34 @@ export interface AuthorWithCount {
 export async function getAuthorsByPublication(
   publicationId: string
 ): Promise<AuthorWithCount[]> {
-  // Fetch all authors for this publication
+  // Step 1: Find all author IDs who have published on this site
+  const { data: postData, error: postError } = await supabase
+    .from("posts")
+    .select("author_id")
+    .eq("publication_id", publicationId)
+    .eq("status", "published");
+
+  if (postError) {
+    console.error("getAuthorsByPublication posts error:", postError);
+    return [];
+  }
+
+  // Deduplicate author IDs and tally post counts in one pass
+  const counts: Record<string, number> = {};
+  for (const row of (postData || []) as Array<{ author_id: string | null }>) {
+    if (row.author_id) {
+      counts[row.author_id] = (counts[row.author_id] || 0) + 1;
+    }
+  }
+
+  const authorIds = Object.keys(counts);
+  if (authorIds.length === 0) return [];
+
+  // Step 2: Fetch full author records for those IDs
   const { data: authorRows, error } = await supabase
     .from("authors")
     .select("id, name, slug, bio, credentials, avatar_url, beat_description")
-    .eq("publication_id", publicationId)
+    .in("id", authorIds)
     .order("name");
 
   if (error) {
@@ -250,49 +277,9 @@ export async function getAuthorsByPublication(
     return [];
   }
 
-  const authors = (authorRows || []) as Omit<AuthorWithCount, "published_count">[];
-
-  // Fetch published post counts for each author in one batch query
-  const { data: countRows } = await supabase
-    .from("posts")
-    .select("author_id")
-    .eq("publication_id", publicationId)
-    .eq("status", "published")
-    .in(
-      "author_id",
-      authors.map((a) => a.id)
-    );
-
-  // Tally counts per author
-  const counts: Record<string, number> = {};
-  for (const row of (countRows || []) as Array<{ author_id: string | null }>) {
-    if (row.author_id) {
-      counts[row.author_id] = (counts[row.author_id] || 0) + 1;
-    }
-  }
-
-  return authors.map((a) => ({
-    ...a,
-    published_count: counts[a.id] || 0,
-  }));
-}
-
-// All authors (for sitemap generation)
-// -------------------------------------------------------
-
-export async function getAllAuthors(
-  publicationId: string
-): Promise<Pick<Author, "slug">[]> {
-  const { data, error } = await supabase
-    .from("authors")
-    .select("slug")
-    .eq("publication_id", publicationId);
-
-  if (error) {
-    console.error("getAllAuthors error:", error);
-    return [];
-  }
-  return data || [];
+  return ((authorRows || []) as Omit<AuthorWithCount, "published_count">[]).map(
+    (a) => ({ ...a, published_count: counts[a.id] || 0 })
+  );
 }
 
 // -------------------------------------------------------
