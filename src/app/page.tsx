@@ -57,6 +57,11 @@ export default async function HomePage() {
     ? await getPostsByBeatWithAuthors(publication.id, "opinion", 4)
     : [];
 
+  // Topics nav excludes opinion when it already has its own sidebar section
+  const topicBeats = opinionBeat
+    ? beats.filter((b) => b.slug !== "opinion")
+    : beats;
+
   // Split into sections
   const lead = posts[0];
   const secondary = posts.slice(1, 3);
@@ -273,7 +278,7 @@ export default async function HomePage() {
           ))}
         </div>
 
-        {/* Right sidebar â Opinion + Guides + Sections */}
+        {/* Right sidebar — Opinion + Guides + Topics */}
         <aside className="md:col-span-4 md:pl-6">
           {/* Opinion section */}
           {opinionPosts.length > 0 && (
@@ -304,11 +309,11 @@ export default async function HomePage() {
             </div>
           )}
 
-          {/* Guides & Hubs section */}
+          {/* Guides section */}
           {hubPages.length > 0 && (
             <div className="mb-8">
               <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
-                Guides &amp; Hubs
+                Guides
               </h2>
               <nav className="space-y-0">
                 {hubPages.map((hub, i) => (
@@ -331,17 +336,17 @@ export default async function HomePage() {
             </div>
           )}
 
-          {/* Sections nav */}
+          {/* Topics nav */}
           <div>
             <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
-              Sections
+              Topics
             </h2>
             <nav className="space-y-0">
-              {beats.map((beat, i) => (
+              {topicBeats.map((beat, i) => (
                 <Link
                   key={beat.slug}
                   href={`/${beat.slug}`}
-                  className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < beats.length - 1 ? "border-b border-mercury-rule" : ""}`}
+                  className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < topicBeats.length - 1 ? "border-b border-mercury-rule" : ""}`}
                 >
                   <span className="font-sans text-sm font-medium text-mercury-ink">{beat.label}</span>
                   <span className="text-xs text-mercury-muted font-sans tabular-nums">
