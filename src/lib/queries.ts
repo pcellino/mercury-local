@@ -9,7 +9,7 @@ const supabase = createServerClient();
 // -------------------------------------------------------
 
 export async function getPublicationBySlug(slug: string): Promise<Publication | null> {
-  const { data, error } = await supabas
+  const { data, error } = await supabase
     .from("publications")
     .select("*")
     .eq("slug", slug)
