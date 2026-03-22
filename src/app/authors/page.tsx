@@ -14,7 +14,7 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const { publication } = await getPublicationFromRequest();
   return {
-    title: `Our Staff | ${publication.name}`,
+    title: "Our Staff",
     description: `Meet the reporters, writers, and contributors behind ${publication.name}.`,
   };
 }
