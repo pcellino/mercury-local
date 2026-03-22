@@ -78,6 +78,59 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        {slug === "peter-cellino" && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Person",
+                "name": "Peter Cellino",
+                "jobTitle": "Publisher & Media Entrepreneur",
+                "description":
+                  "Publisher of The Charlotte Mercury and the creator of Mercury Local \u2014 a platform rebuilding local news into something that actually serves residents and the local businesses who need to reach them, without the ad-tech middlemen.",
+                "url": "https://petercellino.com",
+                "sameAs": [
+                  "https://www.linkedin.com/in/petercellino",
+                  "https://twitter.com/pcellino",
+                  "https://cltmercury.com",
+                  "https://www.mercurylocal.com",
+                ],
+                "knowsAbout": [
+                  "Agentic AI",
+                  "Large Language Models",
+                  "Token Efficiency",
+                  "AI-Powered Publishing",
+                  "Local Journalism",
+                  "Media Entrepreneurship",
+                  "Independent News Media",
+                ],
+                "affiliation": [
+                  {
+                    "@type": "NewsMediaOrganization",
+                    "name": "The Charlotte Mercury",
+                    "url": "https://cltmercury.com",
+                  },
+                  {
+                    "@type": "Organization",
+                    "name": "Mercury Local",
+                    "url": "https://www.mercurylocal.com",
+                  },
+                ],
+                "alumniOf": [
+                  {
+                    "@type": "CollegeOrUniversity",
+                    "name": "Villanova University",
+                  },
+                  {
+                    "@type": "CollegeOrUniversity",
+                    "name": "New York Law School",
+                  },
+                ],
+              }),
+            }}
+          />
+        )}
       </head>
       <body className="min-h-screen flex flex-col bg-white text-mercury-ink">
         {/* ---- DARK UTILITY BAR ---- */}
@@ -131,11 +184,11 @@ export default async function RootLayout({
                   {publication.name}
                 </h1>
               </Link>
-              {/* #Beta — the only thing under the title */}
+              {/* #Beta \u2014 the only thing under the title */}
               {!isCustomLayout && <BetaBanner />}
             </div>
 
-            {/* Beat navigation with hub dropdowns — news publications */}
+            {/* Beat navigation with hub dropdowns \u2014 news publications */}
             {!isCustomLayout && beats.length > 0 && (
               <BeatDropdownNav beats={beats} hubsByBeat={hubsByBeat} />
             )}
@@ -212,7 +265,7 @@ export default async function RootLayout({
                 </div>
               )}
 
-              {/* Guides column — hub pages */}
+              {/* Guides column \u2014 hub pages */}
               {!isCustomLayout && hubPages.length > 0 && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
