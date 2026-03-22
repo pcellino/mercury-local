@@ -286,6 +286,14 @@ export default async function RootLayout({
                   About
                 </Link>
                 <span className="mx-2">|</span>
+                {!isCustomLayout && (
+                  <>
+                    <Link href="/authors" className="hover:text-mercury-ink">
+                      Our Staff
+                    </Link>
+                    <span className="mx-2">|</span>
+                  </>
+                )}
                 <Link href="/page/contact" className="hover:text-mercury-ink">
                   Contact
                 </Link>
