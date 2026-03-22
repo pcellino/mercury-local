@@ -131,12 +131,7 @@ export default async function RootLayout({
                   {publication.name}
                 </h1>
               </Link>
-              {publication.tagline && (
-                <p className="text-sm text-mercury-muted mt-2 font-sans italic">
-                  {publication.tagline}
-                </p>
-              )}
-              {/* #Beta — always under the title on every news publication page */}
+              {/* #Beta — the only thing under the title */}
               {!isCustomLayout && <BetaBanner />}
             </div>
 
