@@ -136,6 +136,8 @@ export default async function RootLayout({
                   {publication.tagline}
                 </p>
               )}
+              {/* #Beta — always under the title on every news publication page */}
+              {!isCustomLayout && <BetaBanner />}
             </div>
 
             {/* Beat navigation with hub dropdowns — news publications */}
@@ -175,8 +177,6 @@ export default async function RootLayout({
         {/* ---- MAIN CONTENT ---- */}
         <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
           {children}
-          {/* #Beta — always the last h2 on every page across all news publications */}
-          {!isCustomLayout && <BetaBanner />}
         </main>
 
         {/* ---- FOOTER ---- */}
@@ -192,6 +192,8 @@ export default async function RootLayout({
                     ? slug === "peter-cellino"
                       ? ""
                       : "A Mercury Local property."
+                    : slug === "charlotte-mercury"
+                    ? "Independent local journalism. Mercury Local is our hyper-local platform."
                     : "A Mercury Local publication. Independent, local journalism."}
                 </p>
               </div>
