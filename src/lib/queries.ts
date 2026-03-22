@@ -9,7 +9,7 @@ const supabase = createServerClient();
 // -------------------------------------------------------
 
 export async function getPublicationBySlug(slug: string): Promise<Publication | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabas
     .from("publications")
     .select("*")
     .eq("slug", slug)
@@ -288,10 +288,11 @@ export async function getAuthorsByPublication(
   }));
 }
 
-export async function getAllAuthors(): Promise<{ slug: string }[]> {
+export async function getAllAuthors(publicationId: string): Promise<{ slug: string }[]> {
   const { data, error } = await supabase
     .from("authors")
     .select("slug")
+    .eq("publication_id", publicationId)
     .order("name");
 
   if (error) {
