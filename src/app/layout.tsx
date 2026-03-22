@@ -5,6 +5,7 @@ import { getBaseUrl, CUSTOM_LAYOUT_SLUGS } from "@/lib/domains";
 import Link from "next/link";
 import { decodeHtmlEntities } from "@/lib/content";
 import BeatDropdownNav from "@/components/BeatDropdownNav";
+import BetaBanner from "@/components/BetaBanner";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -137,7 +138,7 @@ export default async function RootLayout({
               )}
             </div>
 
-            {/* Beat navigation with hub dropdowns â news publications */}
+            {/* Beat navigation with hub dropdowns — news publications */}
             {!isCustomLayout && beats.length > 0 && (
               <BeatDropdownNav beats={beats} hubsByBeat={hubsByBeat} />
             )}
@@ -174,6 +175,8 @@ export default async function RootLayout({
         {/* ---- MAIN CONTENT ---- */}
         <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
           {children}
+          {/* #Beta — always the last h2 on every page across all news publications */}
+          {!isCustomLayout && <BetaBanner />}
         </main>
 
         {/* ---- FOOTER ---- */}
@@ -196,7 +199,7 @@ export default async function RootLayout({
               {!isCustomLayout && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
-                    Sections
+                    Topics
                   </p>
                   <div className="grid grid-cols-2 gap-1">
                     {beats.map((beat) => (
@@ -212,7 +215,7 @@ export default async function RootLayout({
                 </div>
               )}
 
-              {/* Guides column â hub pages */}
+              {/* Guides column — hub pages */}
               {!isCustomLayout && hubPages.length > 0 && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
