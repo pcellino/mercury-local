@@ -1,18 +1,13 @@
-// BetaBanner — Always the last h2 on every page.
-// Mercury Local publications are in public beta. This banner signals that
-// to readers and reinforces the independent, early-access spirit of the platform.
-
+// BetaBanner — displayed under the masthead title on every news publication page.
 export default function BetaBanner() {
   return (
-    <section className="mt-16 pt-6 border-t border-mercury-rule">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-        <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-accent">
-          Always Last.. To Break News.. #Beta
-        </h2>
-        <p className="text-[11px] text-mercury-muted font-sans text-center md:text-right">
-          Mercury Local is in public beta — independent, locally owned, and just getting started.
-        </p>
-      </div>
-    </section>
+    <div className="mt-2">
+      <h2 className="font-sans text-[10px] font-bold uppercase tracking-widest text-mercury-accent text-center">
+        Always Last.. To Break News.. #Beta
+      </h2>
+      <p className="text-[10px] text-mercury-muted font-sans text-center mt-0.5">
+        Mercury Local is in public beta — independent, locally owned, and just getting started.
+      </p>
+    </div>
   );
 }
