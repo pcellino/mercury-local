@@ -230,7 +230,7 @@ export default async function RootLayout({
         {/* ---- FOOTER ---- */}
         <footer className="bg-stone-50 border-t border-mercury-rule mt-16">
           <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? "md:grid-cols-4" : "md:grid-cols-3"} gap-8`}>
+            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? "md:grid-cols-5" : "md:grid-cols-3"} gap-8`}>
               <div>
                 <p className="font-display font-black text-2xl">
                   {publication.name}
@@ -261,6 +261,32 @@ export default async function RootLayout({
                         {beat.label}
                       </Link>
                     ))}
+                  </div>
+                </div>
+              )}
+
+                            {/* Resources column — utility pages residents bookmark */}
+              {!isCustomLayout && (
+                <div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
+                    Resources
+                  </p>
+                  <div className="grid grid-cols-1 gap-1">
+                    <Link href="/page/ballantyne-emergency-contacts-country-club-services-guide" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                      Emergency Numbers
+                    </Link>
+                    <Link href="/page/ballantyne-business-services-directory" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                      Business Directory
+                    </Link>
+                    <Link href="/page/ballantynes-complete-guide-to-your-representatives" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                      Your Representatives
+                    </Link>
+                    <Link href="/page/partners" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                      Our Partners
+                    </Link>
+                    <Link href="/page/advertise" className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5">
+                      Advertise
+                    </Link>
                   </div>
                 </div>
               )}

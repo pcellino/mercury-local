@@ -336,26 +336,33 @@ export default async function HomePage() {
             </div>
           )}
 
-          {/* Topics nav */}
-          <div>
-            <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
-              Topics
-            </h2>
-            <nav className="space-y-0">
-              {topicBeats.map((beat, i) => (
-                <Link
-                  key={beat.slug}
-                  href={`/${beat.slug}`}
-                  className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < topicBeats.length - 1 ? "border-b border-mercury-rule" : ""}`}
-                >
-                  <span className="font-sans text-sm font-medium text-mercury-ink">{beat.label}</span>
-                  <span className="text-xs text-mercury-muted font-sans tabular-nums">
-                    {beatCounts[beat.slug] || 0}
-                  </span>
-                </Link>
-              ))}
-            </nav>
-          </div>
+          {/* Neighborhood Resources — utility pages residents bookmark */}
+          {(() => {
+            const resourcePages = [
+              { slug: "ballantyne-emergency-contacts-country-club-services-guide", label: "Emergency Numbers & Contacts" },
+              { slug: "ballantyne-business-services-directory", label: "Business & Services Directory" },
+              { slug: "ballantynes-complete-guide-to-your-representatives", label: "Your Representatives" },
+              { slug: "partners", label: "Our Partners" },
+            ];
+            return (
+              <div>
+                <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
+                  Neighborhood Resources
+                </h2>
+                <nav className="space-y-0">
+                  {resourcePages.map((page, i) => (
+                    <Link
+                      key={page.slug}
+                      href={`/page/${page.slug}`}
+                      className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < resourcePages.length - 1 ? "border-b border-mercury-rule" : ""}`}
+                    >
+                      <span className="font-sans text-sm font-medium text-mercury-ink">{page.label}</span>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            );
+          })()}
         </aside>
       </div>
 
