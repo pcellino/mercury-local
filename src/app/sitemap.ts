@@ -53,6 +53,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
+
+  // petercellino.com-specific static routes (not in pages table)
+  if (slug === "petercellino") {
+    entries.push({
+      url: `${base}/notes`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+  }
   // Author pages
   for (const author of authors) {
     entries.push({
