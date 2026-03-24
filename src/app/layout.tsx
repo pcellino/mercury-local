@@ -230,7 +230,7 @@ export default async function RootLayout({
         {/* ---- FOOTER ---- */}
         <footer className="bg-stone-50 border-t border-mercury-rule mt-16">
           <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? "md:grid-cols-5" : "md:grid-cols-3"} gap-8`}>
+            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? (slug === "strolling-ballantyne" ? "md:grid-cols-5" : "md:grid-cols-4") : "md:grid-cols-3"} gap-8`}>
               <div>
                 <p className="font-display font-black text-2xl">
                   {publication.name}
@@ -265,8 +265,8 @@ export default async function RootLayout({
                 </div>
               )}
 
-                            {/* Resources column — utility pages residents bookmark */}
-              {!isCustomLayout && (
+                            {/* Resources column — Strolling Ballantyne only */}
+              {slug === "strolling-ballantyne" && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
                     Resources
