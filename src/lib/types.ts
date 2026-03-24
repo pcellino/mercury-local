@@ -140,12 +140,12 @@ export const CHARLOTTE_BEATS: BeatConfig[] = [
 ];
 
 export const BALLANTYNE_BEATS: BeatConfig[] = [
-  { slug: "wellness", label: "Wellness", description: "Health, fitness, beauty, and spa in Ballantyne" },
-  { slug: "business", label: "Business", description: "Local business profiles and features" },
-  { slug: "government", label: "Government", description: "Policy and civic news affecting Ballantyne" },
-  { slug: "community", label: "Community", description: "Events, pets, and neighborhood life" },
-  { slug: "lifestyle", label: "Lifestyle", description: "Travel, entertainment, and living well in south Charlotte" },
-  { slug: "dining", label: "Dining", description: "Restaurants, recipes, and the Ballantyne food scene" },
+  { slug: "wellness", label: "Health & Wellness", description: "Fitness, beauty, spa, and taking care of yourself in Ballantyne" },
+  { slug: "business", label: "Local Business", description: "The people behind the storefronts, leases, and side hustles" },
+  { slug: "government", label: "Civic", description: "Zoning votes, city council, and the policy that shapes your commute" },
+  { slug: "community", label: "Neighbors", description: "The people, pets, and stories that make Ballantyne home" },
+  { slug: "lifestyle", label: "Living", description: "Travel, real estate, culture, and the occasional hot take" },
+  { slug: "dining", label: "Eat & Drink", description: "Where to eat, what to cook, and who\'s behind the kitchen door" },
 ];
 
 export const MERCURY_LOCAL_BEATS: BeatConfig[] = [
