@@ -5,7 +5,9 @@ import { getPublicationFromRequest } from "@/lib/publication";
 import {
   getPostByBeatAndSlug,
   getBeatsForPublication,
-  getPostsByBeatWithAuthors
+  getPostsByBeatWithAuthors,
+  getPageBySlug,
+  getHubPosts,
 } from "@/lib/queries";
 import {
   sanitizeContent,
@@ -15,6 +17,7 @@ import {
 } from "@/lib/content";
 import { generateArticleJsonLd, generateBreadcrumbJsonLd } from "@/lib/jsonld";
 import BeatIllustration from "@/components/BeatIllustration";
+import PostCard from "@/components/PostCard";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
@@ -28,6 +31,21 @@ interface PostPageProps {
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { beat, slug } = await params;
   const { publication } = await getPublicationFromRequest();
+
+  // Check if this slug is a hub page (e.g., /sports/hornets → team page)
+  const hubPage = await getPageBySlug(publication.id, slug);
+  if (hubPage && (hubPage.hub_tag || hubPage.hub_beat)) {
+    return {
+      title: decodeHtmlEntities(hubPage.title),
+      alternates: { canonical: `/${beat}/${slug}` },
+      openGraph: {
+        title: decodeHtmlEntities(hubPage.title),
+        type: "website",
+        url: `/${beat}/${slug}`,
+      },
+    };
+  }
+
   const post = await getPostByBeatAndSlug(publication.id, beat, slug);
 
   if (!post) return {};
@@ -73,6 +91,73 @@ export default async function PostPage({ params }: PostPageProps) {
   const { beat, slug } = await params;
   const { publication, slug: pubSlug } = await getPublicationFromRequest();
 
+  // -------------------------------------------------------
+  // Hub page detection — e.g., /sports/hornets → team page
+  // If the slug matches a hub page, render it instead of a post.
+  // -------------------------------------------------------
+  const hubPage = await getPageBySlug(publication.id, slug);
+  if (hubPage && (hubPage.hub_tag || hubPage.hub_beat)) {
+    const beats = getBeatsForPublication(pubSlug);
+    const beatConfig = beats.find((b) => b.slug === beat);
+    const hubContentHtml = sanitizeContent(hubPage.content);
+    const hubPosts = await getHubPosts(
+      publication.id,
+      hubPage.hub_beat,
+      hubPage.hub_tag,
+      hubPage.hub_limit || 20
+    );
+
+    return (
+      <article className="max-w-3xl mx-auto">
+        {/* Breadcrumbs: Home / Sports / Charlotte Hornets */}
+        <nav
+          className="text-xs text-mercury-muted mb-6 font-sans uppercase tracking-wide"
+          aria-label="Breadcrumb"
+        >
+          <Link href="/" className="hover:text-mercury-ink">
+            Home
+          </Link>
+          <span className="mx-2">/</span>
+          <Link href={`/${beat}`} className="hover:text-mercury-ink">
+            {beatConfig?.label || beat}
+          </Link>
+          <span className="mx-2">/</span>
+          <span>{decodeHtmlEntities(hubPage.title)}</span>
+        </nav>
+
+        {/* Page header */}
+        <header className="mb-8">
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
+            {decodeHtmlEntities(hubPage.title)}
+          </h1>
+        </header>
+
+        {/* Page body */}
+        <div
+          className="article-content font-serif"
+          dangerouslySetInnerHTML={{ __html: hubContentHtml }}
+        />
+
+        {/* Hub post feed */}
+        {hubPosts.length > 0 && (
+          <section className="mt-12 pt-8 border-t-2 border-mercury-ink">
+            <h2 className="font-display text-2xl font-black tracking-tight mb-6">
+              {hubPage.hub_heading || "Related Coverage"}
+            </h2>
+            <div className="max-w-3xl">
+              {hubPosts.map((post) => (
+                <PostCard key={post.id} post={post} showBeat={!hubPage.hub_beat} />
+              ))}
+            </div>
+          </section>
+        )}
+      </article>
+    );
+  }
+
+  // -------------------------------------------------------
+  // Normal article post rendering
+  // -------------------------------------------------------
   const post = await getPostByBeatAndSlug(publication.id, beat, slug);
   if (!post) notFound();
 

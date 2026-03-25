@@ -70,6 +70,15 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
+      // === CLT MERCURY — Sports team pages → /sports/{team} ===
+      { source: "/page/hornets", destination: "/sports/hornets", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+      { source: "/page/panthers", destination: "/sports/panthers", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+      { source: "/page/charlotte-fc", destination: "/sports/charlotte-fc", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+      { source: "/page/carolina-ascent-fc", destination: "/sports/carolina-ascent-fc", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+      { source: "/page/knights", destination: "/sports/knights", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+      { source: "/page/checkers", destination: "/sports/checkers", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+      { source: "/page/nascar", destination: "/sports/nascar", has: [{ type: "host", value: "cltmercury.com" }], permanent: true },
+
       // === CLT MERCURY — old page slugs (WordPress used flat URLs, we use /page/) ===
       { source: "/about-us", destination: "/page/about", permanent: true },
       { source: "/contact-us", destination: "/page/contact", permanent: true },

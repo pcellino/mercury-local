@@ -42,27 +42,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // All published pages (exclude hub pages — they're covered by beat URLs)
+  // Sports team page slugs — these render at /sports/{slug} instead of /page/{slug}
+  const SPORTS_TEAM_SLUGS = ["hornets", "panthers", "charlotte-fc", "carolina-ascent-fc", "knights", "checkers", "nascar"];
+
+  // All published pages (exclude hub pages with hub_beat — they're covered by beat URLs)
   for (const page of pages) {
     if (page.hub_beat) continue;
-    entries.push({
-      url: `${base}/page/${page.slug}`,
-      lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    });
+
+    // Team pages render under /sports/ for SEO
+    if (slug === "charlotte-mercury" && SPORTS_TEAM_SLUGS.includes(page.slug)) {
+      entries.push({
+        url: `${base}/sports/${page.slug}`,
+        lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),
+        changeFrequency: "daily",
+        priority: 0.8,
+      });
+    } else {
+      entries.push({
+        url: `${base}/page/${page.slug}`,
+        lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      });
+    }
   }
 
-
-  // petercellino.com-specific static routes (not in pages table)
-  if (slug === "petercellino") {
-    entries.push({
-      url: `${base}/notes`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    });
-  }
   // Author pages
   for (const author of authors) {
     entries.push({
