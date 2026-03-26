@@ -194,7 +194,7 @@ export default async function RootLayout({
 
             {/* Beat navigation with hub dropdowns \u2014 news publications */}
             {!isCustomLayout && beats.length > 0 && (
-              <BeatDropdownNav beats={beats} hubsByBeat={hubsByBeat} />
+              <BeatDropdownNav beats={beats} hubsByBeat={hubsByBeat} publicationSlug={slug} />
             )}
 
             {/* Simplified nav for custom-layout publications */}
