@@ -56,10 +56,14 @@ export default async function RootLayout({
   // Fetch hub pages for nav and footer
   const hubPages = isCustomLayout ? [] : await getHubPages(publication.id);
 
+  // Sports team slugs — hub_tag pages that belong under the Sports dropdown
+  const SPORTS_TEAM_SLUGS = new Set(["hornets", "panthers", "charlotte-fc", "carolina-ascent-fc", "knights", "checkers", "nascar"]);
+
   // Group hub pages by beat for dropdown nav
   const hubsByBeat: Record<string, Array<{ slug: string; title: string }>> = {};
   for (const hub of hubPages) {
-    const beat = hub.hub_beat || "_none";
+    // Team pages (hub_tag, no hub_beat) belong under "sports"
+    const beat = hub.hub_beat || (SPORTS_TEAM_SLUGS.has(hub.slug) ? "sports" : "_none");
     if (!hubsByBeat[beat]) hubsByBeat[beat] = [];
     hubsByBeat[beat].push({ slug: hub.slug, title: hub.title });
   }
@@ -230,7 +234,7 @@ export default async function RootLayout({
         {/* ---- FOOTER ---- */}
         <footer className="bg-stone-50 border-t border-mercury-rule mt-16">
           <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? (slug === "strolling-ballantyne" ? "md:grid-cols-5" : "md:grid-cols-4") : "md:grid-cols-3"} gap-8`}>
+            <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? "md:grid-cols-6" : "md:grid-cols-3"} gap-8`}>
               <div>
                 <p className="font-display font-black text-2xl">
                   {publication.name}
@@ -265,8 +269,8 @@ export default async function RootLayout({
                 </div>
               )}
 
-                            {/* Resources column — Strolling Ballantyne only */}
-              {slug === "strolling-ballantyne" && (
+              {/* Resources column — utility pages residents bookmark */}
+              {!isCustomLayout && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
                     Resources
@@ -291,22 +295,46 @@ export default async function RootLayout({
                 </div>
               )}
 
-              {/* Guides column \u2014 hub pages */}
-              {!isCustomLayout && hubPages.length > 0 && (
+              {/* Sports column — team pages */}
+              {!isCustomLayout && hubPages.some((h) => SPORTS_TEAM_SLUGS.has(h.slug)) && (
+                <div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
+                    Sports
+                  </p>
+                  <div className="grid grid-cols-1 gap-1">
+                    {hubPages
+                      .filter((hub) => SPORTS_TEAM_SLUGS.has(hub.slug))
+                      .map((hub) => (
+                        <Link
+                          key={hub.slug}
+                          href={`/sports/${hub.slug}`}
+                          className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
+                        >
+                          {decodeHtmlEntities(hub.title)}
+                        </Link>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Guides column — non-sports hub pages */}
+              {!isCustomLayout && hubPages.some((h) => !SPORTS_TEAM_SLUGS.has(h.slug) && !h.hub_beat) && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
                     Guides
                   </p>
                   <div className="grid grid-cols-1 gap-1">
-                    {hubPages.map((hub) => (
-                      <Link
-                        key={hub.slug}
-                        href={`/page/${hub.slug}`}
-                        className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
-                      >
-                        {decodeHtmlEntities(hub.title)}
-                      </Link>
-                    ))}
+                    {hubPages
+                      .filter((hub) => !SPORTS_TEAM_SLUGS.has(hub.slug) && !hub.hub_beat)
+                      .map((hub) => (
+                        <Link
+                          key={hub.slug}
+                          href={`/page/${hub.slug}`}
+                          className="text-sm font-sans text-mercury-ink hover:text-mercury-accent transition-colors py-0.5"
+                        >
+                          {decodeHtmlEntities(hub.title)}
+                        </Link>
+                      ))}
                   </div>
                 </div>
               )}

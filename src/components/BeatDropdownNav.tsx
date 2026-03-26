@@ -10,6 +10,9 @@ interface BeatDropdownNavProps {
   hubsByBeat: Record<string, Array<{ slug: string; title: string }>>;
 }
 
+// Team pages render at /sports/{slug}, not /page/{slug}
+const SPORTS_TEAM_SLUGS = new Set(["hornets", "panthers", "charlotte-fc", "carolina-ascent-fc", "knights", "checkers", "nascar"]);
+
 export default function BeatDropdownNav({ beats, hubsByBeat }: BeatDropdownNavProps) {
   const [openBeat, setOpenBeat] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
@@ -79,7 +82,7 @@ export default function BeatDropdownNav({ beats, hubsByBeat }: BeatDropdownNavPr
                     {hubs.map((hub) => (
                       <Link
                         key={hub.slug}
-                        href={`/page/${hub.slug}`}
+                        href={SPORTS_TEAM_SLUGS.has(hub.slug) ? `/sports/${hub.slug}` : `/page/${hub.slug}`}
                         className="block px-4 py-2 text-sm font-sans text-mercury-ink hover:bg-stone-50 hover:text-mercury-accent transition-colors"
                         onClick={() => setOpenBeat(null)}
                       >
