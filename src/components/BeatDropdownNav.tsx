@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import type { BeatConfig } from "@/lib/types";
-import { decodeHtmlEntities } from "@/lb/content";
+import { decodeHtmlEntities } from "@/lib/content";
 
 interface BeatDropdownNavProps {
   beats: BeatConfig[];
