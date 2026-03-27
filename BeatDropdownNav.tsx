@@ -36,7 +36,6 @@ const NAV_GROUPS: Record<string, NavGroup[]> = {
       childLinks: [
         { label: "All Government", href: "/government" },
         { label: "Elections", href: "/elections" },
-        { label: "County Commissioners", href: "/page/board-of-county-commissioners" },
       ],
     },
     {
