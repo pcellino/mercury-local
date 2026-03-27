@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!page) return {};
 
   // If this is a hub page, don't generate metadata — it will redirect
-  if (page.hub_beat) return {};
+  if (page.hub_beat && slug === page.hub_beat) return {};
 
   return {
     title: decodeHtmlEntities(page.title),
@@ -61,7 +61,7 @@ export default async function StaticPage({ params }: PageProps) {
   if (!page) notFound();
 
   // If this page has hub_beat set and it's a valid beat, 301 redirect to /{hub_beat}
-  if (page.hub_beat) {
+  if (page.hub_beat && slug === page.hub_beat) {
     const beats = getBeatsForPublication(pubSlug);
     const isValidBeat = beats.some((b) => b.slug === page.hub_beat);
     if (isValidBeat) {
