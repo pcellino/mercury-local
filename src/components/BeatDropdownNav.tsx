@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import type { BeatConfig } from "@/lib/types";
-import { decodeHtmlEntities } from "@/lib/content";
+import { decodeHtmlEntities } from "@/lb/content";
 
 interface BeatDropdownNavProps {
   beats: BeatConfig[];
@@ -36,6 +36,7 @@ const NAV_GROUPS: Record<string, NavGroup[]> = {
       childLinks: [
         { label: "All Government", href: "/government" },
         { label: "Elections", href: "/elections" },
+        { label: "County Commissioners", href: "/page/board-of-county-commissioners" },
       ],
     },
     {
