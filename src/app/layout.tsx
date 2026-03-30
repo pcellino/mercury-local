@@ -142,7 +142,7 @@ export default async function RootLayout({
         {isGNT ? (
           <div className="bg-gnt-dark border-b border-gnt-rule overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="gnt-on-air-badge shrink-0">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gnt-accent opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-gnt-accent"></span>
@@ -151,7 +151,7 @@ export default async function RootLayout({
               </div>
               <div className="flex-1 mx-4 overflow-hidden">
                 <div className="whitespace-nowrap animate-marquee font-sans text-[10px] tracking-widest text-gnt-muted uppercase">
-                  Grand National Today &middot; Developmental Stock Car Racing &middot; O&apos;Reilly Auto Parts Grand National Series &middot; CARS Tour &middot; Virginia Triple Crown &middot; Launching June 1, 2026
+                  Grand National Today &middot; Developmental Stock Car Racing &middot; O&apos;Reilly Auto Parts Grand National Series &middot; CARS Tour &middot; Virginia Triple Crown coverage &mdash; TheSportsmanShow.com &mdash; Est. 2026
                 </div>
               </div>
               <span className="font-sans text-[10px] tracking-wider text-gnt-muted shrink-0">VOL. I &middot; NO. 1</span>
@@ -220,6 +220,7 @@ export default async function RootLayout({
                   <Link href="/vtc" className="font-sans text-xs font-semibold uppercase tracking-widest text-[#2563eb] hover:text-[#2563eb]/80 transition-colors no-underline">Virginia Triple Crown</Link>
                   <Link href="/opinion" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Columns</Link>
                   <Link href="/standings" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Stats</Link>
+                  <Link href="/features" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Podcasts</Link>
                 </nav>
                 {/* Mobile menu button */}
                 <button className="md:hidden text-gnt-muted hover:text-gnt-text p-1" aria-label="Menu">
@@ -296,7 +297,7 @@ export default async function RootLayout({
                     Grand <span className="text-gnt-accent">National</span> Today
                   </p>
                   <p className="text-sm text-gnt-muted mt-3 font-sans leading-relaxed">
-                    The definitive source for developmental stock car racing. Covering the O&apos;Reilly Auto Parts Grand National Series, CARS Tour, and Virginia Triple Crown.
+                    Motorsports editorial covering the NASCAR O&apos;Reilly Auto Parts Series, CARS Tour, and Virginia Triple Crown.
                   </p>
                   <p className="text-xs text-gnt-muted mt-4 font-sans">
                     A Queen City Garage Production
@@ -304,7 +305,7 @@ export default async function RootLayout({
                 </div>
                 {/* Column 2 — Quick Links / Schedule */}
                 <div>
-                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-gnt-gold mb-3">
+                  <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gnt-gold mb-3">
                     Quick Links
                   </p>
                   <div className="grid grid-cols-1 gap-1.5">
@@ -313,26 +314,26 @@ export default async function RootLayout({
                     <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">News</Link>
                     <Link href="/opinion" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Columns</Link>
                     <Link href="/page/about" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">About</Link>
-                    <Link href="/authors" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Staff</Link>
+                    <Link href="/page/contact" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Contact</Link>
+                    <Link href="/page/advertise" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Advertise</Link>
                   </div>
                 </div>
-                {/* Column 3 — External / Shows */}
+                {/* Column 3 — External */}
                 <div>
-                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-gnt-gold mb-3">
-                    Shows &amp; More
+                  <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gnt-gold mb-3">
+                    External
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     <div>
                       <a href="https://thesportsmanshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
-                        The Sportsman Show
+                        TheSportsmanShow.com <span className="opacity-50 text-xs">&#x2197;</span>
                       </a>
-                      <p className="text-xs text-gnt-muted mt-0.5">New episodes weekly</p>
                     </div>
                     <div>
                       <a href="https://thegrandnationalshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
-                        The Grand National Show
+                        TheGrandNationalShow.com <span className="opacity-50 text-xs">&#x2197;</span>
                       </a>
-                      <p className="text-xs text-gnt-muted mt-0.5">Coming 2027</p>
+                      <p className="text-xs text-gnt-muted mt-0.5 font-sans uppercase tracking-wider">Coming 2027</p>
                     </div>
                   </div>
                 </div>

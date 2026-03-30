@@ -80,13 +80,13 @@ export default function GrandNationalTodayHome({
     <>
       {/* ── PRE-LAUNCH HERO ─────────────────────────────── */}
       {!countdown.launched && (
-        <section className="relative py-16 md:py-24 lg:py-32 -mx-4 px-4 overflow-hidden">
-          {/* Subtle radial background texture */}
+        <section className="relative py-16 md:py-24 lg:py-32 -mx-4 px-4 overflow-hidden gnt-bg-pattern">
+          {/* Subtle radial glow */}
           <div
-            className="absolute inset-0 opacity-[0.04]"
+            className="absolute inset-0 opacity-[0.06]"
             style={{
               backgroundImage:
-                "radial-gradient(circle at 50% 50%, #d4a574 0%, transparent 70%)",
+                "radial-gradient(circle at 50% 35%, #d4a574 0%, transparent 60%)",
             }}
           />
           <div className="relative z-10 text-center max-w-4xl mx-auto">
@@ -149,15 +149,15 @@ export default function GrandNationalTodayHome({
               <p className="text-gnt-muted font-sans text-sm mb-3">
                 Get notified when we go live
               </p>
-              <div className="flex border border-gnt-rule overflow-hidden">
+              <div className="flex overflow-hidden rounded-sm">
                 <input
                   type="email"
                   placeholder="Your email address"
-                  className="flex-1 bg-gnt-surface text-gnt-text font-sans text-sm px-4 py-3 focus:outline-none placeholder-gnt-muted border-none"
+                  className="flex-1 gnt-email-input text-gnt-text font-sans text-sm px-4 py-3.5 placeholder-gnt-muted"
                 />
                 <button
                   type="button"
-                  className="bg-gnt-gold text-gnt-dark font-sans text-xs font-bold uppercase tracking-widest px-6 py-3 hover:opacity-90 transition-opacity whitespace-nowrap"
+                  className="bg-gnt-gold text-gnt-dark font-sans text-xs font-bold uppercase tracking-[0.2em] px-7 py-3.5 hover:opacity-90 transition-opacity whitespace-nowrap"
                 >
                   Notify Me
                 </button>
@@ -173,7 +173,7 @@ export default function GrandNationalTodayHome({
                 className="font-sans text-[10px] md:text-xs uppercase tracking-widest hover:text-gnt-text transition-colors"
               >
                 The Sportsman Show{" "}
-                <span className="inline-block ml-0.5 opacity-50">&nearr;</span>
+                <span className="inline-block ml-0.5 opacity-50">&#x2197;</span>
               </a>
               <span className="text-gnt-rule">&middot;</span>
               <span className="font-sans text-[10px] md:text-xs uppercase tracking-widest">
