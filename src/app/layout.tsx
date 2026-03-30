@@ -140,18 +140,21 @@ export default async function RootLayout({
       <body className={`min-h-screen flex flex-col ${isGNT ? "bg-gnt-dark text-gnt-text" : "bg-white text-mercury-ink"}`}>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}
         {isGNT ? (
-          <div className="bg-gnt-dark border-b border-gnt-rule">
+          <div className="bg-gnt-dark border-b border-gnt-rule overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-xs">
-              <span className="font-sans font-bold text-gnt-accent tracking-wider">GNT</span>
-              <div className="flex items-center gap-3">
-                <Link href="/racing" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">Racing</Link>
-                <Link href="/features" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">Features</Link>
-                <Link href="/opinion" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">Opinion</Link>
-                <Link href="/standings" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">Standings</Link>
-                <Link href="/vtc" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">VTC</Link>
-                <span className="text-gnt-rule mx-1">|</span>
-                <span className="text-gnt-muted font-sans text-[10px] tracking-wider">EST. 2026 &middot; A QUEEN CITY GARAGE PRODUCTION</span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gnt-accent opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-gnt-accent"></span>
+                </span>
+                <span className="font-sans font-bold text-gnt-accent tracking-wider text-[10px] uppercase">On Air</span>
               </div>
+              <div className="flex-1 mx-4 overflow-hidden">
+                <div className="whitespace-nowrap animate-marquee font-sans text-[10px] tracking-widest text-gnt-muted uppercase">
+                  Grand National Today &middot; Developmental Stock Car Racing &middot; O&apos;Reilly Auto Parts Grand National Series &middot; CARS Tour &middot; Virginia Triple Crown &middot; Launching June 1, 2026
+                </div>
+              </div>
+              <span className="font-sans text-[10px] tracking-wider text-gnt-muted shrink-0">VOL. I &middot; NO. 1</span>
             </div>
           </div>
         ) : (
@@ -199,29 +202,29 @@ export default async function RootLayout({
 
         {/* ---- MASTHEAD ---- */}
         {isGNT ? (
-          <header className="bg-gnt-dark">
+          <header className="bg-gnt-surface/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gnt-rule">
             <div className="max-w-7xl mx-auto px-4">
-              <div className="py-8 md:py-12 text-center border-b border-gnt-rule">
-                <Link href="/" className="no-underline">
-                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-black text-gnt-text tracking-tight leading-none">
-                    Grand National Today
-                  </h1>
+              <div className="flex items-center justify-between h-14">
+                {/* Logo / site name — left */}
+                <Link href="/" className="no-underline shrink-0">
+                  <span className="font-display text-xl md:text-2xl font-black text-gnt-text tracking-tight leading-none">
+                    Grand <span className="text-gnt-accent">National</span> Today
+                  </span>
                 </Link>
-                <p className="text-gnt-muted font-sans text-sm mt-3 tracking-wide">
-                  Covering racing before it becomes famous.
-                </p>
-              </div>
-              {/* Series navigation badges */}
-              <div className="flex items-center justify-center gap-3 py-4 border-b border-gnt-rule">
-                <Link href="/racing" className="inline-block bg-gnt-accent text-white font-sans text-xs font-bold uppercase tracking-widest px-4 py-2 hover:opacity-90 transition-opacity no-underline">
-                  O&apos;Reilly Series
-                </Link>
-                <Link href="/racing" className="inline-block bg-gnt-gold text-gnt-dark font-sans text-xs font-bold uppercase tracking-widest px-4 py-2 hover:opacity-90 transition-opacity no-underline">
-                  CARS Tour
-                </Link>
-                <Link href="/vtc" className="inline-block border border-gnt-gold text-gnt-gold font-sans text-xs font-bold uppercase tracking-widest px-4 py-2 hover:bg-gnt-gold hover:text-gnt-dark transition-colors no-underline">
-                  Virginia Triple Crown
-                </Link>
+                {/* Primary nav — right */}
+                <nav className="hidden md:flex items-center gap-5">
+                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">News</Link>
+                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Schedules</Link>
+                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-accent hover:text-gnt-accent/80 transition-colors no-underline">O&apos;Reilly Series</Link>
+                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-gold hover:text-gnt-gold/80 transition-colors no-underline">CARS Tour</Link>
+                  <Link href="/vtc" className="font-sans text-xs font-semibold uppercase tracking-widest text-[#2563eb] hover:text-[#2563eb]/80 transition-colors no-underline">Virginia Triple Crown</Link>
+                  <Link href="/opinion" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Columns</Link>
+                  <Link href="/standings" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Stats</Link>
+                </nav>
+                {/* Mobile menu button */}
+                <button className="md:hidden text-gnt-muted hover:text-gnt-text p-1" aria-label="Menu">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
               </div>
             </div>
           </header>
@@ -279,64 +282,73 @@ export default async function RootLayout({
         </main>
 
         {/* ---- FOOTER ---- */}
-        <footer className={isGNT ? "bg-gnt-dark border-t border-gnt-rule mt-16" : "bg-stone-50 border-t border-mercury-rule mt-16"}>
+        <footer className={isGNT ? "bg-gnt-dark mt-16" : "bg-stone-50 border-t border-mercury-rule mt-16"}>
+          {/* Red top border for GNT */}
+          {isGNT && <div className="h-1 bg-gnt-accent" />}
           <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
             {/* GNT custom footer content */}
             {isGNT ? (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                {/* Column 1 — Description */}
                 <div>
                   <p className="font-display font-black text-2xl text-gnt-text">
-                    Grand National Today
+                    Grand <span className="text-gnt-accent">National</span> Today
                   </p>
-                  <p className="text-sm text-gnt-muted mt-2 font-sans">
-                    Covering racing before it becomes famous.
+                  <p className="text-sm text-gnt-muted mt-3 font-sans leading-relaxed">
+                    The definitive source for developmental stock car racing. Covering the O&apos;Reilly Auto Parts Grand National Series, CARS Tour, and Virginia Triple Crown.
                   </p>
-                  <p className="text-xs text-gnt-muted mt-3 font-sans">
-                    &copy; {new Date().getFullYear()} Grand National Today &middot; A Queen City Garage Production
+                  <p className="text-xs text-gnt-muted mt-4 font-sans">
+                    A Queen City Garage Production
                   </p>
                 </div>
+                {/* Column 2 — Quick Links / Schedule */}
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-gnt-gold mb-3">
-                    Shows
+                    Quick Links
+                  </p>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Race Schedule</Link>
+                    <Link href="/standings" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Standings &amp; Stats</Link>
+                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">News</Link>
+                    <Link href="/opinion" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Columns</Link>
+                    <Link href="/page/about" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">About</Link>
+                    <Link href="/authors" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Staff</Link>
+                  </div>
+                </div>
+                {/* Column 3 — External / Shows */}
+                <div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-gnt-gold mb-3">
+                    Shows &amp; More
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     <div>
-                      <a href="https://thesportsmanshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors">
+                      <a href="https://thesportsmanshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
                         The Sportsman Show
                       </a>
                       <p className="text-xs text-gnt-muted mt-0.5">New episodes weekly</p>
                     </div>
                     <div>
-                      <a href="https://thegrandnationalshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors">
+                      <a href="https://thegrandnationalshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
                         The Grand National Show
                       </a>
                       <p className="text-xs text-gnt-muted mt-0.5">Coming 2027</p>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-gnt-gold mb-3">
-                    Beats
-                  </p>
-                  <div className="grid grid-cols-1 gap-1">
-                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">Racing</Link>
-                    <Link href="/features" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">Features</Link>
-                    <Link href="/opinion" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">Opinion</Link>
-                    <Link href="/standings" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">Standings</Link>
-                    <Link href="/vtc" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">VTC</Link>
-                  </div>
-                </div>
-                <div>
-                  <p className="font-sans text-xs font-bold uppercase tracking-wider text-gnt-gold mb-3">
-                    Quick Links
-                  </p>
-                  <div className="grid grid-cols-1 gap-1">
-                    <Link href="/page/about" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">About</Link>
-                    <Link href="/authors" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors py-0.5 no-underline">Staff</Link>
-                    <Link href="/newsroom" className="text-sm font-sans text-gnt-muted hover:text-gnt-accent transition-colors py-0.5 no-underline">Staff Login</Link>
-                  </div>
+              </div>
+              {/* Bottom copyright row */}
+              <div className="mt-10 pt-6 border-t border-gnt-rule text-xs text-gnt-muted font-sans flex flex-col md:flex-row justify-between items-center gap-2">
+                <p>&copy; {new Date().getFullYear()} Grand National Today. All rights reserved.</p>
+                <div className="flex items-center gap-3">
+                  <Link href="/page/privacy" className="hover:text-gnt-text transition-colors no-underline">Privacy</Link>
+                  <span className="text-gnt-rule">&middot;</span>
+                  <Link href="/page/contact" className="hover:text-gnt-text transition-colors no-underline">Contact</Link>
+                  <span className="text-gnt-rule">&middot;</span>
+                  <Link href="/newsroom" className="hover:text-gnt-text transition-colors no-underline">Staff Login</Link>
                 </div>
               </div>
+              </>
             ) : (
             <>
             <div className={`grid grid-cols-1 ${!isCustomLayout && hubPages.length > 0 ? "md:grid-cols-6" : "md:grid-cols-3"} gap-8`}>
