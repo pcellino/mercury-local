@@ -11,6 +11,7 @@ import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
 import BeatIllustration from "@/components/BeatIllustration";
 import MercuryLocalHome from "@/components/MercuryLocalHome";
 import PeterCellinoHome from "@/components/PeterCellinoHome";
+import GrandNationalTodayHome from "@/components/GrandNationalTodayHome";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
@@ -39,6 +40,20 @@ export default async function HomePage() {
   if (slug === "peter-cellino") {
     const posts = await getLatestPostsWithAuthors(publication.id, 5);
     return <PeterCellinoHome publication={publication} posts={posts} />;
+  }
+
+  if (slug === "grand-national-today") {
+    const [posts, opinionPosts] = await Promise.all([
+      getLatestPostsWithAuthors(publication.id, 7),
+      getPostsByBeatWithAuthors(publication.id, "opinion", 2),
+    ]);
+    return (
+      <GrandNationalTodayHome
+        publication={publication}
+        posts={posts}
+        opinionPosts={opinionPosts}
+      />
+    );
   }
 
   // -------------------------------------------------------

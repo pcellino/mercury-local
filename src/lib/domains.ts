@@ -15,6 +15,8 @@ export const DOMAIN_MAP: Record<string, string> = {
   "www.farmingtonmercury.com": "farmington-mercury",
   "strollingballantyne.com": "strolling-ballantyne",
   "www.strollingballantyne.com": "strolling-ballantyne",
+  "grandnationaltoday.com": "grand-national-today",
+  "www.grandnationaltoday.com": "grand-national-today",
 
   // Production domains — non-news publications
   "mercurylocal.com": "mercury-local",
@@ -52,6 +54,7 @@ export const CANONICAL_DOMAINS: Record<string, string> = {
   "strolling-ballantyne": "strollingballantyne.com",
   "mercury-local": "mercurylocal.com",
   "peter-cellino": "petercellino.com",
+  "grand-national-today": "grandnationaltoday.com",
 };
 
 /**
@@ -70,4 +73,5 @@ export function getBaseUrl(slug: string): string {
 export const CUSTOM_LAYOUT_SLUGS = new Set([
   "mercury-local",
   "peter-cellino",
+  "grand-national-today",
 ]);

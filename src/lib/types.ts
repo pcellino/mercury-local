@@ -156,10 +156,19 @@ export const PETER_CELLINO_BEATS: BeatConfig[] = [
   { slug: "notes", label: "Notes", description: "Thoughts on media, AI, and local journalism" },
 ];
 
+export const GNT_BEATS: BeatConfig[] = [
+  { slug: "racing", label: "Racing", description: "NASCAR O'Reilly Auto Parts Series and CARS Tour coverage" },
+  { slug: "features", label: "Features", description: "Driver profiles, track features, and long-form storytelling" },
+  { slug: "opinion", label: "Opinion", description: "Columns, commentary, and the Speedway perspective" },
+  { slug: "standings", label: "Standings", description: "Championship standings, trackers, and season stats" },
+  { slug: "vtc", label: "VTC", description: "Virginia Triple Crown — South Boston, Langley, Motor Mile" },
+];
+
 export const BEATS_BY_PUBLICATION: Record<string, BeatConfig[]> = {
   "farmington-mercury": FARMINGTON_BEATS,
   "charlotte-mercury": CHARLOTTE_BEATS,
   "strolling-ballantyne": BALLANTYNE_BEATS,
   "mercury-local": MERCURY_LOCAL_BEATS,
   "peter-cellino": PETER_CELLINO_BEATS,
+  "grand-national-today": GNT_BEATS,
 };

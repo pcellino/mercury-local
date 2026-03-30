@@ -24,6 +24,15 @@ const config: Config = {
           highlight: "#fef3c7",
           dark: "#111827",
         },
+        gnt: {
+          dark: "#0a0a0a",
+          surface: "#141414",
+          accent: "#e63946",
+          gold: "#d4a574",
+          text: "#f5f5f5",
+          muted: "#8a8a8a",
+          rule: "#2a2a2a",
+        },
       },
       typography: {
         DEFAULT: {
