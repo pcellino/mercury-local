@@ -150,7 +150,7 @@ export default async function RootLayout({
                 <Link href="/standings" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">Standings</Link>
                 <Link href="/vtc" className="font-sans uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors text-[10px] no-underline">VTC</Link>
                 <span className="text-gnt-rule mx-1">|</span>
-                <span className="text-gnt-muted font-sans text-[10px] tracking-wider">EST. 2026 &middot; A MERCURY LOCAL PUBLICATION</span>
+                <span className="text-gnt-muted font-sans text-[10px] tracking-wider">EST. 2026 &middot; A QUEEN CITY GARAGE PRODUCTION</span>
               </div>
             </div>
           </div>
@@ -292,7 +292,7 @@ export default async function RootLayout({
                     Covering racing before it becomes famous.
                   </p>
                   <p className="text-xs text-gnt-muted mt-3 font-sans">
-                    &copy; {new Date().getFullYear()} Grand National Today &middot; A Mercury Local Publication
+                    &copy; {new Date().getFullYear()} Grand National Today &middot; A Queen City Garage Production
                   </p>
                 </div>
                 <div>
