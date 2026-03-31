@@ -136,6 +136,88 @@ export default async function RootLayout({
             }}
           />
         )}
+        {slug === "strolling-ballantyne" && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "NewsMediaOrganization",
+                "name": "Strolling Ballantyne",
+                "url": "https://strollingballantyne.com",
+                "logo": publication.logo_url || undefined,
+                "description": publication.tagline || "Ballantyne's neighborhood newspaper — dining, wellness, local business, and community news.",
+                "foundingDate": "2025",
+                "areaServed": {
+                  "@type": "City",
+                  "name": "Ballantyne",
+                  "containedInPlace": {
+                    "@type": "City",
+                    "name": "Charlotte",
+                    "containedInPlace": {
+                      "@type": "State",
+                      "name": "North Carolina",
+                    },
+                  },
+                },
+                "publisher": {
+                  "@type": "Person",
+                  "name": "Peter Cellino",
+                  "url": "https://petercellino.com",
+                },
+                "parentOrganization": {
+                  "@type": "Organization",
+                  "name": "Mercury Local",
+                  "url": "https://www.mercurylocal.com",
+                },
+              }),
+            }}
+          />
+        )}
+        {slug === "strolling-firethorne" && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "NewsMediaOrganization",
+                "name": "Strolling Firethorne",
+                "url": "https://strollingfirethorne.com",
+                "logo": publication.logo_url || undefined,
+                "description": publication.tagline || "Firethorne, Marvin, and Waxhaw's neighborhood newspaper — dining, wellness, local business, and community news.",
+                "foundingDate": "2026",
+                "areaServed": [
+                  {
+                    "@type": "City",
+                    "name": "Marvin",
+                    "containedInPlace": {
+                      "@type": "State",
+                      "name": "North Carolina",
+                    },
+                  },
+                  {
+                    "@type": "City",
+                    "name": "Waxhaw",
+                    "containedInPlace": {
+                      "@type": "State",
+                      "name": "North Carolina",
+                    },
+                  },
+                ],
+                "publisher": {
+                  "@type": "Person",
+                  "name": "Peter Cellino",
+                  "url": "https://petercellino.com",
+                },
+                "parentOrganization": {
+                  "@type": "Organization",
+                  "name": "Mercury Local",
+                  "url": "https://www.mercurylocal.com",
+                },
+              }),
+            }}
+          />
+        )}
       </head>
       <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : "bg-white text-mercury-ink"}`}>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}

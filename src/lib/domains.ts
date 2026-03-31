@@ -15,6 +15,8 @@ export const DOMAIN_MAP: Record<string, string> = {
   "www.farmingtonmercury.com": "farmington-mercury",
   "strollingballantyne.com": "strolling-ballantyne",
   "www.strollingballantyne.com": "strolling-ballantyne",
+  "strollingfirethorne.com": "strolling-firethorne",
+  "www.strollingfirethorne.com": "strolling-firethorne",
   "grandnationaltoday.com": "grand-national-today",
   "www.grandnationaltoday.com": "grand-national-today",
 
@@ -52,6 +54,7 @@ export const CANONICAL_DOMAINS: Record<string, string> = {
   "charlotte-mercury": "cltmercury.com",
   "farmington-mercury": "farmingtonmercury.com",
   "strolling-ballantyne": "strollingballantyne.com",
+  "strolling-firethorne": "strollingfirethorne.com",
   "mercury-local": "mercurylocal.com",
   "peter-cellino": "petercellino.com",
   "grand-national-today": "grandnationaltoday.com",

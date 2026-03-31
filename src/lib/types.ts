@@ -149,6 +149,15 @@ export const BALLANTYNE_BEATS: BeatConfig[] = [
   { slug: "dining", label: "Eat & Drink", description: "Where to eat, what to cook, and who\'s behind the kitchen door" },
 ];
 
+export const FIRETHORNE_BEATS: BeatConfig[] = [
+  { slug: "wellness", label: "Health & Wellness", description: "Fitness, beauty, spa, and taking care of yourself in Marvin and Waxhaw" },
+  { slug: "business", label: "Local Business", description: "The people behind the storefronts, leases, and side hustles" },
+  { slug: "government", label: "Civic", description: "Zoning votes, town council, and the policy that shapes life south of Charlotte" },
+  { slug: "community", label: "Neighbors", description: "The people, pets, and stories that make Firethorne and Waxhaw home" },
+  { slug: "lifestyle", label: "Living", description: "Travel, real estate, culture, and life along Providence Road South" },
+  { slug: "dining", label: "Eat & Drink", description: "Where to eat, what to cook, and who's behind the kitchen door" },
+];
+
 export const MERCURY_LOCAL_BEATS: BeatConfig[] = [
   { slug: "dispatches", label: "Dispatches", description: "Notes on building local media in Charlotte" },
 ];
@@ -169,6 +178,7 @@ export const BEATS_BY_PUBLICATION: Record<string, BeatConfig[]> = {
   "farmington-mercury": FARMINGTON_BEATS,
   "charlotte-mercury": CHARLOTTE_BEATS,
   "strolling-ballantyne": BALLANTYNE_BEATS,
+  "strolling-firethorne": FIRETHORNE_BEATS,
   "mercury-local": MERCURY_LOCAL_BEATS,
   "peter-cellino": PETER_CELLINO_BEATS,
   "grand-national-today": GNT_BEATS,
