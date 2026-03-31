@@ -1,5 +1,5 @@
 import { createServerClient } from "./supabase";
-import type { Post, PostWithAuthor, Publication, Author, Page, BeatConfig } from "./types";
+import type { Post, PostWithAuthor, Publication, Author, Page, Tag, BeatConfig } from "./types";
 import { BEATS_BY_PUBLICATION } from "./types";
 
 const supabase = createServerClient();
@@ -514,6 +514,86 @@ export async function getHubPages(
     return [];
   }
   return (data || []) as Pick<Page, "slug" | "title" | "hub_beat" | "hub_tag" | "hub_heading">[];
+}
+
+// -------------------------------------------------------
+// Tags
+// -------------------------------------------------------
+
+export async function getTagBySlug(
+  publicationId: string,
+  slug: string
+): Promise<Tag | null> {
+  const { data, error } = await supabase
+    .from("tags")
+    .select("*")
+    .eq("publication_id", publicationId)
+    .eq("slug", slug)
+    .single();
+
+  if (error) {
+    if (error.code !== "PGRST116") {
+      console.error("getTagBySlug error:", error);
+    }
+    return null;
+  }
+  return data as Tag;
+}
+
+export async function getPostsByTag(
+  publicationId: string,
+  tagId: string,
+  limit = 50
+): Promise<PostWithAuthor[]> {
+  // Step 1: Get post IDs with this tag
+  const { data: ptRows, error: ptError } = await supabase
+    .from("post_tags")
+    .select("post_id")
+    .eq("tag_id", tagId);
+
+  if (ptError) {
+    console.error("getPostsByTag post_tags error:", ptError);
+    return [];
+  }
+
+  const postIds = ((ptRows || []) as Array<{ post_id: string }>).map((pt) => pt.post_id);
+  if (postIds.length === 0) return [];
+
+  // Step 2: Fetch matching published posts with authors
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      author:authors(*)
+    `)
+    .in("id", postIds)
+    .eq("publication_id", publicationId)
+    .eq("status", "published")
+    .order("pub_date", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("getPostsByTag error:", error);
+    return [];
+  }
+
+  return (data || []) as PostWithAuthor[];
+}
+
+export async function getAllTagsForPublication(
+  publicationId: string
+): Promise<Pick<Tag, "slug" | "name" | "description">[]> {
+  const { data, error } = await supabase
+    .from("tags")
+    .select("slug, name, description")
+    .eq("publication_id", publicationId)
+    .order("name");
+
+  if (error) {
+    console.error("getAllTagsForPublication error:", error);
+    return [];
+  }
+  return (data || []) as Pick<Tag, "slug" | "name" | "description">[];
 }
 
 // -------------------------------------------------------

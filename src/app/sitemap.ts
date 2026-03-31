@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getAllPublishedPosts, getAllPublishedPages, getAllAuthors, getBeatsForPublication } from "@/lib/queries";
+import { getAllPublishedPosts, getAllPublishedPages, getAllAuthors, getAllTagsForPublication, getBeatsForPublication } from "@/lib/queries";
 
 /**
  * Dynamic sitemap generated from Supabase.
@@ -15,11 +15,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const domain = publication.domain || "localhost:3000";
   const base = `https://${domain}`;
 
-  const [posts, pages, beats, authors] = await Promise.all([
+  const [posts, pages, beats, authors, tags] = await Promise.all([
     getAllPublishedPosts(publication.id),
     getAllPublishedPages(publication.id),
     Promise.resolve(getBeatsForPublication(slug)),
     getAllAuthors(publication.id),
+    getAllTagsForPublication(publication.id),
   ]);
 
   const entries: MetadataRoute.Sitemap = [];
@@ -71,6 +72,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const author of authors) {
     entries.push({
       url: `${base}/author/${author.slug}`,
+      changeFrequency: "weekly",
+      priority: 0.5,
+    });
+  }
+
+  // Tag pages
+  for (const tag of tags) {
+    entries.push({
+      url: `${base}/tag/${tag.slug}`,
       changeFrequency: "weekly",
       priority: 0.5,
     });

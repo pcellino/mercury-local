@@ -1,4 +1,4 @@
-import type { PostWithAuthor, Publication } from "./types";
+import type { PostWithAuthor, Publication, Tag } from "./types";
 import { decodeHtmlEntities } from "./content";
 
 /**
@@ -148,6 +148,42 @@ export function generatePersonJsonLd(
       "@type": "Organization",
       name: publication.name,
       url: `https://${domain}`,
+    },
+  };
+}
+
+// -------------------------------------------------------
+// CollectionPage schema (for tag pages)
+// -------------------------------------------------------
+
+export function generateCollectionPageJsonLd(
+  tag: Pick<Tag, "name" | "slug" | "description">,
+  posts: PostWithAuthor[],
+  publication: Publication
+) {
+  const domain = publication.domain || "localhost:3000";
+  const base = `https://${domain}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${tag.name} — ${publication.name}`,
+    url: `${base}/tag/${tag.slug}`,
+    ...(tag.description && { description: tag.description }),
+    publisher: {
+      "@type": "Organization",
+      name: publication.name,
+      url: base,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: posts.length,
+      itemListElement: posts.slice(0, 20).map((post, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${base}/${post.beat}/${post.slug}`,
+        name: decodeHtmlEntities(post.title),
+      })),
     },
   };
 }

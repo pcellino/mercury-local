@@ -81,6 +81,7 @@ export interface Tag {
   publication_id: string | null;
   name: string;
   slug: string;
+  description: string | null;
 }
 
 export interface Page {
