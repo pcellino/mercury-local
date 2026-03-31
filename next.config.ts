@@ -279,9 +279,9 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
-      // === CATCH-ALL — remaining /category/ and /tag/ paths → homepage ===
+      // === CATCH-ALL — remaining /category/ paths → homepage ===
+      // NOTE: /tag/:path* redirect REMOVED — tag pages now exist as a live route.
       { source: "/category/:path*", destination: "/", permanent: true },
-      { source: "/tag/:path*", destination: "/", permanent: true },
     ];
   },
 
