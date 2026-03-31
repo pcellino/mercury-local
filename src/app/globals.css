@@ -22,11 +22,25 @@
     text-decoration: none;
   }
 
-  /* Article content styling — classic newspaper feel */
+  /* Article content styling — classic newspaper feel
+     Uses CSS custom properties so publication themes can override colors */
   .article-content {
+    --ac-text: #1a1a1a;
+    --ac-heading: #1a1a1a;
+    --ac-link: theme('colors.mercury-accent');
+    --ac-bold: inherit;
+    --ac-blockquote: #374151;
+    --ac-blockquote-border: theme('colors.mercury-ink');
+    --ac-muted: theme('colors.mercury-muted');
+    --ac-rule: theme('colors.mercury-rule');
+    --ac-table-header-bg: #f9fafb;
+    --ac-code-text: inherit;
+    --ac-code-bg: #f3f4f6;
+    --ac-dropcap: #1a1a1a;
+
     @apply leading-[1.75] text-lg;
     font-family: Georgia, "Times New Roman", serif;
-    color: #1a1a1a;
+    color: var(--ac-text);
   }
 
   .article-content p {
@@ -36,15 +50,18 @@
   .article-content h2 {
     font-family: "Playfair Display", Georgia, serif;
     @apply text-2xl font-black mt-10 mb-4 tracking-tight;
+    color: var(--ac-heading);
   }
 
   .article-content h3 {
     font-family: "Playfair Display", Georgia, serif;
     @apply text-xl font-bold mt-8 mb-3;
+    color: var(--ac-heading);
   }
 
   .article-content a {
-    @apply text-mercury-accent underline underline-offset-2 hover:no-underline;
+    color: var(--ac-link);
+    @apply underline underline-offset-2 hover:no-underline;
   }
 
   .article-content img {
@@ -52,8 +69,9 @@
   }
 
   .article-content blockquote {
-    @apply border-l-4 border-mercury-ink pl-5 italic my-6;
-    color: #374151;
+    @apply border-l-4 pl-5 italic my-6;
+    color: var(--ac-blockquote);
+    border-color: var(--ac-blockquote-border);
     font-family: "Playfair Display", Georgia, serif;
   }
 
@@ -75,16 +93,19 @@
   }
 
   .article-content hr {
-    @apply my-10 border-t border-mercury-rule;
+    @apply my-10 border-t;
+    border-color: var(--ac-rule);
   }
 
   .article-content h1 {
     font-family: "Playfair Display", Georgia, serif;
     @apply text-3xl font-black mt-10 mb-5 tracking-tight;
+    color: var(--ac-heading);
   }
 
   .article-content strong {
     @apply font-bold;
+    color: var(--ac-bold);
   }
 
   .article-content em {
@@ -98,11 +119,13 @@
 
   .article-content th,
   .article-content td {
-    @apply border border-mercury-rule px-3 py-2 text-left;
+    @apply border px-3 py-2 text-left;
+    border-color: var(--ac-rule);
   }
 
   .article-content th {
-    @apply bg-gray-50 font-sans font-semibold text-sm uppercase tracking-wide;
+    @apply font-sans font-semibold text-sm uppercase tracking-wide;
+    background: var(--ac-table-header-bg);
   }
 
   .article-content figure {
@@ -110,7 +133,8 @@
   }
 
   .article-content figcaption {
-    @apply text-xs text-mercury-muted mt-2;
+    @apply text-xs mt-2;
+    color: var(--ac-muted);
     font-family: "Inter", system-ui, sans-serif;
   }
 
@@ -123,8 +147,33 @@
     padding-right: 0.5rem;
     padding-top: 0.25rem;
     font-weight: 900;
-    color: #1a1a1a;
+    color: var(--ac-dropcap);
   }
+}
+
+/* -------------------------------------------------------
+   GNT — Dark Theme Article Content
+   Override custom properties for readability on dark bg.
+   Any future dark-themed pub: add a similar block.
+   ------------------------------------------------------- */
+
+.pub-gnt .article-content {
+  --ac-text: #f5f5f5;
+  --ac-heading: #f5f5f5;
+  --ac-link: #d4a574;
+  --ac-bold: #ffffff;
+  --ac-blockquote: #8a8a8a;
+  --ac-blockquote-border: #d4a574;
+  --ac-muted: #8a8a8a;
+  --ac-rule: #2a2a2a;
+  --ac-table-header-bg: #1a1a1a;
+  --ac-code-text: #d4a574;
+  --ac-code-bg: #1a1a1a;
+  --ac-dropcap: #d4a574;
+}
+
+.pub-gnt .article-content a:hover {
+  color: #e8c49a;
 }
 
 /* -------------------------------------------------------

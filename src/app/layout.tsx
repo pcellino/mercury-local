@@ -137,7 +137,7 @@ export default async function RootLayout({
           />
         )}
       </head>
-      <body className={`min-h-screen flex flex-col ${isGNT ? "bg-gnt-dark text-gnt-text" : "bg-white text-mercury-ink"}`}>
+      <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : "bg-white text-mercury-ink"}`}>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}
         {isGNT ? (
           <div className="bg-gnt-dark border-b border-gnt-rule overflow-hidden">
