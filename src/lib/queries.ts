@@ -181,6 +181,30 @@ export async function getAllPublishedPosts(
 }
 
 // -------------------------------------------------------
+// Recent posts (for Google News sitemap — last 48 hours)
+// -------------------------------------------------------
+
+export async function getRecentPublishedPosts(
+  publicationId: string,
+  hoursAgo = 48
+): Promise<Pick<Post, "title" | "slug" | "beat" | "pub_date">[]> {
+  const cutoff = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("posts")
+    .select("title, slug, beat, pub_date")
+    .eq("publication_id", publicationId)
+    .eq("status", "published")
+    .gte("pub_date", cutoff)
+    .order("pub_date", { ascending: false });
+
+  if (error) {
+    console.error("getRecentPublishedPosts error:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// -------------------------------------------------------
 // Authors
 // -------------------------------------------------------
 
