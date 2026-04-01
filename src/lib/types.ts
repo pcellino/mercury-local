@@ -10,6 +10,8 @@ export interface Database {
       authors: { Row: Author };
       categories: { Row: Category };
       tags: { Row: Tag };
+      pages: { Row: Page };
+      post_tags: { Row: PostTag };
     };
   };
 }
@@ -100,6 +102,11 @@ export interface Page {
   hub_tag: string | null;
   hub_limit: number | null;
   hub_heading: string | null;
+}
+
+export interface PostTag {
+  post_id: string;
+  tag_id: string;
 }
 
 // -------------------------------------------------------
