@@ -34,6 +34,15 @@ const config: Config = {
           rule: "#3d3028",
           cream: "#f5e6d3",
         },
+        sf: {
+          cream: "#faf8f5",
+          ink: "#2a2218",
+          terra: "#a65b3c",
+          surface: "#f3efe9",
+          muted: "#7a7164",
+          rule: "#e2ddd5",
+          highlight: "#fef3c7",
+        },
       },
       typography: {
         DEFAULT: {

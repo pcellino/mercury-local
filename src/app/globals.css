@@ -152,6 +152,31 @@
 }
 
 /* -------------------------------------------------------
+   SF — Strolling Firethorne Warm Editorial Theme
+   Cream background, terracotta accents, warm ink.
+   ------------------------------------------------------- */
+
+.pub-sf {
+  background-color: #faf8f5;
+  color: #2a2218;
+}
+
+.pub-sf .article-content {
+  --ac-text: #2a2218;
+  --ac-heading: #2a2218;
+  --ac-link: #a65b3c;
+  --ac-bold: #2a2218;
+  --ac-blockquote: #5a5145;
+  --ac-blockquote-border: #a65b3c;
+  --ac-muted: #7a7164;
+  --ac-rule: #e2ddd5;
+  --ac-table-header-bg: #f3efe9;
+  --ac-code-text: #a65b3c;
+  --ac-code-bg: #f3efe9;
+  --ac-dropcap: #a65b3c;
+}
+
+/* -------------------------------------------------------
    GNT — Dark Theme Article Content
    Override custom properties for readability on dark bg.
    Any future dark-themed pub: add a similar block.

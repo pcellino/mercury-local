@@ -53,6 +53,7 @@ export default async function RootLayout({
   const beats = getBeatsForPublication(slug);
   const isCustomLayout = CUSTOM_LAYOUT_SLUGS.has(slug);
   const isGNT = slug === "grand-national-today";
+  const isSF = slug === "strolling-firethorne";
 
   // Fetch hub pages for nav and footer
   const hubPages = isCustomLayout ? [] : await getHubPages(publication.id);
@@ -219,7 +220,7 @@ export default async function RootLayout({
           />
         )}
       </head>
-      <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : "bg-white text-mercury-ink"}`}>
+      <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : isSF ? "pub-sf bg-sf-cream text-sf-ink" : "bg-white text-mercury-ink"}`}>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}
         {isGNT ? (
           <div className="bg-gnt-dark border-b border-gnt-rule overflow-hidden">

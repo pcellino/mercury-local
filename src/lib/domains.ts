@@ -77,4 +77,5 @@ export const CUSTOM_LAYOUT_SLUGS = new Set([
   "mercury-local",
   "peter-cellino",
   "grand-national-today",
+  "strolling-firethorne",
 ]);

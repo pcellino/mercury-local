@@ -5,6 +5,9 @@ import {
   getPostCountByBeat,
   getPostsByBeatWithAuthors,
   getHubPages,
+  getTagBySlug,
+  getPostsByTag,
+  getPageBySlug,
 } from "@/lib/queries";
 import Link from "next/link";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
@@ -12,6 +15,7 @@ import BeatIllustration from "@/components/BeatIllustration";
 import MercuryLocalHome from "@/components/MercuryLocalHome";
 import PeterCellinoHome from "@/components/PeterCellinoHome";
 import GrandNationalTodayHome from "@/components/GrandNationalTodayHome";
+import StrollingFirethorneHome from "@/components/StrollingFirethorneHome";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
@@ -52,6 +56,35 @@ export default async function HomePage() {
         publication={publication}
         posts={posts}
         opinionPosts={opinionPosts}
+      />
+    );
+  }
+
+  if (slug === "strolling-firethorne") {
+    // Fetch featured stories
+    const posts = await getLatestPostsWithAuthors(publication.id, 8);
+
+    // Fetch neighbor spotlight posts by tag
+    const neighborTag = await getTagBySlug(publication.id, "neighbor-spotlight");
+    const neighborPosts = neighborTag
+      ? await getPostsByTag(publication.id, neighborTag.id, 4)
+      : [];
+
+    // Fetch cover image from a dedicated page, falling back to latest post hero
+    const coverPage = await getPageBySlug(publication.id, "current-cover");
+    const coverContent = coverPage?.content?.trim() || null;
+    // Cover page content is just the image URL
+    const coverImageUrl =
+      coverContent && coverContent.startsWith("http")
+        ? coverContent
+        : posts[0]?.hero_image_url || null;
+
+    return (
+      <StrollingFirethorneHome
+        publication={publication}
+        posts={posts}
+        neighborPosts={neighborPosts}
+        coverImageUrl={coverImageUrl}
       />
     );
   }
