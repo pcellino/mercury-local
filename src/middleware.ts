@@ -18,6 +18,7 @@ const ALL_BEATS = new Set([
 // System routes that are never legacy slugs.
 const SYSTEM_ROUTES = new Set([
   "page", "author", "api", "_next", "favicon.ico",
+  "icon", "apple-icon",
   "sitemap.xml", "robots.txt", "beats", "search",
 ]);
 
@@ -138,6 +139,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|robots.txt|sitemap.xml|api/).*)",
   ],
 };
