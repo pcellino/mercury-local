@@ -668,7 +668,13 @@ export default async function RootLayout({
         {/* Per-publication Fathom Analytics */}
         {(() => {
           const fathomSites: Record<string, string> = {
+            "charlotte-mercury": "OXCUIWUS",
+            "farmington-mercury": "BEEYFCZE",
+            "strolling-ballantyne": "FEALMTSO",
+            "strolling-firethorne": "LWVCNMPP",
             "grand-national-today": "HTQBJVGV",
+            "peter-cellino": "SAEIYNJG",
+            "mercury-local": "GBFVBSGG",
           };
           const siteId = fathomSites[slug] || "GBFVBSGG";
           return (
