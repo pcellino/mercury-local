@@ -87,9 +87,9 @@ export default function GrandNationalTodayHome({
 
             {/* Series badges */}
             <div className="flex items-center justify-center gap-3 mt-10 flex-wrap">
-              <SeriesBadge href="/racing" label="O'Reilly Series" variant="accent" />
-              <SeriesBadge href="/racing" label="CARS Tour" variant="gold" />
-              <SeriesBadge href="/vtc" label="Virginia Triple Crown" variant="vtc" />
+              <SeriesBadge href="/page/oreilly-auto-parts-series-guide" label="O'Reilly Series" variant="accent" />
+              <SeriesBadge href="/page/cars-tour-guide" label="CARS Tour" variant="gold" />
+              <SeriesBadge href="/page/virginia-triple-crown-guide" label="Virginia Triple Crown" variant="vtc" />
             </div>
 
             {/* Bottom line */}

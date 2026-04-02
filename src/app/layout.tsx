@@ -6,6 +6,7 @@ import Link from "next/link";
 import { decodeHtmlEntities } from "@/lib/content";
 import BeatDropdownNav from "@/components/BeatDropdownNav";
 import BetaBanner from "@/components/BetaBanner";
+import GNTHeader from "@/components/GNTHeader";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -334,33 +335,7 @@ export default async function RootLayout({
 
         {/* ---- MASTHEAD ---- */}
         {isGNT ? (
-          <header className="bg-gnt-surface/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gnt-rule">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="flex items-center justify-between h-14">
-                {/* Logo / site name — left */}
-                <Link href="/" className="no-underline shrink-0">
-                  <span className="font-display text-xl md:text-2xl font-black text-gnt-text tracking-tight leading-none">
-                    Grand <span className="text-gnt-accent">National</span> Today
-                  </span>
-                </Link>
-                {/* Primary nav — right */}
-                <nav className="hidden md:flex items-center gap-5">
-                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">News</Link>
-                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Schedules</Link>
-                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-accent hover:text-gnt-accent/80 transition-colors no-underline">O&apos;Reilly Series</Link>
-                  <Link href="/racing" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-gold hover:text-gnt-gold/80 transition-colors no-underline">CARS Tour</Link>
-                  <Link href="/vtc" className="font-sans text-xs font-semibold uppercase tracking-widest text-[#2563eb] hover:text-[#2563eb]/80 transition-colors no-underline">Virginia Triple Crown</Link>
-                  <Link href="/opinion" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Columns</Link>
-                  <Link href="/standings" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Stats</Link>
-                  <Link href="/features" className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline">Podcasts</Link>
-                </nav>
-                {/* Mobile menu button */}
-                <button className="md:hidden text-gnt-muted hover:text-gnt-text p-1" aria-label="Menu">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
-              </div>
-            </div>
-          </header>
+          <GNTHeader />
         ) : (
           <header className="bg-white">
             <div className="max-w-7xl mx-auto px-4">
@@ -435,38 +410,44 @@ export default async function RootLayout({
                     A Queen City Garage Production
                   </p>
                 </div>
-                {/* Column 2 — Quick Links / Schedule */}
+                {/* Column 2 — Coverage */}
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gnt-gold mb-3">
-                    Quick Links
+                    Coverage
                   </p>
                   <div className="grid grid-cols-1 gap-1.5">
-                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Race Schedule</Link>
+                    <Link href="/page/oreilly-auto-parts-series-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">O&apos;Reilly Auto Parts Series</Link>
+                    <Link href="/page/cars-tour-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">CARS Tour</Link>
+                    <Link href="/page/virginia-triple-crown-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Virginia Triple Crown</Link>
+                    <Link href="/page/schedules" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Race Schedules</Link>
                     <Link href="/standings" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Standings &amp; Stats</Link>
-                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">News</Link>
+                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Latest News</Link>
+                    <Link href="/features" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Features</Link>
                     <Link href="/opinion" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Columns</Link>
+                  </div>
+                </div>
+                {/* Column 3 — Reference */}
+                <div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gnt-gold mb-3">
+                    Reference
+                  </p>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    <Link href="/page/driver-directory" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Driver Directory</Link>
+                    <Link href="/page/team-directory" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Team Directory</Link>
+                    <Link href="/page/martinsville-speedway-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Martinsville Speedway</Link>
+                    <Link href="/page/south-boston-speedway-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">South Boston Speedway</Link>
+                    <Link href="/page/langley-speedway-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Langley Speedway</Link>
+                  </div>
+                  <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gnt-gold mb-3 mt-5">
+                    GNT
+                  </p>
+                  <div className="grid grid-cols-1 gap-1.5">
                     <Link href="/page/about" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">About</Link>
                     <Link href="/page/contact" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Contact</Link>
                     <Link href="/page/advertise" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Advertise</Link>
-                  </div>
-                </div>
-                {/* Column 3 — External */}
-                <div>
-                  <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-gnt-gold mb-3">
-                    External
-                  </p>
-                  <div className="grid grid-cols-1 gap-2">
-                    <div>
-                      <a href="https://thesportsmanshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
-                        TheSportsmanShow.com <span className="opacity-50 text-xs">&#x2197;</span>
-                      </a>
-                    </div>
-                    <div>
-                      <a href="https://thegrandnationalshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
-                        TheGrandNationalShow.com <span className="opacity-50 text-xs">&#x2197;</span>
-                      </a>
-                      <p className="text-xs text-gnt-muted mt-0.5 font-sans uppercase tracking-wider">Coming 2027</p>
-                    </div>
+                    <a href="https://thesportsmanshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
+                      TheSportsmanShow.com <span className="opacity-50 text-xs">&#x2197;</span>
+                    </a>
                   </div>
                 </div>
               </div>
