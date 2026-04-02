@@ -219,6 +219,36 @@ export default async function RootLayout({
             }}
           />
         )}
+        {slug === "grand-national-today" && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "NewsMediaOrganization",
+                "name": "Grand National Today",
+                "url": "https://grandnationaltoday.com",
+                "logo": publication.logo_url || undefined,
+                "description": publication.tagline || "The editorial home for NASCAR O'Reilly Auto Parts Series, CARS Tour & Virginia Triple Crown coverage.",
+                "foundingDate": "2026",
+                "areaServed": {
+                  "@type": "Country",
+                  "name": "United States",
+                },
+                "publisher": {
+                  "@type": "Person",
+                  "name": "Peter Cellino",
+                  "url": "https://petercellino.com",
+                },
+                "parentOrganization": {
+                  "@type": "Organization",
+                  "name": "Mercury Local",
+                  "url": "https://www.mercurylocal.com",
+                },
+              }),
+            }}
+          />
+        )}
       </head>
       <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : isSF ? "pub-sf bg-sf-cream text-sf-ink" : "bg-white text-mercury-ink"}`}>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}
