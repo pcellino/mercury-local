@@ -665,11 +665,20 @@ export default async function RootLayout({
           </div>
         </footer>
 
-        <script
-          src="https://cdn.usefathom.com/script.js"
-          data-site="GBFVBSGG"
-          defer
-        ></script>
+        {/* Per-publication Fathom Analytics */}
+        {(() => {
+          const fathomSites: Record<string, string> = {
+            "grand-national-today": "HTQBJVGV",
+          };
+          const siteId = fathomSites[slug] || "GBFVBSGG";
+          return (
+            <script
+              src="https://cdn.usefathom.com/script.js"
+              data-site={siteId}
+              defer
+            />
+          );
+        })()}
       </body>
     </html>
   );
