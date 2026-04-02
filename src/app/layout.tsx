@@ -249,6 +249,22 @@ export default async function RootLayout({
             }}
           />
         )}
+        {/* WebSite schema — universal, enables Google sitelinks search box */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": publication.name,
+              "url": `https://${publication.domain || "localhost:3000"}`,
+              "publisher": {
+                "@type": "Organization",
+                "name": publication.name,
+              },
+            }),
+          }}
+        />
       </head>
       <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : isSF ? "pub-sf bg-sf-cream text-sf-ink" : "bg-white text-mercury-ink"}`}>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}

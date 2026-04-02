@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
 import { getPostsByBeatWithAuthors, getBeatsForPublication, getHubPageByBeat, getHubPages } from "@/lib/queries";
 import { sanitizeContent, decodeHtmlEntities } from "@/lib/content";
+import { getBaseUrl } from "@/lib/domains";
 import PostCard from "@/components/PostCard";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
@@ -64,6 +65,33 @@ export default async function BeatPage({ params }: BeatPageProps) {
   const postLimit = hubPage?.hub_limit ?? 50;
   const posts = await getPostsByBeatWithAuthors(publication.id, beat, postLimit);
 
+  // CollectionPage JSON-LD for beat/hub pages
+  const baseUrl = getBaseUrl(slug);
+  const beatJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": hubPage ? decodeHtmlEntities(hubPage.title) : beatConfig.label,
+    "url": `${baseUrl}/${beat}`,
+    "description": hubPage
+      ? `${decodeHtmlEntities(hubPage.title)} — coverage from ${publication.name}.`
+      : `${beatConfig.description}. Coverage from ${publication.name}.`,
+    "publisher": {
+      "@type": "Organization",
+      "name": publication.name,
+      "url": baseUrl,
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": posts.length,
+      "itemListElement": posts.slice(0, 20).map((post, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "url": `${baseUrl}/${post.beat}/${post.slug}`,
+        "name": decodeHtmlEntities(post.title),
+      })),
+    },
+  };
+
   if (hubPage) {
     // ---- Hub page: editorial content + dynamic post feed ----
     const contentHtml = sanitizeContent(hubPage.content);
@@ -71,6 +99,10 @@ export default async function BeatPage({ params }: BeatPageProps) {
 
     return (
       <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(beatJsonLd) }}
+        />
         {/* Editorial content */}
         <article className="max-w-3xl mx-auto">
           <header className="mb-8">
@@ -111,6 +143,10 @@ export default async function BeatPage({ params }: BeatPageProps) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(beatJsonLd) }}
+      />
       <header className="mb-6 pb-4 border-b-2 border-mercury-ink">
         <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight">
           {beatConfig.label}
