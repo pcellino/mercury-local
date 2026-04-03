@@ -9,7 +9,7 @@ import {
   estimateReadingTime,
   decodeHtmlEntities,
 } from "@/lib/content";
-import { generatePageJsonLd, generatePageBreadcrumbJsonLd } from "@/lib/jsonld";
+import { generatePageJsonLd, generatePageBreadcrumbJsonLd, generateFAQJsonLd } from "@/lib/jsonld";
 import PostCard from "@/components/PostCard";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
@@ -101,6 +101,7 @@ export default async function StaticPage({ params }: PageProps) {
   // JSON-LD structured data
   const pageJsonLd = generatePageJsonLd(page, publication);
   const breadcrumbJsonLd = generatePageBreadcrumbJsonLd(page, publication);
+  const faqJsonLd = generateFAQJsonLd(page, publication);
 
   return (
     <>
@@ -112,6 +113,12 @@ export default async function StaticPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <article className="max-w-3xl mx-auto">
       {/* ---- BREADCRUMBS ---- */}
       <nav

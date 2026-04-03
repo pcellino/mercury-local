@@ -5,7 +5,7 @@ import { getPublicationFromRequest } from "@/lib/publication";
 import {
   getPostByBeatAndSlug,
   getBeatsForPublication,
-  getPostsByBeatWithAuthors,
+  getRelatedPosts,
   getPageBySlug,
   getHubPosts,
 } from "@/lib/queries";
@@ -166,9 +166,8 @@ export default async function PostPage({ params }: PostPageProps) {
   const readingTime = estimateReadingTime(post.content);
   const contentHtml = sanitizeContent(post.content);
 
-  // Related stories from same beat
-  const relatedPosts = await getPostsByBeatWithAuthors(publication.id, beat, 4);
-  const related = relatedPosts.filter((p) => p.id !== post.id).slice(0, 3);
+  // Related stories — tag overlap first, then same-beat backfill
+  const related = await getRelatedPosts(publication.id, post.id, beat, 3);
 
   // JSON-LD structured data
   const articleJsonLd = generateArticleJsonLd(post, publication);

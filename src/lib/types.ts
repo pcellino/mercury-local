@@ -45,6 +45,8 @@ export interface Post {
   featured: boolean | null;
   hero_image_url: string | null;
   hero_image_alt: string | null;
+  hero_image_width: number | null;
+  hero_image_height: number | null;
   beat: string | null;
   seo_title: string | null;
   meta_description: string | null;

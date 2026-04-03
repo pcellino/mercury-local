@@ -31,7 +31,13 @@ export function generateArticleJsonLd(
       ? decodeHtmlEntities(post.meta_description)
       : undefined,
     image: post.hero_image_url
-      ? [{ "@type": "ImageObject", url: post.hero_image_url }]
+      ? [{
+          "@type": "ImageObject",
+          url: post.hero_image_url,
+          ...(post.hero_image_alt && { name: post.hero_image_alt }),
+          ...(post.hero_image_width && { width: post.hero_image_width }),
+          ...(post.hero_image_height && { height: post.hero_image_height }),
+        }]
       : undefined,
     datePublished: post.pub_date || post.created_at,
     dateModified: post.updated_at || post.pub_date || post.created_at,
@@ -323,5 +329,104 @@ export function generatePageBreadcrumbJsonLd(
         item: `${base}/page/${page.slug}`,
       },
     ],
+  };
+}
+
+// -------------------------------------------------------
+// FAQPage schema (for guide pages with Q&A headings)
+// -------------------------------------------------------
+
+/** Heading patterns that can be converted to questions. */
+const QUESTION_REWRITES: [RegExp, (match: RegExpMatchArray, pageTitle: string) => string][] = [
+  // Already a question — keep as-is
+  [/^(.+\?)$/, (m) => m[1]],
+  // "How to Watch" → "How do you watch the {title}?"
+  [/^How to Watch$/i, (_m, title) => `How do you watch ${title}?`],
+  // "Why It Matters" → "Why does the {title} matter?"
+  [/^Why It Matters$/i, (_m, title) => `Why does ${title} matter?`],
+];
+
+/**
+ * Extract FAQ pairs from markdown content.
+ *
+ * Scans for H2 headings that are questions (end with `?`) or match
+ * known convertible patterns. Returns the heading as the question
+ * and the content between it and the next H2 as the answer.
+ */
+function extractFAQPairs(
+  content: string,
+  pageTitle: string
+): { question: string; answer: string }[] {
+  const lines = content.split("\n");
+  const pairs: { question: string; answer: string }[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const headingMatch = lines[i].match(/^## (.+)/);
+    if (!headingMatch) continue;
+
+    const heading = headingMatch[1].trim();
+    let question: string | null = null;
+
+    for (const [pattern, rewrite] of QUESTION_REWRITES) {
+      const m = heading.match(pattern);
+      if (m) {
+        question = rewrite(m, pageTitle);
+        break;
+      }
+    }
+
+    if (!question) continue;
+
+    // Collect answer text until the next H2 or end of content
+    const answerLines: string[] = [];
+    for (let j = i + 1; j < lines.length; j++) {
+      if (lines[j].match(/^## /)) break;
+      answerLines.push(lines[j]);
+    }
+
+    const answer = answerLines
+      .join("\n")
+      .trim()
+      // Strip markdown links but keep text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      // Strip bold/italic
+      .replace(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
+      // Strip images
+      .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+      // Collapse multiple newlines
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+
+    if (answer.length > 20) {
+      pairs.push({
+        question: decodeHtmlEntities(question),
+        answer: decodeHtmlEntities(answer).slice(0, 500),
+      });
+    }
+  }
+
+  return pairs;
+}
+
+export function generateFAQJsonLd(
+  page: Page,
+  publication: Publication
+): object | null {
+  if (!page.content) return null;
+
+  const pairs = extractFAQPairs(page.content, decodeHtmlEntities(page.title));
+  if (pairs.length === 0) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: pairs.map((pair) => ({
+      "@type": "Question",
+      name: pair.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: pair.answer,
+      },
+    })),
   };
 }

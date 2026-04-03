@@ -627,3 +627,83 @@ export async function getAllTagsForPublication(
 export function getBeatsForPublication(pubSlug: string): BeatConfig[] {
   return BEATS_BY_PUBLICATION[pubSlug] || [];
 }
+
+// -------------------------------------------------------
+// Related posts (tag-aware internal linking)
+// -------------------------------------------------------
+
+/**
+ * Get related posts for internal linking, ranked by tag overlap.
+ *
+ * 1. Fetch the current post's tags.
+ * 2. Find other posts sharing those tags (most shared tags first).
+ * 3. Backfill with same-beat posts if not enough tag matches.
+ */
+export async function getRelatedPosts(
+  publicationId: string,
+  postId: string,
+  beat: string | null,
+  limit = 3
+): Promise<PostWithAuthor[]> {
+  // Step 1: Get this post's tag IDs
+  const { data: tagLinks } = await supabase
+    .from("post_tags")
+    .select("tag_id")
+    .eq("post_id", postId);
+
+  const tagIds = (tagLinks || []).map((t: { tag_id: string }) => t.tag_id);
+
+  let tagRelated: PostWithAuthor[] = [];
+
+  if (tagIds.length > 0) {
+    // Step 2: Find posts sharing these tags, ordered by most recent
+    const { data: relatedTagLinks } = await supabase
+      .from("post_tags")
+      .select(`
+        post_id,
+        posts:post_id (
+          *,
+          author:authors(*)
+        )
+      `)
+      .in("tag_id", tagIds)
+      .neq("post_id", postId)
+      .limit(50);
+
+    if (relatedTagLinks) {
+      // Count tag overlap per post and deduplicate
+      const postMap = new Map<string, { post: PostWithAuthor; overlap: number }>();
+      for (const link of relatedTagLinks) {
+        const post = (link as Record<string, unknown>).posts as PostWithAuthor | null;
+        if (!post || post.publication_id !== publicationId || post.status !== "published") continue;
+        const existing = postMap.get(post.id);
+        if (existing) {
+          existing.overlap++;
+        } else {
+          postMap.set(post.id, { post, overlap: 1 });
+        }
+      }
+
+      // Sort by overlap desc, then by pub_date desc
+      tagRelated = Array.from(postMap.values())
+        .sort((a, b) => {
+          if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+          const aDate = a.post.pub_date || a.post.created_at;
+          const bDate = b.post.pub_date || b.post.created_at;
+          return bDate.localeCompare(aDate);
+        })
+        .slice(0, limit)
+        .map((entry) => entry.post);
+    }
+  }
+
+  // Step 3: Backfill with same-beat posts if needed
+  if (tagRelated.length < limit && beat) {
+    const existingIds = new Set([postId, ...tagRelated.map((p) => p.id)]);
+    const beatPosts = await getPostsByBeatWithAuthors(publicationId, beat, limit + 5);
+    const backfill = beatPosts.filter((p) => !existingIds.has(p.id));
+    tagRelated = [...tagRelated, ...backfill].slice(0, limit);
+  }
+
+  return tagRelated;
+}
