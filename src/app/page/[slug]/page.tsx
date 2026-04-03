@@ -30,16 +30,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // If this is a hub page, don't generate metadata — it will redirect
   if (page.hub_beat && slug === page.hub_beat) return {};
 
+  const title = page.seo_title || page.title;
+  const description = page.meta_description || "";
+
   return {
-    title: decodeHtmlEntities(page.title),
+    title: decodeHtmlEntities(title),
+    ...(description && { description: decodeHtmlEntities(description) }),
     alternates: {
       canonical: `/page/${slug}`,
     },
     openGraph: {
-      title: decodeHtmlEntities(page.title),
+      title: decodeHtmlEntities(title),
+      ...(description && { description: decodeHtmlEntities(description) }),
       type: "website",
       url: `/page/${slug}`,
     },
+    ...(description && {
+      twitter: {
+        card: "summary",
+        title: decodeHtmlEntities(title),
+        description: decodeHtmlEntities(description),
+      },
+    }),
   };
 }
 

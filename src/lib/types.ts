@@ -97,6 +97,9 @@ export interface Page {
   updated_at: string;
   source: string | null;
   original_url: string | null;
+  // SEO fields
+  seo_title: string | null;
+  meta_description: string | null;
   // Hub fields
   hub_beat: string | null;
   hub_tag: string | null;

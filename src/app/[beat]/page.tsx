@@ -26,10 +26,14 @@ export async function generateMetadata({
   // Check for hub page to use its title/description if available
   const hubPage = await getHubPageByBeat(publication.id, beat);
 
-  const title = hubPage ? decodeHtmlEntities(hubPage.title) : beatConfig.label;
-  const description = hubPage
-    ? `${decodeHtmlEntities(hubPage.title)} — coverage from ${publication.name}.`
-    : `${beatConfig.description}. Coverage from ${publication.name}.`;
+  const title = hubPage
+    ? decodeHtmlEntities(hubPage.seo_title || hubPage.title)
+    : beatConfig.label;
+  const description = hubPage?.meta_description
+    ? decodeHtmlEntities(hubPage.meta_description)
+    : hubPage
+      ? `${decodeHtmlEntities(hubPage.title)} — coverage from ${publication.name}.`
+      : `${beatConfig.description}. Coverage from ${publication.name}.`;
 
   return {
     title,
