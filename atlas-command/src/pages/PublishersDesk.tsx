@@ -1,33 +1,37 @@
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { getRecentPosts, getEditorialPipeline, getActiveTasks, completeTask, type RecentPost, type EditorialItem, type ProjectGroup } from '../lib/queries'
-// SiteStats and CurrentVisitors used in TrafficStrip component props
+import { getRecentPosts, getEditorialPipeline, getActiveTasks, completeTask, getDocuments, getPinnedDocuments, type RecentPost, type EditorialItem, type ProjectGroup, type Document } from '../lib/queries'
 import { updateEditorialStatus, logActivity } from '../lib/mutations'
 import { getAllSiteStats, getAllCurrentVisitors, type SiteStats, type CurrentVisitors } from '../lib/fathom'
 import { PUB_COLORS, PUB_SHORT, PUB_DOMAINS, formatRelative, statusColor } from '../lib/utils'
-import { ExternalLink, ChevronRight, AlertTriangle, Clock, CheckCircle, Circle, Eye, ArrowRight } from 'lucide-react'
+import { ExternalLink, ChevronRight, AlertTriangle, Clock, CheckCircle, Circle, Eye, ArrowRight, FileText, Pin, BookOpen } from 'lucide-react'
+import MarkdownViewer, { DocSection, DocTypeBadge } from '../components/MarkdownViewer'
 
 const STATUS_FLOW = ['concept', 'assigned', 'drafting', 'review', 'scheduled', 'published']
 
 export default function PublishersDesk() {
   const queryClient = useQueryClient()
+  const [viewingDoc, setViewingDoc] = useState<string | null>(null)
 
   // --- Data ---
   const recent = useQuery({ queryKey: ['desk-recent'], queryFn: () => getRecentPosts(5, 'published') })
   const pipeline = useQuery({ queryKey: ['desk-pipeline'], queryFn: getEditorialPipeline })
   const projects = useQuery({ queryKey: ['desk-projects'], queryFn: getActiveTasks })
+  const pinnedDocs = useQuery({ queryKey: ['desk-pinned-docs'], queryFn: getPinnedDocuments })
+  const allDocs = useQuery({ queryKey: ['desk-all-docs'], queryFn: () => getDocuments() })
 
   // Fathom: today's traffic
   const today = new Date().toISOString().split('T')[0]
   const traffic = useQuery({
     queryKey: ['desk-traffic', today],
     queryFn: () => getAllSiteStats(today, today),
-    staleTime: 5 * 60 * 1000, // 5 min
+    staleTime: 5 * 60 * 1000,
   })
   const liveVisitors = useQuery({
     queryKey: ['desk-live'],
     queryFn: getAllCurrentVisitors,
-    refetchInterval: 30_000, // every 30s
+    refetchInterval: 30_000,
   })
 
   // --- Mutations ---
@@ -51,6 +55,16 @@ export default function PublishersDesk() {
   const totalVisits = (traffic.data ?? []).reduce((s, t) => s + t.visits, 0)
   const totalLive = (liveVisitors.data ?? []).reduce((s, v) => s + v.visitors, 0)
 
+  // Group docs by project for project cards
+  const docsByProject = new Map<string, Document[]>()
+  for (const doc of allDocs.data ?? []) {
+    if (doc.project) {
+      const existing = docsByProject.get(doc.project) ?? []
+      existing.push(doc)
+      docsByProject.set(doc.project, existing)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* ── Traffic strip ── */}
@@ -60,6 +74,11 @@ export default function PublishersDesk() {
         sites={traffic.data ?? []}
         live={liveVisitors.data ?? []}
       />
+
+      {/* ── Quick Reference strip ── */}
+      {(pinnedDocs.data?.length ?? 0) > 0 && (
+        <QuickReferenceStrip docs={pinnedDocs.data!} onSelect={setViewingDoc} />
+      )}
 
       {/* ── Two-column: Recent + Pipeline ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -122,13 +141,22 @@ export default function PublishersDesk() {
         {projects.isLoading && <p className="text-[13px] text-[var(--color-text-muted)]">Loading...</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {projects.data?.map(group => (
-            <ProjectCard key={group.project} group={group} onComplete={done.mutate} />
+            <ProjectCard
+              key={group.project}
+              group={group}
+              onComplete={done.mutate}
+              docs={docsByProject.get(group.project) ?? []}
+              onViewDoc={setViewingDoc}
+            />
           ))}
         </div>
         {projects.data?.length === 0 && (
           <p className="text-[13px] text-[var(--color-text-muted)]">All projects complete.</p>
         )}
       </section>
+
+      {/* ── Document Viewer (slide-over) ── */}
+      <MarkdownViewer docId={viewingDoc} onClose={() => setViewingDoc(null)} />
     </div>
   )
 }
@@ -137,6 +165,33 @@ export default function PublishersDesk() {
    Sub-components
    ═══════════════════════════════════════════════ */
 
+function QuickReferenceStrip({ docs, onSelect }: { docs: Document[]; onSelect: (id: string) => void }) {
+  return (
+    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-5 py-3">
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <BookOpen size={13} className="text-[var(--color-text-muted)]" />
+          <span className="text-[11px] font-medium text-[var(--color-text-muted)] uppercase tracking-wider">Quick Ref</span>
+        </div>
+        <div className="h-4 w-px bg-[var(--color-border)] hidden sm:block" />
+        <div className="flex items-center gap-2 flex-wrap">
+          {docs.map(doc => (
+            <button
+              key={doc.id}
+              onClick={() => onSelect(doc.id)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--color-surface-2)]/50 hover:bg-[var(--color-accent)]/10 border border-transparent hover:border-[var(--color-accent)]/20 transition-colors group"
+            >
+              <Pin size={10} className="text-amber-400 shrink-0" />
+              <span className="text-[12px] group-hover:text-[var(--color-accent-hover)] transition-colors">{doc.title}</span>
+              <DocTypeBadge type={doc.doc_type} />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function TrafficStrip({ totalVisits, totalLive, sites, live }: {
   totalVisits: number
   totalLive: number
@@ -144,13 +199,11 @@ function TrafficStrip({ totalVisits, totalLive, sites, live }: {
   live: CurrentVisitors[]
 }) {
   const liveMap = new Map(live.map(v => [v.pubSlug, v.visitors]))
-  // Only show pubs with traffic or live visitors
   const activeSites = sites.filter(s => s.visits > 0 || (liveMap.get(s.pubSlug) ?? 0) > 0)
 
   return (
     <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-5 py-3.5">
       <div className="flex items-center gap-6 flex-wrap">
-        {/* Total */}
         <div className="flex items-baseline gap-2">
           <Eye size={14} className="text-[var(--color-text-muted)] relative top-[2px]" />
           <span className="text-2xl font-bold tabular-nums">{totalVisits.toLocaleString()}</span>
@@ -165,10 +218,8 @@ function TrafficStrip({ totalVisits, totalLive, sites, live }: {
           </div>
         )}
 
-        {/* Divider */}
         <div className="h-5 w-px bg-[var(--color-border)] hidden lg:block" />
 
-        {/* Per-pub mini stats */}
         <div className="flex items-center gap-4 flex-wrap">
           {activeSites.map(s => {
             const liveCount = liveMap.get(s.pubSlug) ?? 0
@@ -275,7 +326,12 @@ function PipelineSection({ label, color, items, onAdvance }: {
   )
 }
 
-function ProjectCard({ group, onComplete }: { group: ProjectGroup; onComplete: (id: string) => void }) {
+function ProjectCard({ group, onComplete, docs, onViewDoc }: {
+  group: ProjectGroup
+  onComplete: (id: string) => void
+  docs: Document[]
+  onViewDoc: (id: string) => void
+}) {
   const statusIcon = group.status === 'blocked'
     ? <AlertTriangle size={13} className="text-red-400" />
     : <CheckCircle size={13} className="text-green-400" />
@@ -294,6 +350,12 @@ function ProjectCard({ group, onComplete }: { group: ProjectGroup; onComplete: (
         <span className="tabular-nums">{group.openCount} open</span>
         {group.blockedCount > 0 && (
           <span className="text-red-400 tabular-nums">{group.blockedCount} blocked</span>
+        )}
+        {docs.length > 0 && (
+          <span className="flex items-center gap-1">
+            <FileText size={11} />
+            <span className="tabular-nums">{docs.length} docs</span>
+          </span>
         )}
       </div>
 
@@ -320,6 +382,9 @@ function ProjectCard({ group, onComplete }: { group: ProjectGroup; onComplete: (
           <p className="text-[11px] text-[var(--color-text-muted)] pl-5">+{group.tasks.length - 3} more</p>
         )}
       </div>
+
+      {/* Linked docs */}
+      <DocSection docs={docs} onSelect={onViewDoc} />
     </div>
   )
 }

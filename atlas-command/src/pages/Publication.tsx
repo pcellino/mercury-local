@@ -5,8 +5,8 @@ import {
   getPublicationBySlug, getPublicationStats, getPublicationAuthors,
   getPublicationPages, getPublicationEditorial, getRecentPosts,
   getPublicationBeats, getPublicationVoiceProfiles, getPublicationFeeds,
-  getPublicationLog,
-  type PubAuthor, type PubPage, type BeatResearch, type VoiceProfile, type FeedSource,
+  getPublicationLog, getDocsByPublication,
+  type PubAuthor, type PubPage, type BeatResearch, type VoiceProfile, type FeedSource, type Document,
 } from '../lib/queries'
 import {
   updatePublication, updateAuthor, updateBeatResearch, updateVoiceProfile,
@@ -18,13 +18,14 @@ import { getSiteAggregates, getTopPages, getAllCurrentVisitors } from '../lib/fa
 import { useAuth } from '../lib/auth'
 import { formatRelative, statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import { HealthScoreCompact } from '../components/HealthScores'
+import MarkdownViewer, { DocTypeBadge } from '../components/MarkdownViewer'
 import {
   ArrowLeft, ExternalLink, Pencil, Globe, FileText, Clock, Inbox, Eye,
   Users, BarChart3, Calendar, Settings, Save, Check, AlertCircle, ChevronRight, BookOpen,
-  Rss, Plus, Trash2, X, List, Search,
+  Rss, Plus, Trash2, X, List, Search, Pin,
 } from 'lucide-react'
 
-type TabId = 'overview' | 'posts' | 'pages' | 'editorial' | 'beats' | 'feeds' | 'log' | 'authors' | 'settings'
+type TabId = 'overview' | 'posts' | 'pages' | 'editorial' | 'beats' | 'feeds' | 'log' | 'authors' | 'docs' | 'settings'
 
 export default function Publication() {
   const { slug } = useParams<{ slug: string }>()
@@ -179,6 +180,14 @@ export default function Publication() {
     queryFn: () => getPublicationLog(pub!.id),
     enabled: !!pub?.id && activeTab === 'log',
   })
+
+  // Documents
+  const pubDocs = useQuery({
+    queryKey: ['pub-docs', pub?.id],
+    queryFn: () => getDocsByPublication(pub!.id),
+    enabled: !!pub?.id && activeTab === 'docs',
+  })
+  const [viewingDoc, setViewingDoc] = useState<string | null>(null)
 
   const color = PUB_COLORS[slug ?? ''] ?? '#6366f1'
   const short = PUB_SHORT[slug ?? ''] ?? slug?.slice(0, 3).toUpperCase()
@@ -349,6 +358,7 @@ export default function Publication() {
     { id: 'beats', label: 'Beats', icon: BookOpen },
     { id: 'feeds', label: 'Feeds', icon: Rss },
     { id: 'log', label: 'Log', icon: List },
+    { id: 'docs', label: 'Docs', icon: BookOpen },
     { id: 'authors', label: 'Authors', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
   ]
@@ -1061,6 +1071,65 @@ export default function Publication() {
           {(authors.data ?? []).length === 0 && (
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-8 text-center text-sm text-[var(--color-text-muted)]">No authors assigned to this publication</div>
           )}
+        </div>
+      )}
+
+      {/* ===== DOCS TAB ===== */}
+      {activeTab === 'docs' && (
+        <div>
+          {pubDocs.isLoading && <p className="text-sm text-[var(--color-text-muted)]">Loading documents...</p>}
+          {pubDocs.data && pubDocs.data.length === 0 && (
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-8 text-center text-sm text-[var(--color-text-muted)]">
+              No documents linked to this publication
+            </div>
+          )}
+
+          {/* Group by doc_type */}
+          {pubDocs.data && pubDocs.data.length > 0 && (() => {
+            const grouped: Record<string, Document[]> = {}
+            for (const doc of pubDocs.data) {
+              const key = doc.doc_type
+              if (!grouped[key]) grouped[key] = []
+              grouped[key].push(doc)
+            }
+            const typeOrder = ['brand', 'editorial', 'guideline', 'scope', 'reference', 'template', 'voice', 'beat']
+            const sortedTypes = Object.keys(grouped).sort((a, b) => typeOrder.indexOf(a) - typeOrder.indexOf(b))
+
+            return (
+              <div className="space-y-4">
+                {sortedTypes.map(type => (
+                  <div key={type}>
+                    <h3 className="text-[12px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 capitalize">{type} Documents</h3>
+                    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden">
+                      {grouped[type].map((doc, i) => (
+                        <button
+                          key={doc.id}
+                          onClick={() => setViewingDoc(doc.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--color-surface-2)]/50 transition-colors ${i < grouped[type].length - 1 ? 'border-b border-[var(--color-border)]' : ''}`}
+                        >
+                          <FileText size={14} className="text-[var(--color-text-muted)] shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-medium truncate">{doc.title}</div>
+                            {doc.summary && (
+                              <div className="text-[11px] text-[var(--color-text-muted)] truncate mt-0.5">{doc.summary}</div>
+                            )}
+                          </div>
+                          {doc.pinned && <Pin size={11} className="text-amber-400 shrink-0" />}
+                          <DocTypeBadge type={doc.doc_type} />
+                          {doc.project && (
+                            <span className="text-[10px] text-[var(--color-text-muted)] shrink-0">{doc.project}</span>
+                          )}
+                          <ChevronRight size={13} className="text-[var(--color-text-muted)] shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+
+          <MarkdownViewer docId={viewingDoc} onClose={() => setViewingDoc(null)} />
         </div>
       )}
 

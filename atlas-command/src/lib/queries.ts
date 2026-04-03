@@ -1108,3 +1108,82 @@ export async function getBeatStats(days = 30): Promise<BeatStats[]> {
     .map(([beat, count]) => ({ beat, count }))
     .sort((a, b) => b.count - a.count)
 }
+
+// ---------- Documents ----------
+export interface Document {
+  id: string
+  title: string
+  doc_type: string
+  content: string
+  summary: string | null
+  publication_id: string | null
+  project: string | null
+  file_path: string | null
+  status: string
+  tags: string[]
+  pinned: boolean
+  created_at: string | null
+  updated_at: string | null
+  pub_name?: string
+  pub_slug?: string
+}
+
+export async function getDocuments(filter?: { docType?: string; pubId?: string; project?: string; pinned?: boolean }): Promise<Document[]> {
+  let query = supabase
+    .from('documents')
+    .select(`
+      id, title, doc_type, content, summary, publication_id, project, file_path,
+      status, tags, pinned, created_at, updated_at,
+      publications(name, slug)
+    `)
+    .eq('status', 'active')
+    .order('pinned', { ascending: false })
+    .order('title')
+
+  if (filter?.docType) query = query.eq('doc_type', filter.docType)
+  if (filter?.pubId) query = query.eq('publication_id', filter.pubId)
+  if (filter?.project) query = query.eq('project', filter.project)
+  if (filter?.pinned) query = query.eq('pinned', true)
+
+  const { data, error } = await query
+  if (error) throw error
+
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    pub_name: row.publications?.name ?? null,
+    pub_slug: row.publications?.slug ?? null,
+    publications: undefined,
+  }))
+}
+
+export async function getDocumentById(id: string): Promise<Document> {
+  const { data, error } = await supabase
+    .from('documents')
+    .select(`
+      id, title, doc_type, content, summary, publication_id, project, file_path,
+      status, tags, pinned, created_at, updated_at,
+      publications(name, slug)
+    `)
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  const pubs = (data as any).publications
+  return {
+    ...data,
+    pub_name: Array.isArray(pubs) ? pubs[0]?.name : pubs?.name ?? null,
+    pub_slug: Array.isArray(pubs) ? pubs[0]?.slug : pubs?.slug ?? null,
+    publications: undefined,
+  } as unknown as Document
+}
+
+export async function getDocsByProject(project: string): Promise<Document[]> {
+  return getDocuments({ project })
+}
+
+export async function getDocsByPublication(pubId: string): Promise<Document[]> {
+  return getDocuments({ pubId })
+}
+
+export async function getPinnedDocuments(): Promise<Document[]> {
+  return getDocuments({ pinned: true })
+}
