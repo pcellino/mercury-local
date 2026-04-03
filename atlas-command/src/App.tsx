@@ -22,6 +22,7 @@ import Activity from './pages/Activity'
 import Insights from './pages/Insights'
 import Settings from './pages/Settings'
 import Schedule from './pages/Schedule'
+import Notifications from './pages/Notifications'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -73,6 +74,7 @@ function AppRoutes() {
           <Route path="insights" element={<Insights />} />
           <Route path="settings" element={<Settings />} />
           <Route path="schedule" element={<Schedule />} />
+          <Route path="notifications" element={<Notifications />} />
         </Route>
       </Routes>
     </BrowserRouter>
