@@ -11,6 +11,9 @@ import PostEditor from './pages/PostEditor'
 import PageEditor from './pages/PageEditor'
 import Publication from './pages/Publication'
 import Transcripts from './pages/Transcripts'
+import Sources from './pages/Sources'
+import FeedMonitor from './pages/FeedMonitor'
+import Competitors from './pages/Competitors'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -51,6 +54,9 @@ function AppRoutes() {
           <Route path="pages/:id" element={<PageEditor />} />
           <Route path="publications/:slug" element={<Publication />} />
           <Route path="transcripts" element={<Transcripts />} />
+          <Route path="sources" element={<Sources />} />
+          <Route path="feeds" element={<FeedMonitor />} />
+          <Route path="competitors" element={<Competitors />} />
         </Route>
       </Routes>
     </BrowserRouter>

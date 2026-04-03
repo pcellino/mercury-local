@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getPublicationStats, getAggregateStats, getRecentPosts } from '../lib/queries'
 import { PUB_COLORS, PUB_SHORT, formatRelative } from '../lib/utils'
 import StatCard from '../components/StatCard'
+import HealthScores from '../components/HealthScores'
 import { Globe, FileText, Clock, Inbox, ExternalLink, ChevronRight } from 'lucide-react'
 
 export default function Newsroom() {
@@ -120,6 +121,11 @@ export default function Newsroom() {
           })}
         </div>
       )}
+
+      {/* Health Scores */}
+      <div className="mb-10">
+        <HealthScores />
+      </div>
 
       {/* Recent Activity */}
       <h2 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-4">

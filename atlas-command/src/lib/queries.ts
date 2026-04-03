@@ -693,6 +693,334 @@ export async function getPageById(id: string): Promise<FullPage> {
   } as FullPage
 }
 
+// ---------- Source Documents ----------
+export interface SourceDocument {
+  id: string
+  title: string
+  document_type: string
+  source_org: string | null
+  source_org_type: string | null
+  document_date: string
+  period_start: string | null
+  period_end: string | null
+  summary: string | null
+  record_count: number | null
+  file_path: string | null
+  file_format: string | null
+  file_size_bytes: number | null
+  publication_id: string | null
+  beat: string | null
+  status: string
+  processing_notes: string | null
+  created_at: string | null
+  updated_at: string | null
+  pub_name?: string
+}
+
+export interface SourceDocumentDetail extends SourceDocument {
+  extracted_text: string | null
+  structured_data: any | null
+}
+
+export async function getSourceDocuments(limit = 100): Promise<SourceDocument[]> {
+  const { data, error } = await supabase
+    .from('source_documents')
+    .select(`
+      id, title, document_type, source_org, source_org_type, document_date,
+      period_start, period_end, summary, record_count, file_path, file_format,
+      file_size_bytes, publication_id, beat, status, processing_notes,
+      created_at, updated_at,
+      publications(name)
+    `)
+    .order('document_date', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    pub_name: row.publications?.name ?? null,
+    publications: undefined,
+  }))
+}
+
+export async function searchSourceDocuments(query: string): Promise<SourceDocument[]> {
+  const { data, error } = await supabase
+    .from('source_documents')
+    .select(`
+      id, title, document_type, source_org, source_org_type, document_date,
+      period_start, period_end, summary, record_count, file_path, file_format,
+      file_size_bytes, publication_id, beat, status, processing_notes,
+      created_at, updated_at,
+      publications(name)
+    `)
+    .textSearch('search_vector', query, { type: 'websearch' })
+    .order('document_date', { ascending: false })
+    .limit(50)
+  if (error) throw error
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    pub_name: row.publications?.name ?? null,
+    publications: undefined,
+  }))
+}
+
+export async function getSourceDocumentById(id: string): Promise<SourceDocumentDetail> {
+  const { data, error } = await supabase
+    .from('source_documents')
+    .select(`*, publications(name)`)
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return {
+    ...data,
+    pub_name: (data as any).publications?.name ?? null,
+    publications: undefined,
+  } as unknown as SourceDocumentDetail
+}
+
+export async function getSourceDocumentPosts(docId: string): Promise<{ id: string; title: string; slug: string; pub_date: string | null }[]> {
+  const { data, error } = await supabase
+    .from('post_source_documents')
+    .select('posts(id, title, slug, pub_date)')
+    .eq('source_document_id', docId)
+  if (error) throw error
+  return (data ?? []).map((row: any) => {
+    const p = Array.isArray(row.posts) ? row.posts[0] : row.posts
+    return { id: p?.id ?? '', title: p?.title ?? '', slug: p?.slug ?? '', pub_date: p?.pub_date ?? null }
+  }).filter(p => p.id)
+}
+
+// ---------- Feed Items ----------
+export interface FeedItem {
+  id: string
+  feed_source_id: string | null
+  publication_id: string | null
+  title: string
+  url: string
+  published_at: string | null
+  summary: string | null
+  author: string | null
+  beat_category: string | null
+  status: string
+  editorial_calendar_id: string | null
+  similarity_score: number | null
+  similar_post_id: string | null
+  created_at: string | null
+  feed_name?: string
+  pub_name?: string
+  similar_post_title?: string
+}
+
+export async function getFeedItems(filters?: { status?: string; pubId?: string }, limit = 100): Promise<FeedItem[]> {
+  let query = supabase
+    .from('feed_items')
+    .select(`
+      id, feed_source_id, publication_id, title, url, published_at, summary, author,
+      beat_category, status, editorial_calendar_id, similarity_score, similar_post_id,
+      created_at,
+      feed_sources(name),
+      publications(name)
+    `)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (filters?.status && filters.status !== 'all') {
+    query = query.eq('status', filters.status)
+  }
+  if (filters?.pubId) {
+    query = query.eq('publication_id', filters.pubId)
+  }
+
+  const { data, error } = await query
+  if (error) throw error
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    feed_name: row.feed_sources?.name ?? null,
+    pub_name: row.publications?.name ?? null,
+    feed_sources: undefined,
+    publications: undefined,
+  }))
+}
+
+// ---------- Competitors ----------
+export interface Competitor {
+  id: string
+  publication_id: string | null
+  name: string
+  domain: string
+  feed_url: string | null
+  region: string | null
+  notes: string | null
+  is_active: boolean
+  created_at: string | null
+  updated_at: string | null
+  pub_name?: string
+}
+
+export async function getCompetitors(pubId?: string): Promise<Competitor[]> {
+  let query = supabase
+    .from('competitors')
+    .select('*, publications(name)')
+    .order('name')
+
+  if (pubId) {
+    query = query.eq('publication_id', pubId)
+  }
+
+  const { data, error } = await query
+  if (error) throw error
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    pub_name: row.publications?.name ?? null,
+    publications: undefined,
+  }))
+}
+
+export interface CompetitorArticle {
+  id: string
+  competitor_id: string
+  title: string
+  url: string
+  published_at: string | null
+  beat_category: string | null
+  has_local_coverage: boolean
+  local_post_id: string | null
+  created_at: string | null
+}
+
+export async function getCompetitorArticles(competitorId?: string, uncoveredOnly = false, limit = 100): Promise<CompetitorArticle[]> {
+  let query = supabase
+    .from('competitor_articles')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (competitorId) {
+    query = query.eq('competitor_id', competitorId)
+  }
+  if (uncoveredOnly) {
+    query = query.eq('has_local_coverage', false)
+  }
+
+  const { data, error } = await query
+  if (error) throw error
+  return data ?? []
+}
+
+// ---------- Publication Health Score ----------
+export interface HealthScore {
+  publication_id: string
+  pub_name: string
+  pub_slug: string
+  velocity_score: number      // posts per week vs target
+  beat_coverage_score: number  // how many beats have recent content
+  hub_freshness_score: number  // % of hub pages updated in last 30d
+  pipeline_depth_score: number // editorial items in pipeline
+  overall_score: number        // weighted composite
+  details: {
+    posts_this_week: number
+    weekly_target: number
+    active_beats: number
+    total_beats: number
+    fresh_hubs: number
+    total_hubs: number
+    pipeline_items: number
+  }
+}
+
+export async function getPublicationHealthScores(): Promise<HealthScore[]> {
+  const pubs = await getPublications()
+  const scores: HealthScore[] = []
+
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
+  for (const pub of pubs.filter(p => p.domain)) {
+    // Posts this week
+    const { count: postsThisWeek } = await supabase
+      .from('posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('publication_id', pub.id)
+      .eq('status', 'published')
+      .gte('pub_date', weekAgo)
+
+    // Distinct beats with content in last 30d
+    const { data: recentBeats } = await supabase
+      .from('posts')
+      .select('beat')
+      .eq('publication_id', pub.id)
+      .eq('status', 'published')
+      .gte('pub_date', thirtyDaysAgo)
+      .not('beat', 'is', null)
+
+    const activeBeatSet = new Set((recentBeats ?? []).map(r => r.beat))
+
+    // Total beats for this pub (from beat_research)
+    const { count: totalBeats } = await supabase
+      .from('beat_research')
+      .select('id', { count: 'exact', head: true })
+      .eq('publication_id', pub.id)
+
+    // Hub page freshness
+    const { data: hubs } = await supabase
+      .from('pages')
+      .select('id, updated_at')
+      .eq('publication_id', pub.id)
+      .eq('status', 'published')
+      .not('hub_beat', 'is', null)
+
+    const freshHubs = (hubs ?? []).filter(h =>
+      h.updated_at && new Date(h.updated_at) > new Date(thirtyDaysAgo)
+    ).length
+    const totalHubs = (hubs ?? []).length
+
+    // Editorial pipeline depth
+    const { count: pipelineItems } = await supabase
+      .from('editorial_calendar')
+      .select('id', { count: 'exact', head: true })
+      .eq('publication_id', pub.id)
+      .not('status', 'in', '("published","killed")')
+
+    const pw = postsThisWeek ?? 0
+    const weeklyTarget = 3 // default target
+    const tb = totalBeats ?? 0
+    const pi = pipelineItems ?? 0
+
+    const velocityScore = Math.min(100, Math.round((pw / weeklyTarget) * 100))
+    const beatCoverageScore = tb > 0 ? Math.round((activeBeatSet.size / tb) * 100) : 0
+    const hubFreshnessScore = totalHubs > 0 ? Math.round((freshHubs / totalHubs) * 100) : 100
+    const pipelineDepthScore = Math.min(100, Math.round((pi / 5) * 100)) // 5 items = 100%
+
+    const overall = Math.round(
+      velocityScore * 0.35 +
+      beatCoverageScore * 0.25 +
+      hubFreshnessScore * 0.20 +
+      pipelineDepthScore * 0.20
+    )
+
+    scores.push({
+      publication_id: pub.id,
+      pub_name: pub.name,
+      pub_slug: pub.slug,
+      velocity_score: velocityScore,
+      beat_coverage_score: beatCoverageScore,
+      hub_freshness_score: hubFreshnessScore,
+      pipeline_depth_score: pipelineDepthScore,
+      overall_score: overall,
+      details: {
+        posts_this_week: pw,
+        weekly_target: weeklyTarget,
+        active_beats: activeBeatSet.size,
+        total_beats: tb,
+        fresh_hubs: freshHubs,
+        total_hubs: totalHubs,
+        pipeline_items: pi,
+      },
+    })
+  }
+
+  return scores.sort((a, b) => b.overall_score - a.overall_score)
+}
+
 export async function getBeatStats(days = 30): Promise<BeatStats[]> {
   const { data, error } = await supabase
     .from('posts')

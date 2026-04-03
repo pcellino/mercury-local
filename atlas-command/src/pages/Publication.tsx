@@ -17,6 +17,7 @@ import {
 import { getSiteAggregates, getTopPages, getAllCurrentVisitors } from '../lib/fathom'
 import { useAuth } from '../lib/auth'
 import { formatRelative, statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
+import { HealthScoreCompact } from '../components/HealthScores'
 import {
   ArrowLeft, ExternalLink, Pencil, Globe, FileText, Clock, Inbox, Eye,
   Users, BarChart3, Calendar, Settings, Save, Check, AlertCircle, ChevronRight, BookOpen,
@@ -455,6 +456,9 @@ export default function Publication() {
               </div>
             </div>
           )}
+
+          {/* Health Score */}
+          {pub && <div className="mb-6"><HealthScoreCompact pubId={pub.id} /></div>}
 
           <div className="grid grid-cols-2 gap-8">
             {/* Latest posts */}

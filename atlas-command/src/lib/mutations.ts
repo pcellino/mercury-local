@@ -298,6 +298,101 @@ export async function createBeatResearch(data: {
   return result
 }
 
+// ---------- Feed Items ----------
+
+export async function updateFeedItemStatus(id: string, status: string) {
+  const { error } = await supabase
+    .from('feed_items')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function promoteFeedItemToConcept(
+  feedItemId: string,
+  data: { publication_id: string; concept: string; beat?: string; target_date: string }
+) {
+  // Create editorial calendar entry
+  const { data: ecItem, error: ecError } = await supabase
+    .from('editorial_calendar')
+    .insert({
+      publication_id: data.publication_id,
+      concept: data.concept,
+      beat: data.beat,
+      target_date: data.target_date,
+      status: 'concept',
+      source_type: 'feed_monitor',
+    })
+    .select()
+    .single()
+  if (ecError) throw ecError
+
+  // Link feed item to the editorial calendar entry
+  const { error: fiError } = await supabase
+    .from('feed_items')
+    .update({
+      status: 'concept_created',
+      editorial_calendar_id: ecItem.id,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', feedItemId)
+  if (fiError) throw fiError
+
+  return ecItem
+}
+
+export async function dismissFeedItem(id: string) {
+  const { error } = await supabase
+    .from('feed_items')
+    .update({ status: 'dismissed', updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+// ---------- Competitors ----------
+
+export interface CreateCompetitorPayload {
+  publication_id: string
+  name: string
+  domain: string
+  feed_url?: string
+  region?: string
+  notes?: string
+}
+
+export async function createCompetitor(data: CreateCompetitorPayload) {
+  const { data: result, error } = await supabase
+    .from('competitors')
+    .insert(data)
+    .select()
+    .single()
+  if (error) throw error
+  return result
+}
+
+export async function updateCompetitor(id: string, updates: Partial<{
+  name: string
+  domain: string
+  feed_url: string | null
+  region: string | null
+  notes: string | null
+  is_active: boolean
+}>) {
+  const { error } = await supabase
+    .from('competitors')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteCompetitor(id: string) {
+  const { error } = await supabase
+    .from('competitors')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
+}
+
 // ---------- Tag Management ----------
 
 export async function addTagToPost(postId: string, tagId: string) {
