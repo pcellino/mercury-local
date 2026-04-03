@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getFeedItems, getPublications, type FeedItem } from '../lib/queries'
 import { promoteFeedItemToConcept, dismissFeedItem, updateFeedItemStatus } from '../lib/mutations'
 import { formatRelative } from '../lib/utils'
-import { Rss, ExternalLink, Plus, X, Eye, EyeOff, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Rss, ExternalLink, Plus, X, Eye, EyeOff, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   new: { label: 'New', color: 'text-blue-400 bg-blue-400/10' },
@@ -24,14 +24,18 @@ export default function FeedMonitor() {
     queryFn: () => getFeedItems({ status: statusFilter, pubId: pubFilter || undefined }),
   })
 
+  const [mutError, setMutError] = useState<string | null>(null)
+
   const dismissMut = useMutation({
     mutationFn: dismissFeedItem,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['feed-items'] }),
+    onSuccess: () => { setMutError(null); queryClient.invalidateQueries({ queryKey: ['feed-items'] }) },
+    onError: (err: any) => setMutError(err.message ?? 'Failed to dismiss item'),
   })
 
   const reviewMut = useMutation({
     mutationFn: (id: string) => updateFeedItemStatus(id, 'reviewed'),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['feed-items'] }),
+    onSuccess: () => { setMutError(null); queryClient.invalidateQueries({ queryKey: ['feed-items'] }) },
+    onError: (err: any) => setMutError(err.message ?? 'Failed to mark as reviewed'),
   })
 
   const newCount = items?.filter(i => i.status === 'new').length ?? 0
@@ -84,6 +88,14 @@ export default function FeedMonitor() {
           ))}
         </select>
       </div>
+
+      {/* Error banner */}
+      {mutError && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-red-400/10 border border-red-400/20 rounded-lg text-xs text-red-400">
+          <AlertCircle size={14} /> {mutError}
+          <button onClick={() => setMutError(null)} className="ml-auto hover:text-red-300"><X size={12} /></button>
+        </div>
+      )}
 
       {/* Feed Items */}
       {isLoading ? (
@@ -225,11 +237,13 @@ function ConceptModal({ item, publications, onClose, onCreated }: {
   const [beat, setBeat] = useState(item.beat_category ?? '')
   const [targetDate, setTargetDate] = useState(new Date().toISOString().split('T')[0])
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!pubId || !concept) return
     setSaving(true)
+    setError(null)
     try {
       await promoteFeedItemToConcept(item.id, {
         publication_id: pubId,
@@ -238,8 +252,8 @@ function ConceptModal({ item, publications, onClose, onCreated }: {
         target_date: targetDate,
       })
       onCreated()
-    } catch (err) {
-      console.error('Failed to create concept:', err)
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to create concept')
       setSaving(false)
     }
   }
@@ -309,6 +323,12 @@ function ConceptModal({ item, publications, onClose, onCreated }: {
             </a>
             {item.feed_name && <p className="mt-1">Feed: {item.feed_name}</p>}
           </div>
+
+          {error && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-red-400/10 border border-red-400/20 rounded-lg text-xs text-red-400">
+              <AlertCircle size={14} /> {error}
+            </div>
+          )}
 
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)]">

@@ -60,28 +60,25 @@ export interface PubAuthor {
 }
 
 export async function getPublicationAuthors(pubId: string): Promise<PubAuthor[]> {
-  const { data, error } = await supabase
-    .from('authors')
-    .select('id, name, slug, bio, avatar_url, email, credentials, beat_description')
-    .eq('publication_id', pubId)
-    .order('name')
-  if (error) throw error
+  const [authorsRes, countsRes] = await Promise.all([
+    supabase
+      .from('authors')
+      .select('id, name, slug, bio, avatar_url, email, credentials, beat_description')
+      .eq('publication_id', pubId)
+      .order('name'),
+    supabase.rpc('get_author_post_counts', { pub_id: pubId }),
+  ])
+  if (authorsRes.error) throw authorsRes.error
 
-  // Get 30-day post counts per author
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-  const authors = data ?? []
-  const counts = await Promise.all(
-    authors.map(async (a) => {
-      const { count } = await supabase
-        .from('posts')
-        .select('id', { count: 'exact', head: true })
-        .eq('author_id', a.id)
-        .eq('status', 'published')
-        .gte('pub_date', thirtyDaysAgo)
-      return count ?? 0
-    })
-  )
-  return authors.map((a, i) => ({ ...a, post_count_30d: counts[i] }))
+  const countMap = new Map<string, number>()
+  for (const row of countsRes.data ?? []) {
+    countMap.set(row.author_id, Number(row.post_count))
+  }
+
+  return (authorsRes.data ?? []).map(a => ({
+    ...a,
+    post_count_30d: countMap.get(a.id) ?? 0,
+  }))
 }
 
 export interface PubPage {
@@ -928,67 +925,23 @@ export interface HealthScore {
 }
 
 export async function getPublicationHealthScores(): Promise<HealthScore[]> {
-  const pubs = await getPublications()
-  const scores: HealthScore[] = []
+  const { data, error } = await supabase.rpc('get_publication_health_scores')
+  if (error) throw error
 
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  return (data ?? []).map((row: any) => {
+    const wt = row.weekly_target || 3
+    const pt = row.pipeline_target || 5
+    const pw = Number(row.posts_this_week)
+    const ab = Number(row.active_beats)
+    const tb = Number(row.total_beats)
+    const fh = Number(row.fresh_hubs)
+    const th = Number(row.total_hubs)
+    const pi = Number(row.pipeline_items)
 
-  for (const pub of pubs.filter(p => p.domain)) {
-    // Posts this week
-    const { count: postsThisWeek } = await supabase
-      .from('posts')
-      .select('id', { count: 'exact', head: true })
-      .eq('publication_id', pub.id)
-      .eq('status', 'published')
-      .gte('pub_date', weekAgo)
-
-    // Distinct beats with content in last 30d
-    const { data: recentBeats } = await supabase
-      .from('posts')
-      .select('beat')
-      .eq('publication_id', pub.id)
-      .eq('status', 'published')
-      .gte('pub_date', thirtyDaysAgo)
-      .not('beat', 'is', null)
-
-    const activeBeatSet = new Set((recentBeats ?? []).map(r => r.beat))
-
-    // Total beats for this pub (from beat_research)
-    const { count: totalBeats } = await supabase
-      .from('beat_research')
-      .select('id', { count: 'exact', head: true })
-      .eq('publication_id', pub.id)
-
-    // Hub page freshness
-    const { data: hubs } = await supabase
-      .from('pages')
-      .select('id, updated_at')
-      .eq('publication_id', pub.id)
-      .eq('status', 'published')
-      .not('hub_beat', 'is', null)
-
-    const freshHubs = (hubs ?? []).filter(h =>
-      h.updated_at && new Date(h.updated_at) > new Date(thirtyDaysAgo)
-    ).length
-    const totalHubs = (hubs ?? []).length
-
-    // Editorial pipeline depth
-    const { count: pipelineItems } = await supabase
-      .from('editorial_calendar')
-      .select('id', { count: 'exact', head: true })
-      .eq('publication_id', pub.id)
-      .not('status', 'in', '("published","killed")')
-
-    const pw = postsThisWeek ?? 0
-    const weeklyTarget = 3 // default target
-    const tb = totalBeats ?? 0
-    const pi = pipelineItems ?? 0
-
-    const velocityScore = Math.min(100, Math.round((pw / weeklyTarget) * 100))
-    const beatCoverageScore = tb > 0 ? Math.round((activeBeatSet.size / tb) * 100) : 0
-    const hubFreshnessScore = totalHubs > 0 ? Math.round((freshHubs / totalHubs) * 100) : 100
-    const pipelineDepthScore = Math.min(100, Math.round((pi / 5) * 100)) // 5 items = 100%
+    const velocityScore = wt > 0 ? Math.min(100, Math.round((pw / wt) * 100)) : 100
+    const beatCoverageScore = tb > 0 ? Math.round((ab / tb) * 100) : 0
+    const hubFreshnessScore = th > 0 ? Math.round((fh / th) * 100) : 100
+    const pipelineDepthScore = Math.min(100, Math.round((pi / pt) * 100))
 
     const overall = Math.round(
       velocityScore * 0.35 +
@@ -997,10 +950,10 @@ export async function getPublicationHealthScores(): Promise<HealthScore[]> {
       pipelineDepthScore * 0.20
     )
 
-    scores.push({
-      publication_id: pub.id,
-      pub_name: pub.name,
-      pub_slug: pub.slug,
+    return {
+      publication_id: row.publication_id,
+      pub_name: row.pub_name,
+      pub_slug: row.pub_slug,
       velocity_score: velocityScore,
       beat_coverage_score: beatCoverageScore,
       hub_freshness_score: hubFreshnessScore,
@@ -1008,17 +961,15 @@ export async function getPublicationHealthScores(): Promise<HealthScore[]> {
       overall_score: overall,
       details: {
         posts_this_week: pw,
-        weekly_target: weeklyTarget,
-        active_beats: activeBeatSet.size,
+        weekly_target: wt,
+        active_beats: ab,
         total_beats: tb,
-        fresh_hubs: freshHubs,
-        total_hubs: totalHubs,
+        fresh_hubs: fh,
+        total_hubs: th,
         pipeline_items: pi,
       },
-    })
-  }
-
-  return scores.sort((a, b) => b.overall_score - a.overall_score)
+    } as HealthScore
+  }).sort((a: HealthScore, b: HealthScore) => b.overall_score - a.overall_score)
 }
 
 export async function getBeatStats(days = 30): Promise<BeatStats[]> {
