@@ -14,6 +14,7 @@ import Transcripts from './pages/Transcripts'
 import Sources from './pages/Sources'
 import FeedMonitor from './pages/FeedMonitor'
 import Competitors from './pages/Competitors'
+import PostCreate from './pages/PostCreate'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -50,6 +51,7 @@ function AppRoutes() {
           <Route path="recent" element={<RecentPosts />} />
           <Route path="status" element={<Status />} />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="posts/new" element={<PostCreate />} />
           <Route path="posts/:id" element={<PostEditor />} />
           <Route path="pages/:id" element={<PageEditor />} />
           <Route path="publications/:slug" element={<Publication />} />

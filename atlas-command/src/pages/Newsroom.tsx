@@ -4,6 +4,7 @@ import { getPublicationStats, getAggregateStats, getRecentPosts } from '../lib/q
 import { PUB_COLORS, PUB_SHORT, formatRelative } from '../lib/utils'
 import StatCard from '../components/StatCard'
 import HealthScores from '../components/HealthScores'
+import AlertsBanner from '../components/AlertsBanner'
 import { Globe, FileText, Clock, Inbox, ExternalLink, ChevronRight } from 'lucide-react'
 
 export default function Newsroom() {
@@ -18,6 +19,9 @@ export default function Newsroom() {
         <h1 className="text-2xl font-bold tracking-tight">Newsroom</h1>
         <p className="text-sm text-[var(--color-text-muted)] mt-1">All publications at a glance</p>
       </div>
+
+      {/* Alerts */}
+      <AlertsBanner />
 
       {/* Top stats */}
       {agg.data && (

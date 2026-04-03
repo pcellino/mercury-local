@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications } from '../lib/queries'
-import { LayoutDashboard, Calendar, Newspaper, Activity, LogOut, BarChart3, ChevronDown, ChevronRight, FileText, FolderOpen, Rss, Shield } from 'lucide-react'
+import { LayoutDashboard, Calendar, Newspaper, Activity, LogOut, BarChart3, ChevronDown, ChevronRight, FileText, FolderOpen, Rss, Shield, PlusCircle } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
 
@@ -56,6 +56,21 @@ export default function Sidebar() {
             {label}
           </NavLink>
         ))}
+
+        {/* Quick create */}
+        <NavLink
+          to="/posts/new"
+          className={({ isActive }) =>
+            `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm mt-2 transition-colors ${
+              isActive
+                ? 'bg-green-500/10 text-green-400 font-medium'
+                : 'text-green-400/70 hover:text-green-400 hover:bg-green-500/5'
+            }`
+          }
+        >
+          <PlusCircle size={16} />
+          New Post
+        </NavLink>
 
         {/* Publications section */}
         <div className="mt-4 pt-3 border-t border-[var(--color-border)]">
@@ -118,7 +133,7 @@ export default function Sidebar() {
             <p className="text-[10px] text-[var(--color-text-muted)]">Sign in for write access</p>
           </div>
         )}
-        <p className="text-[10px] text-[var(--color-text-muted)] mt-2">Phase 6 · v0.6.0</p>
+        <p className="text-[10px] text-[var(--color-text-muted)] mt-2">Phase 7 · v0.7.0</p>
       </div>
     </aside>
   )

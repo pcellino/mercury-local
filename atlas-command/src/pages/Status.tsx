@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Activity, AlertTriangle, CheckCircle, Clock, Rocket, ExternalLink, Pencil, BookOpen } from 'lucide-react'
+import { Activity, AlertTriangle, CheckCircle, Clock, Rocket, ExternalLink, Pencil, BookOpen, Users } from 'lucide-react'
 import { formatDate } from '../lib/utils'
+import HealthScores from '../components/HealthScores'
 
 interface ScheduledPost {
   id: string
@@ -27,6 +28,14 @@ interface StaleBeat {
   updated_at: string
   article_count: number
   pub_name: string
+}
+
+interface AuthorWorkload {
+  author_id: string
+  author_name: string
+  posts_7d: number
+  posts_30d: number
+  editorial_items: number
 }
 
 export default function Status() {
@@ -104,6 +113,62 @@ export default function Status() {
         updated_at: row.updated_at,
         pub_name: row.publications?.name ?? '',
       }))
+    },
+  })
+
+  const authorWorkload = useQuery({
+    queryKey: ['author-workload'],
+    queryFn: async (): Promise<AuthorWorkload[]> => {
+      const now = new Date()
+      const d7 = new Date(now); d7.setDate(d7.getDate() - 7)
+      const d30 = new Date(now); d30.setDate(d30.getDate() - 30)
+
+      // Get all authors
+      const { data: authors, error: aErr } = await supabase
+        .from('authors')
+        .select('id, name')
+        .order('name')
+      if (aErr) throw aErr
+
+      // Get post counts per author (7d and 30d)
+      const { data: posts7d } = await supabase
+        .from('posts')
+        .select('author_id')
+        .gte('pub_date', d7.toISOString())
+        .eq('status', 'published')
+      const { data: posts30d } = await supabase
+        .from('posts')
+        .select('author_id')
+        .gte('pub_date', d30.toISOString())
+        .eq('status', 'published')
+
+      // Get active editorial items per author
+      const { data: ecItems } = await supabase
+        .from('editorial_calendar')
+        .select('author_id')
+        .not('status', 'in', '("published","killed")')
+
+      const count7d = new Map<string, number>()
+      const count30d = new Map<string, number>()
+      const countEc = new Map<string, number>()
+
+      for (const p of posts7d ?? []) {
+        if (p.author_id) count7d.set(p.author_id, (count7d.get(p.author_id) ?? 0) + 1)
+      }
+      for (const p of posts30d ?? []) {
+        if (p.author_id) count30d.set(p.author_id, (count30d.get(p.author_id) ?? 0) + 1)
+      }
+      for (const e of ecItems ?? []) {
+        if (e.author_id) countEc.set(e.author_id, (countEc.get(e.author_id) ?? 0) + 1)
+      }
+
+      return (authors ?? []).map((a: any) => ({
+        author_id: a.id,
+        author_name: a.name,
+        posts_7d: count7d.get(a.id) ?? 0,
+        posts_30d: count30d.get(a.id) ?? 0,
+        editorial_items: countEc.get(a.id) ?? 0,
+      })).filter((a: AuthorWorkload) => a.posts_30d > 0 || a.editorial_items > 0)
     },
   })
 
@@ -280,7 +345,7 @@ export default function Status() {
 
       {/* Stale Beat Research */}
       {staleBeats.data && staleBeats.data.length > 0 && (
-        <div>
+        <div className="mb-8">
           <h2 className="text-sm font-semibold text-orange-400 uppercase tracking-wide mb-3 flex items-center gap-2">
             <BookOpen size={14} /> Stale Beat Research (&gt;14 days)
           </h2>
@@ -306,6 +371,52 @@ export default function Status() {
                     <td className="px-4 py-3 text-[var(--color-text-muted)]">{beat.pub_name}</td>
                     <td className="px-4 py-3 text-[var(--color-text-muted)]">{beat.article_count}</td>
                     <td className="px-4 py-3 text-orange-400">{formatDate(beat.updated_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Publication Health Dashboard */}
+      <div className="mb-8">
+        <HealthScores />
+      </div>
+
+      {/* Author Workload */}
+      {authorWorkload.data && authorWorkload.data.length > 0 && (
+        <div>
+          <h2 className="text-sm font-semibold text-[var(--color-text)] uppercase tracking-wide mb-3 flex items-center gap-2">
+            <Users size={14} className="text-[var(--color-accent)]" /> Author Workload
+          </h2>
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[var(--color-surface-2)]">
+                  <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase font-semibold">Author</th>
+                  <th className="text-right px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase font-semibold w-24">7 Days</th>
+                  <th className="text-right px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase font-semibold w-24">30 Days</th>
+                  <th className="text-right px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase font-semibold w-24">In Pipeline</th>
+                </tr>
+              </thead>
+              <tbody>
+                {authorWorkload.data.map((a) => (
+                  <tr key={a.author_id} className="border-t border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50">
+                    <td className="px-4 py-3 font-medium">{a.author_name}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={a.posts_7d >= 3 ? 'text-green-400' : a.posts_7d >= 1 ? 'text-yellow-400' : 'text-[var(--color-text-muted)]'}>
+                        {a.posts_7d}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={a.posts_30d >= 12 ? 'text-green-400' : a.posts_30d >= 4 ? 'text-yellow-400' : 'text-[var(--color-text-muted)]'}>
+                        {a.posts_30d}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-[var(--color-accent-hover)]">
+                      {a.editorial_items}
+                    </td>
                   </tr>
                 ))}
               </tbody>

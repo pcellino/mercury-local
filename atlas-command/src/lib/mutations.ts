@@ -98,6 +98,35 @@ export async function duplicateEditorialItem(id: string) {
 
 // ---------- Post CRUD ----------
 
+export interface CreatePostPayload {
+  title: string
+  slug: string
+  publication_id: string
+  author_id?: string | null
+  status?: string
+  beat?: string | null
+  excerpt?: string | null
+  content?: string | null
+  pub_date?: string | null
+  featured?: boolean
+  hero_image_url?: string | null
+  hero_image_alt?: string | null
+  seo_title?: string | null
+  meta_description?: string | null
+  summary?: string | null
+}
+
+export async function createPost(payload: CreatePostPayload): Promise<string> {
+  const now = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('posts')
+    .insert({ ...payload, status: payload.status ?? 'draft', created_at: now, updated_at: now })
+    .select('id')
+    .single()
+  if (error) throw error
+  return data.id
+}
+
 export async function updatePostStatus(id: string, status: string) {
   const { error } = await supabase
     .from('posts')
