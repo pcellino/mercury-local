@@ -6,9 +6,37 @@ import { updatePost, addTagToPost, removeTagFromPost, type UpdatePostPayload } f
 import { getPathStats, siteIdForPub, postPathname } from '../lib/fathom'
 import { useAuth } from '../lib/auth'
 import { statusColor, PUB_COLORS, PUB_SHORT, PUB_DOMAINS } from '../lib/utils'
-import { ArrowLeft, Save, ExternalLink, X, Plus, Image, FileText, Settings, Tag, AlertCircle, Check, Eye, Users, Clock } from 'lucide-react'
+import { ArrowLeft, Save, ExternalLink, X, Plus, Image, FileText, Settings, Tag, AlertCircle, Check, Eye, Users, Clock, Columns } from 'lucide-react'
 
 type TabId = 'content' | 'meta' | 'seo' | 'tags' | 'settings'
+
+/** Lightweight markdown → HTML for preview (no dependencies) */
+function simpleMarkdown(md: string): string {
+  if (!md) return '<p class="text-[var(--color-text-muted)]">Start writing...</p>'
+  let html = md
+    // Escape HTML
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Headings
+    .replace(/^### (.+)$/gm, '<h3 style="font-size:1.1em;font-weight:700;margin:1em 0 0.3em">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 style="font-size:1.25em;font-weight:700;margin:1em 0 0.3em">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 style="font-size:1.4em;font-weight:700;margin:1em 0 0.3em">$1</h1>')
+    // Bold / italic
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:var(--color-accent-hover);text-decoration:underline">$1</a>')
+    // Unordered lists
+    .replace(/^[*-] (.+)$/gm, '<li style="margin-left:1.5em;list-style:disc">$1</li>')
+    // Horizontal rule
+    .replace(/^---$/gm, '<hr style="border-color:var(--color-border);margin:1em 0">')
+    // Blockquote
+    .replace(/^&gt; (.+)$/gm, '<blockquote style="border-left:3px solid var(--color-border);padding-left:1em;color:var(--color-text-muted);margin:0.5em 0">$1</blockquote>')
+    // Paragraphs (double newline)
+    .replace(/\n\n/g, '</p><p style="margin:0.5em 0">')
+    // Single newlines → <br>
+    .replace(/\n/g, '<br>')
+  return `<p style="margin:0.5em 0">${html}</p>`
+}
 
 export default function PostEditor() {
   const { id } = useParams<{ id: string }>()
@@ -42,6 +70,9 @@ export default function PostEditor() {
   const [summary, setSummary] = useState('')
   const [followUpBy, setFollowUpBy] = useState('')
   const [followUpNote, setFollowUpNote] = useState('')
+
+  // Preview state
+  const [showPreview, setShowPreview] = useState(false)
 
   // Tag state
   const [postTagIds, setPostTagIds] = useState<Set<string>>(new Set())
@@ -432,14 +463,44 @@ export default function PostEditor() {
           </div>
 
           <div>
-            <label className={labelClass}>Body (Markdown)</label>
-            <textarea
-              value={content}
-              onChange={(e) => { setContent(e.target.value); markDirty() }}
-              rows={20}
-              className={`${inputClass} font-mono text-xs leading-relaxed`}
-              placeholder="Article content in markdown..."
-            />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide">Body (Markdown)</label>
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] transition-colors ${
+                  showPreview
+                    ? 'bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)]'
+                    : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                }`}
+              >
+                {showPreview ? <Columns size={12} /> : <Eye size={12} />}
+                {showPreview ? 'Split View' : 'Preview'}
+              </button>
+            </div>
+            {showPreview ? (
+              <div className="grid grid-cols-2 gap-3">
+                <textarea
+                  value={content}
+                  onChange={(e) => { setContent(e.target.value); markDirty() }}
+                  rows={20}
+                  className={`${inputClass} font-mono text-xs leading-relaxed`}
+                  placeholder="Article content in markdown..."
+                />
+                <div
+                  className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-sm leading-relaxed overflow-y-auto max-h-[500px] prose-invert"
+                  dangerouslySetInnerHTML={{ __html: simpleMarkdown(content) }}
+                />
+              </div>
+            ) : (
+              <textarea
+                value={content}
+                onChange={(e) => { setContent(e.target.value); markDirty() }}
+                rows={20}
+                className={`${inputClass} font-mono text-xs leading-relaxed`}
+                placeholder="Article content in markdown..."
+              />
+            )}
             {content && (
               <p className="text-xs text-[var(--color-text-muted)] mt-1">
                 {content.length.toLocaleString()} characters · ~{Math.ceil(content.split(/\s+/).length / 250)} min read

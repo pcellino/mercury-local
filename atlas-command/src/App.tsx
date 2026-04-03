@@ -16,6 +16,8 @@ import FeedMonitor from './pages/FeedMonitor'
 import Competitors from './pages/Competitors'
 import PostCreate from './pages/PostCreate'
 import Tags from './pages/Tags'
+import Authors from './pages/Authors'
+import Hubs from './pages/Hubs'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -61,6 +63,8 @@ function AppRoutes() {
           <Route path="feeds" element={<FeedMonitor />} />
           <Route path="competitors" element={<Competitors />} />
           <Route path="tags" element={<Tags />} />
+          <Route path="authors" element={<Authors />} />
+          <Route path="hubs" element={<Hubs />} />
         </Route>
       </Routes>
     </BrowserRouter>

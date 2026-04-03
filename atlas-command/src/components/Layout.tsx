@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import ShortcutsHelp from './ShortcutsHelp'
+import CommandPalette from './CommandPalette'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 
 export default function Layout() {
@@ -15,6 +16,7 @@ export default function Layout() {
         </div>
       </main>
       <ShortcutsHelp />
+      <CommandPalette />
     </>
   )
 }
