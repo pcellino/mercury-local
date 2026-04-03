@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Playfair_Display, Inter } from "next/font/google";
 import { getPublicationFromRequest } from "@/lib/publication";
 import { getBeatsForPublication, getHubPages } from "@/lib/queries";
 import { getBaseUrl, CUSTOM_LAYOUT_SLUGS } from "@/lib/domains";
@@ -8,6 +9,20 @@ import BeatDropdownNav from "@/components/BeatDropdownNav";
 import BetaBanner from "@/components/BetaBanner";
 import GNTHeader from "@/components/GNTHeader";
 import "./globals.css";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  display: "swap",
+  variable: "--font-playfair",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { publication, slug } = await getPublicationFromRequest();
@@ -82,15 +97,9 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
-        {/* Preconnect to Google Fonts — saves ~100-200ms on font loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
+        {/* Fonts self-hosted via next/font — no render-blocking external requests */}
         {slug === "peter-cellino" && (
           <script
             type="application/ld+json"

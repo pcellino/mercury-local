@@ -337,13 +337,27 @@ export function generatePageBreadcrumbJsonLd(
 // -------------------------------------------------------
 
 /** Heading patterns that can be converted to questions. */
+/**
+ * Extract a short subject name from a page title.
+ * "The CARS Tour — Complete Guide to …" → "the CARS Tour"
+ * "Martinsville Speedway — Track Guide" → "Martinsville Speedway"
+ * Falls back to the full title (lowercased) if no separator found.
+ */
+function shortSubject(pageTitle: string): string {
+  // Split on em-dash or en-dash with surrounding spaces
+  const sep = pageTitle.match(/^(.+?)\s*[—–]\s*/);
+  const name = sep ? sep[1].trim() : pageTitle;
+  // Lowercase the leading "The" for natural question phrasing
+  return name.replace(/^The /i, "the ");
+}
+
 const QUESTION_REWRITES: [RegExp, (match: RegExpMatchArray, pageTitle: string) => string][] = [
   // Already a question — keep as-is
   [/^(.+\?)$/, (m) => m[1]],
-  // "How to Watch" → "How do you watch the {title}?"
-  [/^How to Watch$/i, (_m, title) => `How do you watch ${title}?`],
-  // "Why It Matters" → "Why does the {title} matter?"
-  [/^Why It Matters$/i, (_m, title) => `Why does ${title} matter?`],
+  // "How to Watch" → "How do you watch the CARS Tour?"
+  [/^How to Watch$/i, (_m, title) => `How do you watch ${shortSubject(title)}?`],
+  // "Why It Matters" → "Why does the CARS Tour matter?"
+  [/^Why It Matters$/i, (_m, title) => `Why does ${shortSubject(title)} matter?`],
 ];
 
 /**

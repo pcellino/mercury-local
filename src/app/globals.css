@@ -14,7 +14,7 @@
 
   body {
     @apply bg-white text-mercury-ink;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   }
 
   /* No-underline utility for links */
@@ -48,13 +48,13 @@
   }
 
   .article-content h2 {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: var(--font-playfair), Georgia, serif;
     @apply text-2xl font-black mt-10 mb-4 tracking-tight;
     color: var(--ac-heading);
   }
 
   .article-content h3 {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: var(--font-playfair), Georgia, serif;
     @apply text-xl font-bold mt-8 mb-3;
     color: var(--ac-heading);
   }
@@ -72,7 +72,7 @@
     @apply border-l-4 pl-5 italic my-6;
     color: var(--ac-blockquote);
     border-color: var(--ac-blockquote-border);
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: var(--font-playfair), Georgia, serif;
   }
 
   .article-content ul,
@@ -98,7 +98,7 @@
   }
 
   .article-content h1 {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: var(--font-playfair), Georgia, serif;
     @apply text-3xl font-black mt-10 mb-5 tracking-tight;
     color: var(--ac-heading);
   }
@@ -135,13 +135,13 @@
   .article-content figcaption {
     @apply text-xs mt-2;
     color: var(--ac-muted);
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
   }
 
   /* Drop cap for first paragraph */
   .article-content > p:first-of-type::first-letter {
     float: left;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: var(--font-playfair), Georgia, serif;
     font-size: 4rem;
     line-height: 0.8;
     padding-right: 0.5rem;

@@ -8,9 +8,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', "Georgia", "Cambria", "Times New Roman", "serif"],
+        display: ["var(--font-playfair)", "Georgia", "Cambria", "Times New Roman", "serif"],
         serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["var(--font-inter)", "system-ui", "-apple-system", "sans-serif"],
         mono: ['"JetBrains Mono"', '"Fira Code"', "monospace"],
       },
       colors: {
