@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getTranscripts, searchTranscripts, getTranscriptById, type Transcript } from '../lib/queries'
 import {
-  Search, FileText, ExternalLink, Clock, ChevronRight, ArrowLeft, X,
+  Search, FileText, ExternalLink, ChevronRight, ArrowLeft, X,
 } from 'lucide-react'
-import { formatRelative, statusColor } from '../lib/utils'
+import { statusColor } from '../lib/utils'
 
 export default function Transcripts() {
   const [searchQuery, setSearchQuery] = useState('')
