@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
 import { getTranscripts, searchTranscripts, getTranscriptById, type Transcript } from '../lib/queries'
 import { createEditorialItem } from '../lib/mutations'
 import { supabase } from '../lib/supabase'
 import {
-  Search, FileText, ExternalLink, ChevronRight, ArrowLeft, X, Lightbulb, Plus, Check,
+  Search, FileText, ExternalLink, ChevronRight, ArrowLeft, X, Lightbulb, Plus,
 } from 'lucide-react'
 import { statusColor } from '../lib/utils'
 
@@ -20,7 +19,6 @@ interface StoryLead {
 }
 
 export default function Transcripts() {
-  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [searching, setSearching] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)

@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications, getAuthors } from '../lib/queries'
 import { createPost, type CreatePostPayload } from '../lib/mutations'
-import { useAuth } from '../lib/auth'
-import { ArrowLeft, Plus, Rocket } from 'lucide-react'
+import { ArrowLeft, Plus } from 'lucide-react'
 
 function toSlug(title: string): string {
   return title
@@ -17,7 +16,6 @@ function toSlug(title: string): string {
 
 export default function PostCreate() {
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
