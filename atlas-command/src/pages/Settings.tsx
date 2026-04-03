@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useSearchParams, Link } from 'react-router-dom'
 import { getPublications, getRecentPosts, getEditorialCalendar } from '../lib/queries'
 import { supabase } from '../lib/supabase'
-import { Sun, Moon, Download, Database, RefreshCw, CheckCircle, AlertTriangle, Clock, BookOpen, ExternalLink, Rocket, Pencil, Users } from 'lucide-react'
+import { Sun, Moon, Download, RefreshCw, CheckCircle, AlertTriangle, Clock, BookOpen, ExternalLink, Rocket, Pencil } from 'lucide-react'
 import { PUB_COLORS, PUB_SHORT, formatDate } from '../lib/utils'
 import HealthScores from '../components/HealthScores'
 
@@ -350,28 +350,24 @@ function SystemTab() {
       {/* Health indicators */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <HealthCard
-          ok={cronHealth}
           icon={cronHealth ? CheckCircle : Clock}
           title="pg_cron"
           detail={cronHealth ? 'Queue clear' : `${scheduled.data?.length} posts queued`}
           color={cronHealth ? 'green' : 'yellow'}
         />
         <HealthCard
-          ok={(overdue.data?.length ?? 0) === 0}
           icon={(overdue.data?.length ?? 0) === 0 ? CheckCircle : AlertTriangle}
           title="Deadlines"
           detail={(overdue.data?.length ?? 0) === 0 ? 'No overdue items' : `${overdue.data?.length} overdue`}
           color={(overdue.data?.length ?? 0) === 0 ? 'green' : 'red'}
         />
         <HealthCard
-          ok={(staleHubs.data?.length ?? 0) === 0}
           icon={(staleHubs.data?.length ?? 0) === 0 ? CheckCircle : AlertTriangle}
           title="Hub Freshness"
           detail={(staleHubs.data?.length ?? 0) === 0 ? 'All fresh' : `${staleHubs.data?.length} stale`}
           color={(staleHubs.data?.length ?? 0) === 0 ? 'green' : 'yellow'}
         />
         <HealthCard
-          ok={(staleBeats.data?.length ?? 0) === 0}
           icon={(staleBeats.data?.length ?? 0) === 0 ? CheckCircle : BookOpen}
           title="Beat Research"
           detail={(staleBeats.data?.length ?? 0) === 0 ? 'All fresh' : `${staleBeats.data?.length} stale`}
@@ -566,8 +562,7 @@ function Section({ title, subtitle, titleColor, children }: {
   )
 }
 
-function HealthCard({ ok, icon: Icon, title, detail, color }: {
-  ok: boolean | undefined
+function HealthCard({ icon: Icon, title, detail, color }: {
   icon: typeof CheckCircle
   title: string
   detail: string

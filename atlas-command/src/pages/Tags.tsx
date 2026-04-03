@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { getPublications } from '../lib/queries'
-import { Tag, Plus, Pencil, Trash2, X, Search, ExternalLink } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Search, ExternalLink } from 'lucide-react'
 import { PUB_COLORS, PUB_SHORT, PUB_DOMAINS } from '../lib/utils'
 
 interface TagRow {

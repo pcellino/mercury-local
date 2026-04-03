@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import RecentPosts from './RecentPosts'
 import Tags from './Tags'

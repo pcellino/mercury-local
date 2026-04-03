@@ -5,7 +5,7 @@ import { updateAuthor } from '../lib/mutations'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
-import { Users, Edit2, Save, X, Mail } from 'lucide-react'
+import { Edit2, Save, X, Mail } from 'lucide-react'
 
 interface AuthorDetail {
   id: string

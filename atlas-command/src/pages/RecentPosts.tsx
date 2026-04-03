@@ -5,7 +5,7 @@ import { getRecentPosts, getPublications, getAuthors } from '../lib/queries'
 import { updatePostStatusWithLog } from '../lib/mutations'
 import { getAllTopPagesMap, siteIdForPub, postPathname } from '../lib/fathom'
 import { formatRelative, statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
-import { Newspaper, Search, ExternalLink, Pencil, Eye, CheckSquare, Square, X } from 'lucide-react'
+import { Search, ExternalLink, Pencil, Eye, CheckSquare, Square, X } from 'lucide-react'
 import { logActivity } from '../lib/mutations'
 
 export default function RecentPosts() {

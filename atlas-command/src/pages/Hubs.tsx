@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { PUB_COLORS, PUB_SHORT, PUB_DOMAINS } from '../lib/utils'
-import { Layout, ExternalLink, AlertTriangle, Edit2 } from 'lucide-react'
+import { ExternalLink, AlertTriangle, Edit2 } from 'lucide-react'
 
 interface HubPage {
   id: string
