@@ -20,6 +20,7 @@ import Authors from './pages/Authors'
 import Hubs from './pages/Hubs'
 import Activity from './pages/Activity'
 import Insights from './pages/Insights'
+import Settings from './pages/Settings'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -69,6 +70,7 @@ function AppRoutes() {
           <Route path="hubs" element={<Hubs />} />
           <Route path="activity" element={<Activity />} />
           <Route path="insights" element={<Insights />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications } from '../lib/queries'
-import { LayoutDashboard, Calendar, Newspaper, Activity, LogOut, BarChart3, ChevronDown, ChevronRight, FileText, FolderOpen, Rss, Shield, PlusCircle, Tag, Users, Layout, History } from 'lucide-react'
+import { LayoutDashboard, Calendar, Newspaper, Activity, LogOut, BarChart3, ChevronDown, ChevronRight, FileText, FolderOpen, Rss, Shield, PlusCircle, Tag, Users, Layout, History, Settings } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
 
@@ -21,6 +21,7 @@ const NAV = [
   { to: '/activity', icon: History, label: 'Activity Log' },
   { to: '/insights', icon: BarChart3, label: 'Insights' },
   { to: '/status', icon: Activity, label: 'Status & Alerts' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 
 export default function Sidebar() {
@@ -138,7 +139,7 @@ export default function Sidebar() {
             <p className="text-[10px] text-[var(--color-text-muted)]">Sign in for write access</p>
           </div>
         )}
-        <p className="text-[10px] text-[var(--color-text-muted)] mt-2">Phase 11 · v0.11.0</p>
+        <p className="text-[10px] text-[var(--color-text-muted)] mt-2">Phase 12 · v0.12.0</p>
       </div>
     </aside>
   )
