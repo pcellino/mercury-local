@@ -9,6 +9,7 @@ import {
   estimateReadingTime,
   decodeHtmlEntities,
 } from "@/lib/content";
+import { generatePageJsonLd, generatePageBreadcrumbJsonLd } from "@/lib/jsonld";
 import PostCard from "@/components/PostCard";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
@@ -94,8 +95,21 @@ export default async function StaticPage({ params }: PageProps) {
       )
     : [];
 
+  // JSON-LD structured data
+  const pageJsonLd = generatePageJsonLd(page, publication);
+  const breadcrumbJsonLd = generatePageBreadcrumbJsonLd(page, publication);
+
   return (
-    <article className="max-w-3xl mx-auto">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <article className="max-w-3xl mx-auto">
       {/* ---- BREADCRUMBS ---- */}
       <nav
         className="text-xs text-mercury-muted mb-6 font-sans uppercase tracking-wide"
@@ -159,5 +173,6 @@ export default async function StaticPage({ params }: PageProps) {
         </section>
       )}
     </article>
+    </>
   );
 }

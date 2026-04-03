@@ -74,11 +74,13 @@ export default async function BeatPage({ params }: BeatPageProps) {
   const beatJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": hubPage ? decodeHtmlEntities(hubPage.title) : beatConfig.label,
+    "name": hubPage ? decodeHtmlEntities(hubPage.seo_title || hubPage.title) : beatConfig.label,
     "url": `${baseUrl}/${beat}`,
-    "description": hubPage
-      ? `${decodeHtmlEntities(hubPage.title)} — coverage from ${publication.name}.`
-      : `${beatConfig.description}. Coverage from ${publication.name}.`,
+    "description": hubPage?.meta_description
+      ? decodeHtmlEntities(hubPage.meta_description)
+      : hubPage
+        ? `${decodeHtmlEntities(hubPage.title)} — coverage from ${publication.name}.`
+        : `${beatConfig.description}. Coverage from ${publication.name}.`,
     "publisher": {
       "@type": "Organization",
       "name": publication.name,

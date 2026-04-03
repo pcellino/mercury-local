@@ -1,4 +1,4 @@
-import type { PostWithAuthor, Publication, Tag } from "./types";
+import type { Page, PostWithAuthor, Publication, Tag } from "./types";
 import { decodeHtmlEntities } from "./content";
 
 /**
@@ -185,5 +185,141 @@ export function generateCollectionPageJsonLd(
         name: decodeHtmlEntities(post.title),
       })),
     },
+  };
+}
+
+// -------------------------------------------------------
+// Page JSON-LD (static pages — driver profiles, track
+// guides, team profiles, and generic pages)
+// -------------------------------------------------------
+
+/** Slug-based heuristics to detect page type for schema selection. */
+function detectPageSchemaType(slug: string): "Person" | "Place" | "SportsOrganization" | "WebPage" {
+  // Track guides end with "-guide" or "-speedway-guide"
+  if (slug.endsWith("-guide") || slug.endsWith("-speedway")) return "Place";
+  // Team profiles (known patterns)
+  if (slug === "jr-motorsports" || slug.endsWith("-motorsports") || slug.endsWith("-racing")) return "SportsOrganization";
+  // Driver profiles: known slugs that are person names (no beat prefix, no utility slug)
+  // We detect by checking if the slug is a simple name pattern (no common utility words)
+  const utilityPrefixes = ["about", "contact", "privacy", "terms", "advertise", "staff", "partners", "features", "opinion", "racing", "schedules", "standings", "media"];
+  const hubSlugs = ["dining", "wellness", "lifestyle", "business", "government", "community", "education", "elections", "police", "ballantyne", "vtc"];
+  const directorySlugs = ["driver-directory", "team-directory"];
+  if (utilityPrefixes.includes(slug) || hubSlugs.includes(slug) || directorySlugs.includes(slug)) return "WebPage";
+  if (slug.startsWith("bocc-") || slug.startsWith("council-")) return "Person";
+  if (slug.endsWith("-schedule")) return "WebPage";
+  // If title contains "Driver Profile" or slug looks like a person name (no common suffixes)
+  // This is a broad fallback — pages with simple name slugs like "connor-zilisch" are people
+  return "WebPage";
+}
+
+export function generatePageJsonLd(
+  page: Page,
+  publication: Publication,
+  options?: { schemaOverride?: "Person" | "Place" | "SportsOrganization" | "WebPage" }
+) {
+  const domain = publication.domain || "localhost:3000";
+  const base = `https://${domain}`;
+  const url = `${base}/page/${page.slug}`;
+  const title = decodeHtmlEntities(page.seo_title || page.title);
+  const description = page.meta_description
+    ? decodeHtmlEntities(page.meta_description)
+    : undefined;
+
+  // Detect schema type from slug or allow explicit override
+  const schemaType = options?.schemaOverride || detectPageSchemaType(page.slug);
+
+  // Also detect from title keywords if slug heuristic returned WebPage
+  const titleLower = page.title.toLowerCase();
+  const resolvedType = schemaType === "WebPage"
+    ? (titleLower.includes("driver profile") || titleLower.includes("candidate"))
+      ? "Person" as const
+      : (titleLower.includes("track guide") || titleLower.includes("speedway"))
+        ? "Place" as const
+        : (titleLower.includes("team profile"))
+          ? "SportsOrganization" as const
+          : "WebPage" as const
+    : schemaType;
+
+  const publisher = {
+    "@type": "Organization" as const,
+    name: publication.name,
+    url: base,
+    ...(publication.logo_url && {
+      logo: { "@type": "ImageObject" as const, url: publication.logo_url },
+    }),
+  };
+
+  // Base fields shared across all schema types
+  const baseFields = {
+    "@context": "https://schema.org",
+    name: title,
+    url,
+    ...(description && { description }),
+  };
+
+  switch (resolvedType) {
+    case "Person":
+      return {
+        ...baseFields,
+        "@type": "Person",
+        ...(publication.name && {
+          memberOf: publisher,
+        }),
+      };
+
+    case "Place":
+      return {
+        ...baseFields,
+        "@type": "SportsActivityLocation",
+        ...(description && { description }),
+        isAccessibleForFree: true,
+        publisher,
+      };
+
+    case "SportsOrganization":
+      return {
+        ...baseFields,
+        "@type": "SportsOrganization",
+        publisher,
+      };
+
+    default:
+      return {
+        ...baseFields,
+        "@type": "WebPage",
+        publisher,
+        ...(page.updated_at && { dateModified: page.updated_at }),
+      };
+  }
+}
+
+// -------------------------------------------------------
+// Page BreadcrumbList schema
+// -------------------------------------------------------
+
+export function generatePageBreadcrumbJsonLd(
+  page: Page,
+  publication: Publication
+) {
+  const domain = publication.domain || "localhost:3000";
+  const base = `https://${domain}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: publication.name,
+        item: base,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: decodeHtmlEntities(page.title),
+        item: `${base}/page/${page.slug}`,
+      },
+    ],
   };
 }
