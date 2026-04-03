@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './lib/auth'
 import Layout from './components/Layout'
+import PublishersDesk from './pages/PublishersDesk'
 import Newsroom from './pages/Newsroom'
 import Editorial from './pages/Editorial'
 import Content from './pages/Content'
@@ -42,7 +43,8 @@ function AppRoutes() {
       <Routes>
         <Route element={<Layout />}>
           {/* Primary nav */}
-          <Route index element={<Newsroom />} />
+          <Route index element={<PublishersDesk />} />
+          <Route path="newsroom" element={<Newsroom />} />
           <Route path="editorial" element={<Editorial />} />
           <Route path="content" element={<Content />} />
           <Route path="intel" element={<Intel />} />

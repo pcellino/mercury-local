@@ -7,7 +7,7 @@ import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import { useState } from 'react'
 
 const NAV = [
-  { to: '/', icon: LayoutDashboard, label: 'Newsroom' },
+  { to: '/', icon: LayoutDashboard, label: 'Desk' },
   { to: '/editorial', icon: Calendar, label: 'Editorial' },
   { to: '/content', icon: Newspaper, label: 'Content' },
   { to: '/intel', icon: Radio, label: 'Intel' },

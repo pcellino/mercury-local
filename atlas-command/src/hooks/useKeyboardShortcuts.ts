@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const SHORTCUTS: Record<string, string> = {
-  h: '/',           // Home / Newsroom
+  h: '/',           // Home / Publisher's Desk
   e: '/editorial',  // Editorial Calendar
   c: '/content',    // Content
   i: '/intel',      // Intel

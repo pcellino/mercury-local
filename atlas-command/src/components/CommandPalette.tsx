@@ -12,7 +12,8 @@ interface SearchResult {
 }
 
 const NAV_ITEMS: SearchResult[] = [
-  { id: 'nav-home', type: 'nav', title: 'Newsroom', subtitle: 'Dashboard home', path: '/' },
+  { id: 'nav-home', type: 'nav', title: "Publisher's Desk", subtitle: 'Traffic, pipeline, projects', path: '/' },
+  { id: 'nav-newsroom', type: 'nav', title: 'Newsroom', subtitle: 'Publication stats and health', path: '/newsroom' },
   { id: 'nav-editorial', type: 'nav', title: 'Editorial Calendar', subtitle: 'Plan and track stories', path: '/editorial' },
   { id: 'nav-content', type: 'nav', title: 'Content', subtitle: 'Posts, tags, authors, hubs', path: '/content' },
   { id: 'nav-content-tags', type: 'nav', title: 'Tags', subtitle: 'Manage tags', path: '/content?tab=tags' },

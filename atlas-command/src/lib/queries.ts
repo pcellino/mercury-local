@@ -978,6 +978,116 @@ export async function getPublicationHealthScores(): Promise<HealthScore[]> {
   }).sort((a: HealthScore, b: HealthScore) => b.overall_score - a.overall_score)
 }
 
+// ---------- Tasks (Project backlog) ----------
+export interface TaskRow {
+  id: string
+  title: string
+  description: string | null
+  status: string
+  priority: string
+  assignee: string | null
+  project: string | null
+  due_date: string | null
+  publication_id: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface ProjectGroup {
+  project: string
+  status: 'active' | 'blocked' | 'done'
+  tasks: TaskRow[]
+  openCount: number
+  blockedCount: number
+}
+
+export async function getActiveTasks(): Promise<ProjectGroup[]> {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .not('status', 'eq', 'Done')
+    .order('priority', { ascending: false })
+    .order('created_at', { ascending: true })
+  if (error) throw error
+
+  const grouped: Record<string, TaskRow[]> = {}
+  for (const task of data ?? []) {
+    const proj = task.project ?? 'Unassigned'
+    if (!grouped[proj]) grouped[proj] = []
+    grouped[proj].push(task as TaskRow)
+  }
+
+  return Object.entries(grouped).map(([project, tasks]) => {
+    const blockedCount = tasks.filter(t => t.status === 'Waiting / Blocked').length
+    const openCount = tasks.length
+    const status: ProjectGroup['status'] = blockedCount === tasks.length ? 'blocked' : 'active'
+    return { project, status, tasks, openCount, blockedCount }
+  }).sort((a, b) => {
+    // Active first, blocked last. Within group, more tasks first.
+    if (a.status !== b.status) return a.status === 'active' ? -1 : 1
+    return b.openCount - a.openCount
+  })
+}
+
+export async function completeTask(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('tasks')
+    .update({ status: 'Done', updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+// ---------- Editorial Pipeline (date-windowed) ----------
+export interface PipelineGroup {
+  overdue: EditorialItem[]
+  today: EditorialItem[]
+  upcoming: EditorialItem[]
+}
+
+export async function getEditorialPipeline(): Promise<PipelineGroup> {
+  const { data, error } = await supabase
+    .from('editorial_calendar')
+    .select(`
+      id, concept, status, target_date, priority, beat, notes, post_id, publication_id, author_id,
+      publications!inner(name, slug),
+      authors(name)
+    `)
+    .not('status', 'in', '("published","killed")')
+    .order('target_date', { ascending: true })
+
+  if (error) throw error
+
+  // Use ET-aware date logic
+  const now = new Date()
+  const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }))
+  const todayStr = etNow.toISOString().split('T')[0]
+  const plus3 = new Date(etNow)
+  plus3.setDate(plus3.getDate() + 3)
+  const plus3Str = plus3.toISOString().split('T')[0]
+
+  const items: EditorialItem[] = (data ?? []).map((row: any) => ({
+    id: row.id,
+    concept: row.concept,
+    status: row.status,
+    target_date: row.target_date,
+    priority: row.priority,
+    beat: row.beat,
+    notes: row.notes,
+    post_id: row.post_id,
+    publication_id: row.publication_id,
+    author_id: row.author_id ?? null,
+    pub_name: row.publications?.name ?? '',
+    pub_slug: row.publications?.slug ?? '',
+    author_name: row.authors?.name ?? null,
+  }))
+
+  return {
+    overdue: items.filter(i => i.target_date < todayStr),
+    today: items.filter(i => i.target_date === todayStr),
+    upcoming: items.filter(i => i.target_date > todayStr && i.target_date <= plus3Str),
+  }
+}
+
 export async function getBeatStats(days = 30): Promise<BeatStats[]> {
   const { data, error } = await supabase
     .from('posts')

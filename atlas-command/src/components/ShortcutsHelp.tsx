@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { X, Keyboard } from 'lucide-react'
 
 const SHORTCUTS = [
-  { key: 'H', label: 'Newsroom' },
+  { key: 'H', label: "Publisher's Desk" },
   { key: 'E', label: 'Editorial' },
   { key: 'C', label: 'Content' },
   { key: 'I', label: 'Intel' },
