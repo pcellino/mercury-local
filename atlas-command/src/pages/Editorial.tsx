@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { getEditorialCalendar, getPublications, getAuthors } from '../lib/queries'
-import { createEditorialItem, updateEditorialStatus, updateEditorialDate, killEditorialItem, duplicateEditorialItem, updateEditorialItem, type CreateEditorialItem } from '../lib/mutations'
+import { createEditorialItem, updateEditorialStatus, updateEditorialDate, killEditorialItem, duplicateEditorialItem, updateEditorialItem, logActivity, type CreateEditorialItem } from '../lib/mutations'
 import { statusColor, formatDate, PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import { CalendarDays, Plus, X, Trash2, ArrowRight, Copy, Pencil, AlertCircle } from 'lucide-react'
 import { useAuth } from '../lib/auth'
@@ -29,7 +29,10 @@ export default function Editorial() {
   const authors = useQuery({ queryKey: ['authors'], queryFn: getAuthors })
 
   const advanceStatus = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => updateEditorialStatus(id, status),
+    mutationFn: async ({ id, status, concept }: { id: string; status: string; concept?: string }) => {
+      await updateEditorialStatus(id, status)
+      await logActivity({ action: 'status_change', entity_type: 'editorial', entity_id: id, entity_title: concept, details: { new_status: status } })
+    },
     onSuccess: () => { setMutError(null); queryClient.invalidateQueries({ queryKey: ['editorial'] }) },
     onError: (err: any) => setMutError(err.message ?? 'Failed to advance status'),
   })
@@ -63,7 +66,10 @@ export default function Editorial() {
   })
 
   const create = useMutation({
-    mutationFn: (item: CreateEditorialItem) => createEditorialItem(item),
+    mutationFn: async (item: CreateEditorialItem) => {
+      await createEditorialItem(item)
+      await logActivity({ action: 'create', entity_type: 'editorial', entity_title: item.concept, publication_id: item.publication_id })
+    },
     onSuccess: () => {
       setMutError(null)
       queryClient.invalidateQueries({ queryKey: ['editorial'] })
@@ -335,7 +341,7 @@ export default function Editorial() {
                           <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                             {nextStatus && (
                               <button
-                                onClick={() => advanceStatus.mutate({ id: item.id, status: nextStatus })}
+                                onClick={() => advanceStatus.mutate({ id: item.id, status: nextStatus, concept: item.concept })}
                                 title={`Advance to ${nextStatus}`}
                                 className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/20 transition-colors"
                               >

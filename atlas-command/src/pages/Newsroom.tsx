@@ -6,12 +6,26 @@ import StatCard from '../components/StatCard'
 import HealthScores from '../components/HealthScores'
 import AlertsBanner from '../components/AlertsBanner'
 import GNTCountdown from '../components/GNTCountdown'
-import { Globe, FileText, Clock, Inbox, ExternalLink, ChevronRight } from 'lucide-react'
+import { Globe, FileText, Clock, Inbox, ExternalLink, ChevronRight, History } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 export default function Newsroom() {
   const stats = useQuery({ queryKey: ['pub-stats'], queryFn: getPublicationStats })
   const agg = useQuery({ queryKey: ['aggregate'], queryFn: getAggregateStats })
   const recent = useQuery({ queryKey: ['recent-posts'], queryFn: () => getRecentPosts(8) })
+  const activityFeed = useQuery({
+    queryKey: ['activity-feed-mini'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('activity_log')
+        .select('id, created_at, action, entity_type, entity_title')
+        .order('created_at', { ascending: false })
+        .limit(6)
+      if (error) throw error
+      return data ?? []
+    },
+    refetchInterval: 60_000,
+  })
 
   return (
     <div>
@@ -137,9 +151,47 @@ export default function Newsroom() {
         <HealthScores />
       </div>
 
+      {/* Activity Feed Mini */}
+      {activityFeed.data && activityFeed.data.length > 0 && (
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-2">
+              <History size={14} /> Activity Feed
+            </h2>
+            <Link to="/activity" className="text-[11px] text-[var(--color-accent-hover)] hover:underline">
+              View all →
+            </Link>
+          </div>
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl divide-y divide-[var(--color-border)]">
+            {activityFeed.data.map((entry) => (
+              <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5">
+                <span className={`text-[10px] font-semibold uppercase w-16 ${
+                  entry.action === 'create' ? 'text-green-400' :
+                  entry.action === 'publish' ? 'text-emerald-400' :
+                  entry.action === 'status_change' ? 'text-purple-400' :
+                  entry.action === 'delete' ? 'text-red-400' : 'text-blue-400'
+                }`}>{entry.action.replace('_', ' ')}</span>
+                <span className="text-[10px] text-[var(--color-text-muted)] uppercase w-14">{entry.entity_type}</span>
+                <span className="text-sm flex-1 truncate">{entry.entity_title ?? 'Untitled'}</span>
+                <span className="text-[11px] text-[var(--color-text-muted)] shrink-0">
+                  {(() => {
+                    const mins = Math.floor((Date.now() - new Date(entry.created_at).getTime()) / 60000)
+                    if (mins < 1) return 'now'
+                    if (mins < 60) return `${mins}m`
+                    const hrs = Math.floor(mins / 60)
+                    if (hrs < 24) return `${hrs}h`
+                    return `${Math.floor(hrs / 24)}d`
+                  })()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Recent Activity */}
       <h2 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-4">
-        Recent Activity
+        Recent Posts
       </h2>
       {recent.data && (
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden">

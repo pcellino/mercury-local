@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getPostById, getPublications, getAuthors, getAllTags } from '../lib/queries'
-import { updatePost, addTagToPost, removeTagFromPost, type UpdatePostPayload } from '../lib/mutations'
+import { updatePost, addTagToPost, removeTagFromPost, logActivity, type UpdatePostPayload } from '../lib/mutations'
 import { getPathStats, siteIdForPub, postPathname } from '../lib/fathom'
 import { useAuth } from '../lib/auth'
 import { statusColor, PUB_COLORS, PUB_SHORT, PUB_DOMAINS } from '../lib/utils'
@@ -205,6 +205,16 @@ export default function PostEditor() {
         ...toAdd.map(tid => addTagToPost(id, tid)),
         ...toRemove.map(tid => removeTagFromPost(id, tid)),
       ])
+
+      // Log activity
+      await logActivity({
+        action: 'update',
+        entity_type: 'post',
+        entity_id: id,
+        entity_title: title,
+        publication_id: publicationId || null,
+        details: { status, tags_added: toAdd.length, tags_removed: toRemove.length },
+      })
 
       // Invalidate caches
       queryClient.invalidateQueries({ queryKey: ['post', id] })
