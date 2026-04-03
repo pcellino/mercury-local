@@ -14,22 +14,16 @@ interface SearchResult {
 const NAV_ITEMS: SearchResult[] = [
   { id: 'nav-home', type: 'nav', title: 'Newsroom', subtitle: 'Dashboard home', path: '/' },
   { id: 'nav-editorial', type: 'nav', title: 'Editorial Calendar', subtitle: 'Plan and track stories', path: '/editorial' },
-  { id: 'nav-recent', type: 'nav', title: 'Recent Posts', subtitle: 'Browse all posts', path: '/recent' },
-  { id: 'nav-schedule', type: 'nav', title: 'Schedule', subtitle: 'Visual editorial calendar', path: '/schedule' },
-  { id: 'nav-analytics', type: 'nav', title: 'Analytics', subtitle: 'Fathom pageviews', path: '/analytics' },
-  { id: 'nav-feeds', type: 'nav', title: 'Feed Monitor', subtitle: 'RSS feeds and story leads', path: '/feeds' },
-  { id: 'nav-transcripts', type: 'nav', title: 'Transcripts', subtitle: 'Government meetings', path: '/transcripts' },
-  { id: 'nav-sources', type: 'nav', title: 'Sources', subtitle: 'Source documents', path: '/sources' },
-  { id: 'nav-competitors', type: 'nav', title: 'Competitors', subtitle: 'Competitive intel', path: '/competitors' },
-  { id: 'nav-tags', type: 'nav', title: 'Tags', subtitle: 'Manage tags', path: '/tags' },
-  { id: 'nav-authors', type: 'nav', title: 'Authors', subtitle: 'Manage authors', path: '/authors' },
-  { id: 'nav-hubs', type: 'nav', title: 'Hub Pages', subtitle: 'Beat landing pages', path: '/hubs' },
-  { id: 'nav-activity', type: 'nav', title: 'Activity Log', subtitle: 'Audit trail of all actions', path: '/activity' },
-  { id: 'nav-insights', type: 'nav', title: 'Insights', subtitle: 'Publishing trends, beat coverage, pipeline', path: '/insights' },
-  { id: 'nav-compare', type: 'nav', title: 'Compare Publications', subtitle: 'Side-by-side performance', path: '/compare' },
-  { id: 'nav-notifications', type: 'nav', title: 'Notifications', subtitle: 'Alert rules and health checks', path: '/notifications' },
-  { id: 'nav-status', type: 'nav', title: 'Status & Alerts', subtitle: 'Health dashboard', path: '/status' },
+  { id: 'nav-content', type: 'nav', title: 'Content', subtitle: 'Posts, tags, authors, hubs', path: '/content' },
+  { id: 'nav-content-tags', type: 'nav', title: 'Tags', subtitle: 'Manage tags', path: '/content?tab=tags' },
+  { id: 'nav-content-authors', type: 'nav', title: 'Authors', subtitle: 'Manage authors', path: '/content?tab=authors' },
+  { id: 'nav-content-hubs', type: 'nav', title: 'Hub Pages', subtitle: 'Beat landing pages', path: '/content?tab=hubs' },
+  { id: 'nav-intel', type: 'nav', title: 'Intel', subtitle: 'Feeds, competitors, transcripts, sources', path: '/intel' },
+  { id: 'nav-intel-competitors', type: 'nav', title: 'Competitors', subtitle: 'Competitive monitoring', path: '/intel?tab=competitors' },
+  { id: 'nav-intel-transcripts', type: 'nav', title: 'Transcripts', subtitle: 'Government meetings', path: '/intel?tab=transcripts' },
+  { id: 'nav-intel-sources', type: 'nav', title: 'Sources', subtitle: 'Source documents', path: '/intel?tab=sources' },
   { id: 'nav-settings', type: 'nav', title: 'Settings', subtitle: 'Theme, exports, configuration', path: '/settings' },
+  { id: 'nav-system', type: 'nav', title: 'System Status', subtitle: 'Health checks and alerts', path: '/settings?tab=system' },
   { id: 'nav-new', type: 'nav', title: 'New Post', subtitle: 'Create a new post', path: '/posts/new' },
 ]
 
@@ -118,7 +112,7 @@ export default function CommandPalette() {
           type: 'author' as const,
           title: a.name,
           subtitle: a.credentials,
-          path: '/authors',
+          path: '/content?tab=authors',
         })),
         ...(editorialRes.data ?? []).map(e => ({
           id: e.id,
@@ -164,19 +158,19 @@ export default function CommandPalette() {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/60" onClick={() => setOpen(false)}>
       <div
-        className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-[520px] shadow-2xl overflow-hidden"
+        className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-[480px] shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)]">
-          <Search size={16} className="text-[var(--color-text-muted)] shrink-0" />
+          <Search size={15} className="text-[var(--color-text-muted)] shrink-0" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search posts, pages, authors, or navigate..."
-            className="flex-1 bg-transparent text-sm outline-none placeholder-[var(--color-text-muted)]"
+            placeholder="Search or jump to..."
+            className="flex-1 bg-transparent text-[13px] outline-none placeholder-[var(--color-text-muted)]"
           />
           <kbd className="text-[10px] text-[var(--color-text-muted)] bg-[var(--color-bg)] border border-[var(--color-border)] rounded px-1.5 py-0.5 font-mono">
             esc
@@ -184,9 +178,9 @@ export default function CommandPalette() {
         </div>
 
         {/* Results */}
-        <div className="max-h-[400px] overflow-y-auto">
+        <div className="max-h-[360px] overflow-y-auto">
           {results.length === 0 && !searching && (
-            <div className="px-4 py-8 text-center text-sm text-[var(--color-text-muted)]">
+            <div className="px-4 py-8 text-center text-[13px] text-[var(--color-text-muted)]">
               No results for &quot;{query}&quot;
             </div>
           )}
@@ -205,7 +199,7 @@ export default function CommandPalette() {
               >
                 <Icon size={14} className="shrink-0 opacity-60" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm truncate">{result.title}</div>
+                  <div className="text-[13px] truncate">{result.title}</div>
                   {result.subtitle && (
                     <div className="text-[11px] text-[var(--color-text-muted)] truncate">{result.subtitle}</div>
                   )}

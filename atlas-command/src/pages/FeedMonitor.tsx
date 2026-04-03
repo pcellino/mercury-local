@@ -42,17 +42,7 @@ export default function FeedMonitor() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <Rss size={20} className="text-[var(--color-accent)]" />
-            Feed Monitor
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            Stories surfaced from RSS feeds and news sources
-          </p>
-        </div>
         {newCount > 0 && (
           <span className="text-xs font-medium text-blue-400 bg-blue-400/10 px-3 py-1.5 rounded-lg">
             {newCount} new items

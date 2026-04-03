@@ -97,7 +97,7 @@ export default function AlertsBanner() {
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link
-            to="/status"
+            to="/settings?tab=system"
             className="text-[10px] font-semibold text-[var(--color-accent-hover)] hover:underline"
           >
             View Details

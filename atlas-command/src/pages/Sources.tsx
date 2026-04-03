@@ -63,17 +63,8 @@ export default function Sources() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[var(--color-text)]">Source Documents</h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            PDFs, press releases, FOIA responses, arrest logs, and other primary sources
-          </p>
-        </div>
-        <span className="text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-3 py-1.5 rounded-lg">
-          {docs?.length ?? 0} documents
-        </span>
+        <p className="text-[13px] text-[var(--color-text-muted)]">{docs?.length ?? 0} documents</p>
       </div>
 
       {/* Search */}

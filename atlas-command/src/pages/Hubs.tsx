@@ -52,19 +52,13 @@ export default function Hubs() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <Layout size={20} className="text-[var(--color-accent-hover)]" />
-            Hub Pages
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            {totalCount} hub pages · {staleCount > 0 && (
-              <span className="text-amber-400">{staleCount} stale (&gt;14 days)</span>
-            )}
-            {staleCount === 0 && <span className="text-green-400">all fresh</span>}
-          </p>
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[13px] text-[var(--color-text-muted)]">
+          {totalCount} hub pages · {staleCount > 0 && (
+            <span className="text-amber-400">{staleCount} stale (&gt;14 days)</span>
+          )}
+          {staleCount === 0 && <span className="text-green-400">all fresh</span>}
+        </p>
         <select
           value={filterPub}
           onChange={(e) => setFilterPub(e.target.value)}

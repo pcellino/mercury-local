@@ -99,16 +99,10 @@ export default function Authors() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <Users size={20} className="text-[var(--color-accent-hover)]" />
-            Authors
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            {authors?.length ?? 0} authors across all publications
-          </p>
-        </div>
+      <div className="mb-4">
+        <p className="text-[13px] text-[var(--color-text-muted)]">
+          {authors?.length ?? 0} authors across all publications
+        </p>
       </div>
 
       {isLoading ? (

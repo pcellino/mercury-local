@@ -142,8 +142,8 @@ export default function Editorial() {
       <div className={`flex-1 min-w-0 transition-all duration-200 ${activeItem ? 'pr-4' : ''}`}>
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <CalendarDays size={24} className="text-[var(--color-accent-hover)]" />
+            <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+              <CalendarDays size={20} className="text-[var(--color-accent-hover)]" />
               Editorial Calendar
             </h1>
             <p className="text-sm text-[var(--color-text-muted)] mt-1">

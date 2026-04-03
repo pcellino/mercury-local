@@ -126,14 +126,6 @@ export default function RecentPosts() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Newspaper size={24} className="text-[var(--color-accent-hover)]" />
-          Recent Posts
-        </h1>
-        <p className="text-sm text-[var(--color-text-muted)] mt-1">Search, filter, and edit articles</p>
-      </div>
-
       {isLoading && <p className="text-sm text-[var(--color-text-muted)]">Loading...</p>}
 
       {posts && (

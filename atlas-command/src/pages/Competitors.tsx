@@ -44,17 +44,7 @@ export default function Competitors() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <Shield size={20} className="text-[var(--color-accent)]" />
-            Competitive Monitoring
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            Track competitor coverage and identify gaps
-          </p>
-        </div>
         <button
           onClick={() => setShowAdd(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[var(--color-accent)] text-white rounded-lg hover:bg-[var(--color-accent-hover)]"

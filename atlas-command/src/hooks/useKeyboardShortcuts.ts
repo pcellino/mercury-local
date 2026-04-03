@@ -4,14 +4,9 @@ import { useNavigate } from 'react-router-dom'
 const SHORTCUTS: Record<string, string> = {
   h: '/',           // Home / Newsroom
   e: '/editorial',  // Editorial Calendar
-  r: '/recent',     // Recent Posts
-  a: '/analytics',  // Analytics
-  f: '/feeds',      // Feed Monitor
-  t: '/transcripts',// Transcripts
-  s: '/status',     // Status & Alerts
+  c: '/content',    // Content
+  i: '/intel',      // Intel
   n: '/posts/new',  // New Post
-  g: '/tags',       // Tags
-  i: '/insights',   // Insights
 }
 
 export function useKeyboardShortcuts() {

@@ -154,17 +154,11 @@ export default function Tags() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Tag size={24} className="text-[var(--color-accent-hover)]" />
-            Tags
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">{tags?.length ?? 0} tags across all publications</p>
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[13px] text-[var(--color-text-muted)]">{tags?.length ?? 0} tags across all publications</p>
         <button
           onClick={startCreate}
-          className="flex items-center gap-1.5 bg-[var(--color-accent)] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[var(--color-accent-hover)] transition-colors"
+          className="flex items-center gap-1.5 bg-[var(--color-accent)] text-white px-3 py-1.5 rounded-lg text-[13px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
         >
           <Plus size={14} /> New Tag
         </button>

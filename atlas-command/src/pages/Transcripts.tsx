@@ -151,9 +151,8 @@ export default function Transcripts() {
 
   return (
     <div className="max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold tracking-tight">Transcripts</h1>
-        <span className="text-xs text-[var(--color-text-muted)]">{transcripts.length} transcripts</span>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[13px] text-[var(--color-text-muted)]">{transcripts.length} transcripts</p>
       </div>
 
       {/* Search bar */}
