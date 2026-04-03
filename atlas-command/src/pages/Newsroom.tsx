@@ -5,6 +5,7 @@ import { PUB_COLORS, PUB_SHORT, formatRelative } from '../lib/utils'
 import StatCard from '../components/StatCard'
 import HealthScores from '../components/HealthScores'
 import AlertsBanner from '../components/AlertsBanner'
+import GNTCountdown from '../components/GNTCountdown'
 import { Globe, FileText, Clock, Inbox, ExternalLink, ChevronRight } from 'lucide-react'
 
 export default function Newsroom() {
@@ -22,6 +23,11 @@ export default function Newsroom() {
 
       {/* Alerts */}
       <AlertsBanner />
+
+      {/* GNT Countdown */}
+      <div className="mb-6">
+        <GNTCountdown />
+      </div>
 
       {/* Top stats */}
       {agg.data && (
@@ -151,7 +157,9 @@ export default function Newsroom() {
               {recent.data.map((post) => (
                 <tr key={post.id} className="border-t border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50">
                   <td className="px-4 py-3 max-w-[360px]">
-                    <span className="truncate block">{post.title}</span>
+                    <Link to={`/posts/${post.id}`} className="truncate block hover:text-[var(--color-accent-hover)] transition-colors">
+                      {post.title}
+                    </Link>
                   </td>
                   <td className="px-4 py-3">
                     <span

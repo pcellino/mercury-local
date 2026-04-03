@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { getRecentPosts, getPublications, getAuthors } from '../lib/queries'
+import { updatePostStatus } from '../lib/mutations'
 import { getAllTopPagesMap, siteIdForPub, postPathname } from '../lib/fathom'
 import { formatRelative, statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import { Newspaper, Search, ExternalLink, Pencil, Eye } from 'lucide-react'
@@ -13,6 +14,16 @@ export default function RecentPosts() {
   const [beatFilter, setBeatFilter] = useState('')
   const [dateRange, setDateRange] = useState('all')
   const [statusFilter, setStatusFilter] = useState('')
+  const queryClient = useQueryClient()
+
+  async function handleStatusChange(postId: string, newStatus: string) {
+    try {
+      await updatePostStatus(postId, newStatus)
+      queryClient.invalidateQueries({ queryKey: ['recent-posts-full'] })
+    } catch (err) {
+      console.error('Failed to update status:', err)
+    }
+  }
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ['recent-posts-full', statusFilter],
@@ -215,9 +226,16 @@ export default function RecentPosts() {
                       <td className="px-4 py-3 text-[var(--color-text-muted)]">{post.author_name ?? '—'}</td>
                       <td className="px-4 py-3 text-[var(--color-text-muted)] capitalize">{post.beat ?? '—'}</td>
                       <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusColor(post.status)}`}>
-                          {post.status}
-                        </span>
+                        <select
+                          value={post.status}
+                          onChange={(e) => handleStatusChange(post.id, e.target.value)}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize border-0 cursor-pointer focus:outline-none ${statusColor(post.status)}`}
+                          style={{ background: 'transparent' }}
+                        >
+                          <option value="draft">Draft</option>
+                          <option value="scheduled">Scheduled</option>
+                          <option value="published">Published</option>
+                        </select>
                       </td>
                       <td className="px-4 py-3 text-right text-[var(--color-text-muted)] tabular-nums">
                         {(() => {
