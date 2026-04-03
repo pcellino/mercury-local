@@ -201,6 +201,103 @@ export async function updateAuthor(id: string, updates: UpdateAuthorPayload) {
   if (error) throw error
 }
 
+// ---------- Publication Log CRUD ----------
+
+export async function updatePublicationLog(id: string, content: string) {
+  const { error } = await supabase
+    .from('publication_logs')
+    .update({ content, last_updated: new Date().toISOString(), updated_by: 'atlas-command', updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+// ---------- Feed Source CRUD ----------
+
+export interface CreateFeedSourcePayload {
+  publication_id: string
+  name: string
+  url: string
+  feed_type?: string
+  beat_category?: string
+  notes?: string
+}
+
+export async function createFeedSource(data: CreateFeedSourcePayload) {
+  const { data: result, error } = await supabase
+    .from('feed_sources')
+    .insert(data)
+    .select()
+    .single()
+  if (error) throw error
+  return result
+}
+
+export async function updateFeedSource(id: string, updates: Partial<{
+  name: string
+  url: string
+  feed_type: string
+  beat_category: string | null
+  active: boolean
+  notes: string | null
+}>) {
+  const { error } = await supabase
+    .from('feed_sources')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteFeedSource(id: string) {
+  const { error } = await supabase
+    .from('feed_sources')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
+}
+
+// ---------- Voice Profile CRUD ----------
+
+export async function updateVoiceProfile(id: string, content: string) {
+  const { error } = await supabase
+    .from('voice_profiles')
+    .update({ content, last_updated: new Date().toISOString(), updated_by: 'atlas-command', updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+// ---------- Beat Research CRUD ----------
+
+export interface UpdateBeatResearchPayload {
+  beat_name?: string
+  beat_category?: string | null
+  content?: string
+  updated_by?: string
+}
+
+export async function updateBeatResearch(id: string, updates: UpdateBeatResearchPayload) {
+  const { error } = await supabase
+    .from('beat_research')
+    .update({ ...updates, last_updated: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function createBeatResearch(data: {
+  publication_id: string
+  beat_name: string
+  beat_slug: string
+  beat_category?: string
+  content?: string
+}) {
+  const { data: result, error } = await supabase
+    .from('beat_research')
+    .insert(data)
+    .select()
+    .single()
+  if (error) throw error
+  return result
+}
+
 // ---------- Tag Management ----------
 
 export async function addTagToPost(postId: string, tagId: string) {

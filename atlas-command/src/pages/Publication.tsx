@@ -4,18 +4,26 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getPublicationBySlug, getPublicationStats, getPublicationAuthors,
   getPublicationPages, getPublicationEditorial, getRecentPosts,
-  type PubAuthor, type PubPage,
+  getPublicationBeats, getPublicationVoiceProfiles, getPublicationFeeds,
+  getPublicationLog,
+  type PubAuthor, type PubPage, type BeatResearch, type VoiceProfile, type FeedSource,
 } from '../lib/queries'
-import { updatePublication, updateAuthor, type UpdatePublicationPayload, type UpdateAuthorPayload } from '../lib/mutations'
+import {
+  updatePublication, updateAuthor, updateBeatResearch, updateVoiceProfile,
+  updatePublicationLog,
+  createFeedSource, updateFeedSource, deleteFeedSource,
+  type UpdatePublicationPayload, type UpdateAuthorPayload,
+} from '../lib/mutations'
 import { getSiteAggregates, getTopPages, getAllCurrentVisitors } from '../lib/fathom'
 import { useAuth } from '../lib/auth'
 import { formatRelative, statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import {
   ArrowLeft, ExternalLink, Pencil, Globe, FileText, Clock, Inbox, Eye,
-  Users, BarChart3, Calendar, Settings, Save, Check, AlertCircle, ChevronRight,
+  Users, BarChart3, Calendar, Settings, Save, Check, AlertCircle, ChevronRight, BookOpen,
+  Rss, Plus, Trash2, X, List, Search,
 } from 'lucide-react'
 
-type TabId = 'overview' | 'posts' | 'pages' | 'editorial' | 'authors' | 'settings'
+type TabId = 'overview' | 'posts' | 'pages' | 'editorial' | 'beats' | 'feeds' | 'log' | 'authors' | 'settings'
 
 export default function Publication() {
   const { slug } = useParams<{ slug: string }>()
@@ -40,6 +48,32 @@ export default function Publication() {
   const [authorBio, setAuthorBio] = useState('')
   const [authorBeatDesc, setAuthorBeatDesc] = useState('')
   const [authorCredentials, setAuthorCredentials] = useState('')
+
+  // Beat research state
+  const [selectedBeat, setSelectedBeat] = useState<string | null>(null)
+  const [beatContent, setBeatContent] = useState('')
+  const [beatEditing, setBeatEditing] = useState(false)
+  const [beatSaving, setBeatSaving] = useState(false)
+
+  // Voice profile state
+  const [voiceAuthorId, setVoiceAuthorId] = useState<string | null>(null)
+  const [voiceContent, setVoiceContent] = useState('')
+  const [voiceEditing, setVoiceEditing] = useState(false)
+  const [voiceSaving, setVoiceSaving] = useState(false)
+
+  // Publication log state
+  const [logEditing, setLogEditing] = useState(false)
+  const [logContent, setLogContent] = useState('')
+  const [logSaving, setLogSaving] = useState(false)
+  const [logSearch, setLogSearch] = useState('')
+
+  // Feed source state
+  const [addingFeed, setAddingFeed] = useState(false)
+  const [feedName, setFeedName] = useState('')
+  const [feedUrl, setFeedUrl] = useState('')
+  const [feedType, setFeedType] = useState('rss')
+  const [feedBeat, setFeedBeat] = useState('')
+  const [feedNotes, setFeedNotes] = useState('')
 
   const { data: pub, isLoading: pubLoading } = useQuery({
     queryKey: ['publication', slug],
@@ -117,6 +151,34 @@ export default function Publication() {
     enabled: !!pub?.id,
   })
 
+  // Beats
+  const beats = useQuery({
+    queryKey: ['pub-beats', pub?.id],
+    queryFn: () => getPublicationBeats(pub!.id),
+    enabled: !!pub?.id,
+  })
+
+  // Voice profiles
+  const voiceProfiles = useQuery({
+    queryKey: ['pub-voices', pub?.id],
+    queryFn: () => getPublicationVoiceProfiles(pub!.id),
+    enabled: !!pub?.id && activeTab === 'authors',
+  })
+
+  // Feed sources
+  const feeds = useQuery({
+    queryKey: ['pub-feeds', pub?.id],
+    queryFn: () => getPublicationFeeds(pub!.id),
+    enabled: !!pub?.id,
+  })
+
+  // Publication log
+  const pubLog = useQuery({
+    queryKey: ['pub-log', pub?.id],
+    queryFn: () => getPublicationLog(pub!.id),
+    enabled: !!pub?.id && activeTab === 'log',
+  })
+
   const color = PUB_COLORS[slug ?? ''] ?? '#6366f1'
   const short = PUB_SHORT[slug ?? ''] ?? slug?.slice(0, 3).toUpperCase()
 
@@ -178,6 +240,99 @@ export default function Publication() {
     } finally { setSaving(false) }
   }
 
+  async function handleSaveLog() {
+    if (!pubLog.data || !user) return
+    setLogSaving(true); setError(null)
+    try {
+      await updatePublicationLog(pubLog.data.id, logContent)
+      queryClient.invalidateQueries({ queryKey: ['pub-log', pub?.id] })
+      setLogEditing(false)
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to save log')
+    } finally { setLogSaving(false) }
+  }
+
+  async function handleAddFeed() {
+    if (!pub || !user || !feedName || !feedUrl) return
+    setSaving(true); setError(null)
+    try {
+      await createFeedSource({
+        publication_id: pub.id,
+        name: feedName,
+        url: feedUrl,
+        feed_type: feedType,
+        beat_category: feedBeat || undefined,
+        notes: feedNotes || undefined,
+      })
+      queryClient.invalidateQueries({ queryKey: ['pub-feeds', pub.id] })
+      setAddingFeed(false); setFeedName(''); setFeedUrl(''); setFeedType('rss'); setFeedBeat(''); setFeedNotes('')
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to add feed')
+    } finally { setSaving(false) }
+  }
+
+  async function handleToggleFeed(feedId: string, currentActive: boolean) {
+    if (!user) return
+    try {
+      await updateFeedSource(feedId, { active: !currentActive })
+      queryClient.invalidateQueries({ queryKey: ['pub-feeds', pub?.id] })
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to toggle feed')
+    }
+  }
+
+  async function handleDeleteFeed(feedId: string) {
+    if (!user) return
+    try {
+      await deleteFeedSource(feedId)
+      queryClient.invalidateQueries({ queryKey: ['pub-feeds', pub?.id] })
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to delete feed')
+    }
+  }
+
+  function toggleVoice(authorId: string, vp: VoiceProfile | undefined) {
+    if (voiceAuthorId === authorId) {
+      setVoiceAuthorId(null); setVoiceEditing(false)
+    } else {
+      setVoiceAuthorId(authorId)
+      setVoiceContent(vp?.content ?? '')
+      setVoiceEditing(false)
+    }
+  }
+
+  async function handleSaveVoice() {
+    if (!voiceAuthorId || !user) return
+    const vp = (voiceProfiles.data ?? []).find(v => v.author_id === voiceAuthorId)
+    if (!vp) return
+    setVoiceSaving(true); setError(null)
+    try {
+      await updateVoiceProfile(vp.id, voiceContent)
+      queryClient.invalidateQueries({ queryKey: ['pub-voices', pub?.id] })
+      setVoiceEditing(false)
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to save voice profile')
+    } finally { setVoiceSaving(false) }
+  }
+
+  function openBeat(beat: BeatResearch) {
+    setSelectedBeat(beat.id)
+    setBeatContent(beat.content)
+    setBeatEditing(false)
+  }
+
+  async function handleSaveBeat() {
+    if (!selectedBeat || !user) return
+    setBeatSaving(true); setError(null)
+    try {
+      await updateBeatResearch(selectedBeat, { content: beatContent, updated_by: 'atlas-command' })
+      queryClient.invalidateQueries({ queryKey: ['pub-beats', pub?.id] })
+      setBeatEditing(false)
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to save beat')
+    } finally { setBeatSaving(false) }
+  }
+
   if (pubLoading) {
     return <div className="flex items-center justify-center h-64"><p className="text-sm text-[var(--color-text-muted)]">Loading publication...</p></div>
   }
@@ -190,6 +345,9 @@ export default function Publication() {
     { id: 'posts', label: 'Posts', icon: FileText },
     { id: 'pages', label: 'Pages', icon: Globe },
     { id: 'editorial', label: 'Editorial', icon: Calendar },
+    { id: 'beats', label: 'Beats', icon: BookOpen },
+    { id: 'feeds', label: 'Feeds', icon: Rss },
+    { id: 'log', label: 'Log', icon: List },
     { id: 'authors', label: 'Authors', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
   ]
@@ -511,6 +669,269 @@ export default function Publication() {
         </div>
       )}
 
+      {/* ===== BEATS TAB ===== */}
+      {activeTab === 'beats' && (
+        <div className="flex gap-6">
+          {/* Beat list sidebar */}
+          <div className="w-64 flex-shrink-0">
+            <div className="text-sm text-[var(--color-text-muted)] mb-3">{beats.data?.length ?? 0} beats</div>
+            <div className="space-y-1">
+              {(beats.data ?? []).map((beat: BeatResearch) => (
+                <button
+                  key={beat.id}
+                  onClick={() => openBeat(beat)}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    selectedBeat === beat.id
+                      ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]'
+                      : 'hover:bg-[var(--color-surface-2)] text-[var(--color-text)]'
+                  }`}
+                >
+                  <div className="font-medium truncate">{beat.beat_name}</div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px] text-[var(--color-text-muted)] capitalize">{beat.beat_category ?? 'general'}</span>
+                    <span className="text-[10px] text-[var(--color-text-muted)]">·</span>
+                    <span className="text-[10px] text-[var(--color-text-muted)]">{(beat.content?.length ?? 0).toLocaleString()} chars</span>
+                  </div>
+                </button>
+              ))}
+              {(beats.data ?? []).length === 0 && (
+                <p className="text-sm text-[var(--color-text-muted)] px-3 py-4">No beats configured</p>
+              )}
+            </div>
+          </div>
+
+          {/* Beat content viewer/editor */}
+          <div className="flex-1 min-w-0">
+            {selectedBeat && beats.data ? (() => {
+              const beat = beats.data.find((b: BeatResearch) => b.id === selectedBeat)
+              if (!beat) return null
+              return (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-bold">{beat.beat_name}</h2>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-[var(--color-text-muted)]">
+                        <span className="capitalize">{beat.beat_category ?? 'general'}</span>
+                        <span>·</span>
+                        <span>Updated {beat.last_updated ? new Date(beat.last_updated).toLocaleDateString() : 'never'}</span>
+                        {beat.updated_by && <><span>·</span><span>by {beat.updated_by}</span></>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {!beatEditing ? (
+                        <button
+                          onClick={() => setBeatEditing(true)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/10 rounded-lg transition-colors"
+                        >
+                          <Pencil size={12} /> Edit
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={handleSaveBeat}
+                            disabled={beatSaving}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            <Save size={12} /> {beatSaving ? 'Saving...' : 'Save'}
+                          </button>
+                          <button
+                            onClick={() => { setBeatEditing(false); setBeatContent(beat.content) }}
+                            className="px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {beatEditing ? (
+                    <textarea
+                      value={beatContent}
+                      onChange={(e) => setBeatContent(e.target.value)}
+                      className="w-full h-[600px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-sm font-mono text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-y"
+                      placeholder="Beat research content (markdown)"
+                    />
+                  ) : (
+                    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 max-h-[650px] overflow-y-auto">
+                      <div className="prose prose-sm prose-invert max-w-none text-sm leading-relaxed whitespace-pre-wrap font-mono text-[var(--color-text)]">
+                        {beat.content || 'No content yet. Click Edit to add beat research notes.'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })() : (
+              <div className="flex items-center justify-center h-64 text-sm text-[var(--color-text-muted)]">
+                <div className="text-center">
+                  <BookOpen size={32} className="mx-auto mb-2 opacity-40" />
+                  <p>Select a beat to view research</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ===== FEEDS TAB ===== */}
+      {activeTab === 'feeds' && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-[var(--color-text-muted)]">{feeds.data?.length ?? 0} sources</span>
+            <button
+              onClick={() => setAddingFeed(!addingFeed)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/10 rounded-lg transition-colors"
+            >
+              {addingFeed ? <><X size={12} /> Cancel</> : <><Plus size={12} /> Add Source</>}
+            </button>
+          </div>
+
+          {addingFeed && (
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 mb-4 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className={labelClass}>Name</label><input type="text" value={feedName} onChange={(e) => setFeedName(e.target.value)} className={inputClass} placeholder="Source name" /></div>
+                <div><label className={labelClass}>URL</label><input type="text" value={feedUrl} onChange={(e) => setFeedUrl(e.target.value)} className={inputClass} placeholder="https://..." /></div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className={labelClass}>Type</label>
+                  <select value={feedType} onChange={(e) => setFeedType(e.target.value)} className={inputClass}>
+                    <option value="rss">RSS</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="api">API</option>
+                    <option value="website">Website</option>
+                  </select>
+                </div>
+                <div><label className={labelClass}>Beat</label><input type="text" value={feedBeat} onChange={(e) => setFeedBeat(e.target.value)} className={inputClass} placeholder="e.g. sports, government" /></div>
+                <div><label className={labelClass}>Notes</label><input type="text" value={feedNotes} onChange={(e) => setFeedNotes(e.target.value)} className={inputClass} placeholder="Optional notes" /></div>
+              </div>
+              <button onClick={handleAddFeed} disabled={saving || !feedName || !feedUrl} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50">
+                <Save size={12} /> {saving ? 'Adding...' : 'Add Feed'}
+              </button>
+            </div>
+          )}
+
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[var(--color-surface-2)]">
+                  <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold">Source</th>
+                  <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold w-20">Type</th>
+                  <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold w-24">Beat</th>
+                  <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold w-16">Active</th>
+                  <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold w-12"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(feeds.data ?? []).map((feed: FeedSource) => (
+                  <tr key={feed.id} className="border-t border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50">
+                    <td className="px-4 py-3">
+                      <div>
+                        <a href={feed.url} target="_blank" rel="noopener" className="text-sm hover:text-[var(--color-accent-hover)] transition-colors flex items-center gap-1">
+                          {feed.name} <ExternalLink size={10} className="text-[var(--color-text-muted)]" />
+                        </a>
+                        {feed.notes && <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5">{feed.notes}</div>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
+                        feed.feed_type === 'rss' ? 'bg-orange-500/20 text-orange-400' :
+                        feed.feed_type === 'youtube' ? 'bg-red-500/20 text-red-400' :
+                        feed.feed_type === 'api' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-[var(--color-surface-2)] text-[var(--color-text-muted)]'
+                      }`}>{feed.feed_type}</span>
+                    </td>
+                    <td className="px-4 py-3 text-[var(--color-text-muted)] capitalize text-xs">{feed.beat_category ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleToggleFeed(feed.id, feed.active)}
+                        className={`w-8 h-4 rounded-full transition-colors relative ${feed.active ? 'bg-green-500' : 'bg-[var(--color-surface-2)]'}`}
+                      >
+                        <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${feed.active ? 'left-4' : 'left-0.5'}`} />
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => handleDeleteFeed(feed.id)} className="text-[var(--color-text-muted)] hover:text-red-400 transition-colors">
+                        <Trash2 size={12} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {(feeds.data ?? []).length === 0 && (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-muted)]">No feed sources configured</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ===== LOG TAB ===== */}
+      {activeTab === 'log' && (
+        <div>
+          {pubLog.data ? (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-[var(--color-text-muted)]">Publication Log</span>
+                  <span className="text-[10px] text-[var(--color-text-muted)]">{(pubLog.data.content?.length ?? 0).toLocaleString()} chars</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {!logEditing && (
+                    <div className="relative">
+                      <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]" />
+                      <input
+                        type="text"
+                        value={logSearch}
+                        onChange={(e) => setLogSearch(e.target.value)}
+                        placeholder="Search log..."
+                        className="pl-7 pr-3 py-1.5 text-xs bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)] w-48"
+                      />
+                    </div>
+                  )}
+                  {!logEditing ? (
+                    <button
+                      onClick={() => { setLogContent(pubLog.data!.content); setLogEditing(true) }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/10 rounded-lg transition-colors"
+                    >
+                      <Pencil size={12} /> Edit
+                    </button>
+                  ) : (
+                    <>
+                      <button onClick={handleSaveLog} disabled={logSaving} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50">
+                        <Save size={12} /> {logSaving ? 'Saving...' : 'Save'}
+                      </button>
+                      <button onClick={() => setLogEditing(false)} className="px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)]">Cancel</button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {logEditing ? (
+                <textarea
+                  value={logContent}
+                  onChange={(e) => setLogContent(e.target.value)}
+                  className="w-full h-[650px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-sm font-mono text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-y"
+                />
+              ) : (
+                <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 max-h-[650px] overflow-y-auto">
+                  <pre className="text-xs font-mono text-[var(--color-text)] whitespace-pre-wrap leading-relaxed">
+                    {logSearch
+                      ? pubLog.data.content.split('\n').filter(line => line.toLowerCase().includes(logSearch.toLowerCase())).join('\n') || 'No matches found'
+                      : pubLog.data.content || 'No log content yet.'
+                    }
+                  </pre>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-sm text-[var(--color-text-muted)]">
+              {pubLog.isLoading ? 'Loading log...' : 'No publication log found'}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ===== AUTHORS TAB ===== */}
       {activeTab === 'authors' && (
         <div className="space-y-4">
@@ -532,6 +953,21 @@ export default function Publication() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-[var(--color-accent-hover)] font-semibold">{author.post_count_30d} posts (30d)</span>
+                  {(() => {
+                    const vp = (voiceProfiles.data ?? []).find(v => v.author_id === author.id)
+                    return vp ? (
+                      <button
+                        onClick={() => toggleVoice(author.id, vp)}
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold transition-colors ${
+                          voiceAuthorId === author.id
+                            ? 'bg-purple-500/20 text-purple-400'
+                            : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-purple-400'
+                        }`}
+                      >
+                        <BookOpen size={10} /> Voice
+                      </button>
+                    ) : null
+                  })()}
                   {editingAuthor !== author.id && (
                     <button onClick={() => startEditAuthor(author)} className="text-[var(--color-text-muted)] hover:text-[var(--color-accent-hover)] transition-colors">
                       <Pencil size={14} />
@@ -574,6 +1010,48 @@ export default function Publication() {
                   </div>
                 </div>
               )}
+
+              {/* Voice Profile viewer/editor */}
+              {voiceAuthorId === author.id && (() => {
+                const vp = (voiceProfiles.data ?? []).find(v => v.author_id === author.id)
+                if (!vp) return null
+                return (
+                  <div className="mt-3 border-t border-purple-500/20 pt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <BookOpen size={14} className="text-purple-400" />
+                        <span className="text-xs font-semibold text-purple-400 uppercase tracking-wide">Voice Profile</span>
+                        <span className="text-[10px] text-[var(--color-text-muted)]">Updated {vp.last_updated ? new Date(vp.last_updated).toLocaleDateString() : 'never'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {!voiceEditing ? (
+                          <button onClick={() => { setVoiceContent(vp.content); setVoiceEditing(true) }} className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/10 rounded transition-colors">
+                            <Pencil size={10} /> Edit
+                          </button>
+                        ) : (
+                          <>
+                            <button onClick={handleSaveVoice} disabled={voiceSaving} className="flex items-center gap-1 px-2 py-1 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-[10px] font-medium rounded transition-colors disabled:opacity-50">
+                              <Save size={10} /> {voiceSaving ? 'Saving...' : 'Save'}
+                            </button>
+                            <button onClick={() => setVoiceEditing(false)} className="px-2 py-1 text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text)]">Cancel</button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {voiceEditing ? (
+                      <textarea
+                        value={voiceContent}
+                        onChange={(e) => setVoiceContent(e.target.value)}
+                        className="w-full h-96 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs font-mono text-[var(--color-text)] focus:outline-none focus:border-purple-500 transition-colors resize-y"
+                      />
+                    ) : (
+                      <div className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-3 max-h-96 overflow-y-auto">
+                        <pre className="text-xs font-mono text-[var(--color-text)] whitespace-pre-wrap leading-relaxed">{vp.content || 'No voice profile content.'}</pre>
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           ))}
           {(authors.data ?? []).length === 0 && (

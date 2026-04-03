@@ -10,6 +10,7 @@ import Analytics from './pages/Analytics'
 import PostEditor from './pages/PostEditor'
 import PageEditor from './pages/PageEditor'
 import Publication from './pages/Publication'
+import Transcripts from './pages/Transcripts'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -49,6 +50,7 @@ function AppRoutes() {
           <Route path="posts/:id" element={<PostEditor />} />
           <Route path="pages/:id" element={<PageEditor />} />
           <Route path="publications/:slug" element={<Publication />} />
+          <Route path="transcripts" element={<Transcripts />} />
         </Route>
       </Routes>
     </BrowserRouter>

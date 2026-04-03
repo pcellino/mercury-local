@@ -133,6 +133,173 @@ export async function getPublicationEditorial(pubId: string): Promise<EditorialI
   }))
 }
 
+// ---------- Transcripts ----------
+export interface Transcript {
+  id: string
+  title: string
+  meeting_date: string
+  meeting_type: string | null
+  status: string | null
+  word_count: number | null
+  source_url: string | null
+  summary: string | null
+  publication_id: string | null
+  pub_name?: string
+}
+
+export interface TranscriptDetail extends Transcript {
+  full_text: string | null
+  speakers: any | null
+  key_quotes: any | null
+  processing_notes: string | null
+  file_path: string | null
+}
+
+export async function getTranscripts(limit = 50): Promise<Transcript[]> {
+  const { data, error } = await supabase
+    .from('transcripts')
+    .select('id, title, meeting_date, meeting_type, status, word_count, source_url, summary, publication_id')
+    .order('meeting_date', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  return data ?? []
+}
+
+export async function searchTranscripts(query: string): Promise<Transcript[]> {
+  const { data, error } = await supabase
+    .from('transcripts')
+    .select('id, title, meeting_date, meeting_type, status, word_count, source_url, summary, publication_id')
+    .textSearch('search_vector', query, { type: 'websearch' })
+    .order('meeting_date', { ascending: false })
+    .limit(30)
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getTranscriptById(id: string): Promise<TranscriptDetail> {
+  const { data, error } = await supabase
+    .from('transcripts')
+    .select('*')
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data as TranscriptDetail
+}
+
+// ---------- Publication Log ----------
+export interface PublicationLog {
+  id: string
+  publication_id: string
+  content: string
+  article_count: number
+  last_updated: string | null
+  updated_by: string | null
+}
+
+export async function getPublicationLog(pubId: string): Promise<PublicationLog | null> {
+  const { data, error } = await supabase
+    .from('publication_logs')
+    .select('*')
+    .eq('publication_id', pubId)
+    .maybeSingle()
+  if (error) throw error
+  return data as PublicationLog | null
+}
+
+// ---------- Feed Sources ----------
+export interface FeedSource {
+  id: string
+  publication_id: string
+  name: string
+  url: string
+  feed_type: string
+  beat_category: string | null
+  active: boolean
+  notes: string | null
+  last_fetched: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export async function getPublicationFeeds(pubId: string): Promise<FeedSource[]> {
+  const { data, error } = await supabase
+    .from('feed_sources')
+    .select('*')
+    .eq('publication_id', pubId)
+    .order('name')
+  if (error) throw error
+  return data ?? []
+}
+
+// ---------- Voice Profiles ----------
+export interface VoiceProfile {
+  id: string
+  author_id: string
+  content: string
+  last_updated: string | null
+  updated_by: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export async function getVoiceProfileByAuthor(authorId: string): Promise<VoiceProfile | null> {
+  const { data, error } = await supabase
+    .from('voice_profiles')
+    .select('*')
+    .eq('author_id', authorId)
+    .maybeSingle()
+  if (error) throw error
+  return data as VoiceProfile | null
+}
+
+export async function getPublicationVoiceProfiles(pubId: string): Promise<(VoiceProfile & { author_name: string })[]> {
+  const { data, error } = await supabase
+    .from('voice_profiles')
+    .select('*, authors!inner(name, publication_id)')
+    .eq('authors.publication_id', pubId)
+  if (error) throw error
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    author_name: row.authors?.name ?? '',
+    authors: undefined,
+  }))
+}
+
+// ---------- Beat Research ----------
+export interface BeatResearch {
+  id: string
+  publication_id: string
+  beat_name: string
+  beat_slug: string
+  beat_category: string | null
+  content: string
+  last_updated: string | null
+  updated_by: string | null
+  article_count: number
+  created_at: string | null
+  updated_at: string | null
+}
+
+export async function getPublicationBeats(pubId: string): Promise<BeatResearch[]> {
+  const { data, error } = await supabase
+    .from('beat_research')
+    .select('*')
+    .eq('publication_id', pubId)
+    .order('beat_name')
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getBeatById(id: string): Promise<BeatResearch> {
+  const { data, error } = await supabase
+    .from('beat_research')
+    .select('*')
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data as BeatResearch
+}
+
 // ---------- Publication Stats ----------
 export interface PubStats {
   publication_id: string
