@@ -23,6 +23,7 @@ const NAV_ITEMS: SearchResult[] = [
   { id: 'nav-tags', type: 'nav', title: 'Tags', subtitle: 'Manage tags', path: '/tags' },
   { id: 'nav-authors', type: 'nav', title: 'Authors', subtitle: 'Manage authors', path: '/authors' },
   { id: 'nav-hubs', type: 'nav', title: 'Hub Pages', subtitle: 'Beat landing pages', path: '/hubs' },
+  { id: 'nav-activity', type: 'nav', title: 'Activity Log', subtitle: 'Audit trail of all actions', path: '/activity' },
   { id: 'nav-status', type: 'nav', title: 'Status & Alerts', subtitle: 'Health dashboard', path: '/status' },
   { id: 'nav-new', type: 'nav', title: 'New Post', subtitle: 'Create a new post', path: '/posts/new' },
 ]

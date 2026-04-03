@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { getRecentPosts, getPublications, getAuthors } from '../lib/queries'
-import { updatePostStatus } from '../lib/mutations'
+import { updatePostStatusWithLog } from '../lib/mutations'
 import { getAllTopPagesMap, siteIdForPub, postPathname } from '../lib/fathom'
 import { formatRelative, statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
-import { Newspaper, Search, ExternalLink, Pencil, Eye } from 'lucide-react'
+import { Newspaper, Search, ExternalLink, Pencil, Eye, CheckSquare, Square, X } from 'lucide-react'
+import { logActivity } from '../lib/mutations'
 
 export default function RecentPosts() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -14,14 +15,59 @@ export default function RecentPosts() {
   const [beatFilter, setBeatFilter] = useState('')
   const [dateRange, setDateRange] = useState('all')
   const [statusFilter, setStatusFilter] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkAction, setBulkAction] = useState('')
+  const [bulkProcessing, setBulkProcessing] = useState(false)
   const queryClient = useQueryClient()
 
-  async function handleStatusChange(postId: string, newStatus: string) {
+  async function handleStatusChange(postId: string, newStatus: string, title?: string, pubId?: string | null) {
     try {
-      await updatePostStatus(postId, newStatus)
+      await updatePostStatusWithLog(postId, newStatus, title, pubId)
       queryClient.invalidateQueries({ queryKey: ['recent-posts-full'] })
     } catch (err) {
       console.error('Failed to update status:', err)
+    }
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (!filtered) return
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(filtered.map(p => p.id)))
+    }
+  }
+
+  async function handleBulkAction() {
+    if (!bulkAction || selectedIds.size === 0) return
+    setBulkProcessing(true)
+    try {
+      const selectedPosts = (posts ?? []).filter(p => selectedIds.has(p.id))
+      for (const post of selectedPosts) {
+        await updatePostStatusWithLog(post.id, bulkAction, post.title, null)
+      }
+      await logActivity({
+        action: 'bulk_status_change',
+        entity_type: 'post',
+        entity_title: `${selectedPosts.length} posts → ${bulkAction}`,
+        details: { new_status: bulkAction, count: selectedPosts.length, post_ids: [...selectedIds] },
+      })
+      queryClient.invalidateQueries({ queryKey: ['recent-posts-full'] })
+      setSelectedIds(new Set())
+      setBulkAction('')
+    } catch (err) {
+      console.error('Bulk action failed:', err)
+    } finally {
+      setBulkProcessing(false)
     }
   }
 
@@ -175,11 +221,54 @@ export default function RecentPosts() {
             Showing {filtered.length} of {posts.length} articles
           </div>
 
+          {/* Bulk Action Bar */}
+          {selectedIds.size > 0 && (
+            <div className="bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 rounded-xl px-4 py-3 mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <CheckSquare size={16} className="text-[var(--color-accent-hover)]" />
+                <span className="text-sm font-medium">{selectedIds.size} post{selectedIds.size > 1 ? 's' : ''} selected</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  value={bulkAction}
+                  onChange={(e) => setBulkAction(e.target.value)}
+                  className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-xs"
+                >
+                  <option value="">Choose action...</option>
+                  <option value="draft">Set Draft</option>
+                  <option value="scheduled">Set Scheduled</option>
+                  <option value="published">Set Published</option>
+                </select>
+                <button
+                  onClick={handleBulkAction}
+                  disabled={!bulkAction || bulkProcessing}
+                  className="px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-lg text-xs font-medium disabled:opacity-50 transition-colors"
+                >
+                  {bulkProcessing ? 'Applying...' : 'Apply'}
+                </button>
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  className="p-1.5 rounded-lg hover:bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Table */}
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[var(--color-surface-2)]">
+                  <th className="px-3 py-2.5 w-8">
+                    <button onClick={toggleSelectAll} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
+                      {filtered && selectedIds.size === filtered.length && filtered.length > 0
+                        ? <CheckSquare size={14} />
+                        : <Square size={14} />
+                      }
+                    </button>
+                  </th>
                   <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold">Article</th>
                   <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold w-20">Pub</th>
                   <th className="text-left px-4 py-2.5 text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold w-32">Author</th>
@@ -194,7 +283,12 @@ export default function RecentPosts() {
               <tbody>
                 {filtered.length > 0 ? (
                   filtered.map((post) => (
-                    <tr key={post.id} className="border-t border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50">
+                    <tr key={post.id} className={`border-t border-[var(--color-border)] hover:bg-[var(--color-surface-2)]/50 ${selectedIds.has(post.id) ? 'bg-[var(--color-accent)]/5' : ''}`}>
+                      <td className="px-3 py-3">
+                        <button onClick={() => toggleSelect(post.id)} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
+                          {selectedIds.has(post.id) ? <CheckSquare size={14} className="text-[var(--color-accent-hover)]" /> : <Square size={14} />}
+                        </button>
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Link
@@ -228,7 +322,7 @@ export default function RecentPosts() {
                       <td className="px-4 py-3">
                         <select
                           value={post.status}
-                          onChange={(e) => handleStatusChange(post.id, e.target.value)}
+                          onChange={(e) => handleStatusChange(post.id, e.target.value, post.title, null)}
                           className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize border-0 cursor-pointer focus:outline-none ${statusColor(post.status)}`}
                           style={{ background: 'transparent' }}
                         >

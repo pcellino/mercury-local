@@ -439,3 +439,69 @@ export async function removeTagFromPost(postId: string, tagId: string) {
     .eq('tag_id', tagId)
   if (error) throw error
 }
+
+// ---------- Activity Log ----------
+
+export interface LogActivityPayload {
+  action: string
+  entity_type: string
+  entity_id?: string
+  entity_title?: string
+  publication_id?: string | null
+  details?: Record<string, unknown>
+  actor?: string
+}
+
+export async function logActivity(payload: LogActivityPayload) {
+  const { error } = await supabase
+    .from('activity_log')
+    .insert({
+      action: payload.action,
+      entity_type: payload.entity_type,
+      entity_id: payload.entity_id ?? null,
+      entity_title: payload.entity_title ?? null,
+      publication_id: payload.publication_id ?? null,
+      details: payload.details ?? {},
+      actor: payload.actor ?? 'atlas-command',
+    })
+  // Activity logging is fire-and-forget — don't throw on error
+  if (error) console.warn('Activity log failed:', error.message)
+}
+
+/** Wraps updatePostStatus with activity logging */
+export async function updatePostStatusWithLog(id: string, newStatus: string, title?: string, publicationId?: string | null) {
+  await updatePostStatus(id, newStatus)
+  await logActivity({
+    action: 'status_change',
+    entity_type: 'post',
+    entity_id: id,
+    entity_title: title,
+    publication_id: publicationId,
+    details: { new_status: newStatus },
+  })
+}
+
+/** Wraps createPost with activity logging */
+export async function createPostWithLog(payload: CreatePostPayload): Promise<string> {
+  const id = await createPost(payload)
+  await logActivity({
+    action: 'create',
+    entity_type: 'post',
+    entity_id: id,
+    entity_title: payload.title,
+    publication_id: payload.publication_id,
+  })
+  return id
+}
+
+/** Wraps createEditorialItem with activity logging */
+export async function createEditorialItemWithLog(item: CreateEditorialItem) {
+  const result = await createEditorialItem(item)
+  await logActivity({
+    action: 'create',
+    entity_type: 'editorial',
+    entity_title: item.concept,
+    publication_id: item.publication_id,
+  })
+  return result
+}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications, getAuthors } from '../lib/queries'
-import { createPost, type CreatePostPayload } from '../lib/mutations'
+import { createPostWithLog, type CreatePostPayload } from '../lib/mutations'
 import { ArrowLeft, Plus } from 'lucide-react'
 
 function toSlug(title: string): string {
@@ -53,7 +53,7 @@ export default function PostCreate() {
         excerpt: excerpt || null,
         content: content || null,
       }
-      const newId = await createPost(payload)
+      const newId = await createPostWithLog(payload)
       navigate(`/posts/${newId}`)
     } catch (err: any) {
       setError(err.message ?? 'Failed to create post')
