@@ -30,7 +30,9 @@ export function generateArticleJsonLd(
     description: post.meta_description
       ? decodeHtmlEntities(post.meta_description)
       : undefined,
-    image: post.hero_image_url ? [post.hero_image_url] : undefined,
+    image: post.hero_image_url
+      ? [{ "@type": "ImageObject", url: post.hero_image_url }]
+      : undefined,
     datePublished: post.pub_date || post.created_at,
     dateModified: post.updated_at || post.pub_date || post.created_at,
     author: post.author

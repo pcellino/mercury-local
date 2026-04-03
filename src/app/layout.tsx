@@ -28,6 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: publication.name,
       locale: "en_US",
       type: "website",
+      ...(publication.logo_url && {
+        images: [{ url: publication.logo_url, alt: publication.name }],
+      }),
     },
     robots: {
       index: true,

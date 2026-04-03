@@ -39,6 +39,9 @@ export async function generateMetadata({
       description,
       url: `/tag/${tag.slug}`,
       type: "website",
+      ...(publication.logo_url && {
+        images: [{ url: publication.logo_url, alt: publication.name }],
+      }),
     },
     ...(noindex && {
       robots: {

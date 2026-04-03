@@ -46,6 +46,9 @@ export async function generateMetadata({
       description,
       url: `/${beat}`,
       type: "website",
+      ...(publication.logo_url && {
+        images: [{ url: publication.logo_url, alt: publication.name }],
+      }),
     },
   };
 }

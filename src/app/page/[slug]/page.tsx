@@ -45,6 +45,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ...(description && { description: decodeHtmlEntities(description) }),
       type: "website",
       url: `/page/${slug}`,
+      ...(publication.logo_url && {
+        images: [{ url: publication.logo_url, alt: publication.name }],
+      }),
     },
     ...(description && {
       twitter: {

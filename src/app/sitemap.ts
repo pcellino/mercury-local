@@ -33,6 +33,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   });
 
+  // Authors directory
+  entries.push({
+    url: `${base}/authors`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.6,
+  });
+
   // Beat index pages
   for (const beat of beats) {
     entries.push({
