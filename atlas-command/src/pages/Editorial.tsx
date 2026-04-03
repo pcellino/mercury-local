@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { getEditorialCalendar, getPublications, getAuthors } from '../lib/queries'
+import { useNavigate, Link } from 'react-router-dom'
+import { getEditorialCalendar, getPublications, getAuthors, type EditorialItem } from '../lib/queries'
 import { createEditorialItem, updateEditorialStatus, updateEditorialDate, killEditorialItem, duplicateEditorialItem, updateEditorialItem, logActivity, type CreateEditorialItem } from '../lib/mutations'
 import { statusColor, formatDate, PUB_COLORS, PUB_SHORT } from '../lib/utils'
-import { CalendarDays, Plus, X, Trash2, ArrowRight, Copy, Pencil, AlertCircle } from 'lucide-react'
+import { CalendarDays, Plus, X, Trash2, ArrowRight, Copy, AlertCircle, FileText, ExternalLink, Save, ChevronRight } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 
 const STATUSES = ['all', 'concept', 'assigned', 'drafting', 'review', 'scheduled']
@@ -13,11 +13,11 @@ const STATUS_FLOW = ['concept', 'assigned', 'drafting', 'review', 'scheduled', '
 export default function Editorial() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [statusFilter, setStatusFilter] = useState('all')
   const [showCreate, setShowCreate] = useState(false)
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingText, setEditingText] = useState('')
+  const [activeItem, setActiveItem] = useState<EditorialItem | null>(null)
   const [mutError, setMutError] = useState<string | null>(null)
 
   const { data, isLoading } = useQuery({
@@ -27,6 +27,15 @@ export default function Editorial() {
 
   const pubs = useQuery({ queryKey: ['publications'], queryFn: getPublications })
   const authors = useQuery({ queryKey: ['authors'], queryFn: getAuthors })
+
+  // Keep activeItem in sync with refreshed data
+  useEffect(() => {
+    if (activeItem && data) {
+      const updated = data.find(i => i.id === activeItem.id)
+      if (updated) setActiveItem(updated)
+      else setActiveItem(null) // item was killed or filtered out
+    }
+  }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const advanceStatus = useMutation({
     mutationFn: async ({ id, status, concept }: { id: string; status: string; concept?: string }) => {
@@ -45,7 +54,7 @@ export default function Editorial() {
 
   const kill = useMutation({
     mutationFn: (id: string) => killEditorialItem(id),
-    onSuccess: () => { setMutError(null); queryClient.invalidateQueries({ queryKey: ['editorial'] }) },
+    onSuccess: () => { setMutError(null); setActiveItem(null); queryClient.invalidateQueries({ queryKey: ['editorial'] }) },
     onError: (err: any) => setMutError(err.message ?? 'Failed to kill item'),
   })
 
@@ -53,16 +62,6 @@ export default function Editorial() {
     mutationFn: (id: string) => duplicateEditorialItem(id),
     onSuccess: () => { setMutError(null); queryClient.invalidateQueries({ queryKey: ['editorial'] }) },
     onError: (err: any) => setMutError(err.message ?? 'Failed to duplicate item'),
-  })
-
-  const updateConcept = useMutation({
-    mutationFn: ({ id, concept }: { id: string; concept: string }) => updateEditorialItem(id, { concept }),
-    onSuccess: () => {
-      setMutError(null)
-      queryClient.invalidateQueries({ queryKey: ['editorial'] })
-      setEditingId(null)
-    },
-    onError: (err: any) => setMutError(err.message ?? 'Failed to update concept'),
   })
 
   const create = useMutation({
@@ -138,264 +137,502 @@ export default function Editorial() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <CalendarDays size={24} className="text-[var(--color-accent-hover)]" />
-            Editorial Calendar
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            {data?.length ?? 0} open items across all publications
-          </p>
+    <div className="flex gap-0 h-full">
+      {/* Main list */}
+      <div className={`flex-1 min-w-0 transition-all duration-200 ${activeItem ? 'pr-4' : ''}`}>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <CalendarDays size={24} className="text-[var(--color-accent-hover)]" />
+              Editorial Calendar
+            </h1>
+            <p className="text-sm text-[var(--color-text-muted)] mt-1">
+              {data?.length ?? 0} open items across all publications
+            </p>
+          </div>
+          {user && (
+            <button
+              onClick={() => setShowCreate(!showCreate)}
+              className="flex items-center gap-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            >
+              {showCreate ? <X size={14} /> : <Plus size={14} />}
+              {showCreate ? 'Cancel' : 'New Concept'}
+            </button>
+          )}
         </div>
-        {user && (
+
+        {/* Create form */}
+        {showCreate && <CreateForm pubs={pubs.data ?? []} authors={authors.data ?? []} onSubmit={create.mutate} loading={create.isPending} />}
+
+        {/* Error banner */}
+        {mutError && (
+          <div className="flex items-center gap-2 px-4 py-2.5 mb-6 bg-red-400/10 border border-red-400/20 rounded-lg text-xs text-red-400">
+            <AlertCircle size={14} /> {mutError}
+            <button onClick={() => setMutError(null)} className="ml-auto hover:text-red-300"><X size={12} /></button>
+          </div>
+        )}
+
+        {/* Status filter pills */}
+        <div className="flex gap-1 mb-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-1 w-fit">
+          {STATUSES.map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
+                statusFilter === s
+                  ? 'bg-[var(--color-accent)] text-white'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {/* Bulk actions bar */}
+        {selectedItems.size > 0 && user && (
+          <div className="mb-6 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 rounded-lg p-4 flex items-center justify-between">
+            <span className="text-sm font-medium text-[var(--color-accent-hover)]">{selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => advanceAllStatus.mutate()}
+                disabled={advanceAllStatus.isPending}
+                className="px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                {advanceAllStatus.isPending ? 'Advancing...' : 'Advance All'}
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('Kill all selected items?')) killAll.mutate()
+                }}
+                disabled={killAll.isPending}
+                className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                {killAll.isPending ? 'Killing...' : 'Kill All'}
+              </button>
+              <button
+                onClick={() => setSelectedItems(new Set())}
+                className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-border)] text-[var(--color-text-muted)] text-xs font-medium rounded-lg transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isLoading && <p className="text-sm text-[var(--color-text-muted)]">Loading editorial calendar...</p>}
+
+        {/* Timeline view */}
+        <div className="space-y-6">
+          {sortedDates.map((date) => {
+            const items = grouped[date]!
+            const isPast = date !== 'unscheduled' && date < today
+            return (
+              <div key={date}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`text-sm font-semibold ${isPast ? 'text-red-400' : date === today ? 'text-green-400' : 'text-[var(--color-text)]'}`}>
+                    {date === 'unscheduled' ? 'Unscheduled' : date === today ? `Today — ${formatDate(date)}` : formatDate(date)}
+                  </div>
+                  {isPast && (
+                    <span className="text-[10px] bg-red-400/10 text-red-400 px-2 py-0.5 rounded-full font-semibold uppercase">Overdue</span>
+                  )}
+                  <div className="flex-1 h-px bg-[var(--color-border)]" />
+                  <span className="text-[11px] text-[var(--color-text-muted)]">{items.length} items</span>
+                </div>
+
+                <div className="space-y-2 ml-1">
+                  {items.map((item) => {
+                    const nextStatus = getNextStatus(item.status)
+                    const isSelected = selectedItems.has(item.id)
+                    const isActive = activeItem?.id === item.id
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={(e) => {
+                          // Don't open drawer when clicking checkbox or action buttons
+                          if ((e.target as HTMLElement).closest('input[type="checkbox"], button, a')) return
+                          setActiveItem(isActive ? null : item)
+                        }}
+                        className={`bg-[var(--color-surface)] border rounded-lg p-4 transition-all group cursor-pointer ${
+                          isActive
+                            ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5 ring-1 ring-[var(--color-accent)]/30'
+                            : isSelected
+                              ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
+                              : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          {user && (
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                const newSet = new Set(selectedItems)
+                                if (e.target.checked) {
+                                  newSet.add(item.id)
+                                } else {
+                                  newSet.delete(item.id)
+                                }
+                                setSelectedItems(newSet)
+                              }}
+                              className="mt-1 shrink-0 cursor-pointer w-4 h-4"
+                            />
+                          )}
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span
+                                className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold text-white shrink-0"
+                                style={{ backgroundColor: PUB_COLORS[item.pub_slug] ?? '#6366f1' }}
+                              >
+                                {PUB_SHORT[item.pub_slug] ?? item.pub_slug}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusColor(item.status)}`}>
+                                {item.status}
+                              </span>
+                              {item.priority && (
+                                <span className={`text-[10px] font-medium capitalize ${item.priority === 'primary' ? 'text-amber-400' : 'text-[var(--color-text-muted)]'}`}>
+                                  {item.priority}
+                                </span>
+                              )}
+                              {item.post_id && (
+                                <Link
+                                  to={`/posts/${item.post_id}`}
+                                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-green-400/10 text-green-400 hover:bg-green-400/20 transition-colors shrink-0"
+                                  title="Open linked article"
+                                >
+                                  <FileText size={9} /> Article
+                                </Link>
+                              )}
+                            </div>
+                            <h3 className="text-sm font-medium leading-snug">
+                              {item.concept}
+                            </h3>
+                            {item.notes && (
+                              <p className="text-[12px] text-[var(--color-text-muted)] mt-1 leading-relaxed line-clamp-2">{item.notes}</p>
+                            )}
+                          </div>
+
+                          {/* Inline actions */}
+                          {user && (
+                            <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {nextStatus && (
+                                <button
+                                  onClick={() => advanceStatus.mutate({ id: item.id, status: nextStatus, concept: item.concept })}
+                                  title={`Advance to ${nextStatus}`}
+                                  className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/20 transition-colors"
+                                >
+                                  <ArrowRight size={10} /> {nextStatus}
+                                </button>
+                              )}
+                              <button
+                                onClick={() => duplicate.mutate(item.id)}
+                                title="Duplicate tomorrow"
+                                className="px-2 py-1 rounded text-[10px] font-semibold bg-purple-400/10 text-purple-400 hover:bg-purple-400/20 transition-colors"
+                              >
+                                <Copy size={10} />
+                              </button>
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            <div className="text-right">
+                              {item.author_name && <p className="text-[11px] text-[var(--color-text-muted)]">{item.author_name}</p>}
+                              {item.beat && <p className="text-[10px] text-[var(--color-text-muted)] capitalize mt-0.5">{item.beat}</p>}
+                            </div>
+                            <ChevronRight size={14} className={`text-[var(--color-text-muted)] transition-transform ${isActive ? 'rotate-90 text-[var(--color-accent-hover)]' : ''}`} />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {data?.length === 0 && !isLoading && (
+          <div className="text-center py-16 text-[var(--color-text-muted)]">
+            <p className="text-sm">No editorial items found for this filter.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Detail drawer */}
+      {activeItem && (
+        <DetailDrawer
+          item={activeItem}
+          authors={authors.data ?? []}
+          user={user}
+          onClose={() => setActiveItem(null)}
+          onAdvance={(id, status, concept) => advanceStatus.mutate({ id, status, concept })}
+          onBumpDate={(id, date) => bumpDate.mutate({ id, date })}
+          onKill={(id) => { if (confirm('Kill this item?')) kill.mutate(id) }}
+          onDuplicate={(id) => duplicate.mutate(id)}
+          onNavigateToPost={(postId) => navigate(`/posts/${postId}`)}
+          onCreateArticle={(item) => navigate('/posts/new', { state: { concept: item.concept, publication_id: item.publication_id, beat: item.beat, author_id: item.author_id, editorial_calendar_id: item.id } })}
+          onSave={async (id, updates) => {
+            await updateEditorialItem(id, updates)
+            await logActivity({ action: 'update', entity_type: 'editorial', entity_id: id, entity_title: updates.concept ?? activeItem.concept, details: updates })
+            queryClient.invalidateQueries({ queryKey: ['editorial'] })
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+// ---------- Detail Drawer ----------
+
+function DetailDrawer({
+  item,
+  authors,
+  user,
+  onClose,
+  onAdvance,
+  onBumpDate,
+  onKill,
+  onDuplicate,
+  onNavigateToPost,
+  onCreateArticle,
+  onSave,
+}: {
+  item: EditorialItem
+  authors: { id: string; name: string }[]
+  user: any
+  onClose: () => void
+  onAdvance: (id: string, status: string, concept: string) => void
+  onBumpDate: (id: string, date: string) => void
+  onKill: (id: string) => void
+  onDuplicate: (id: string) => void
+  onNavigateToPost: (postId: string) => void
+  onCreateArticle: (item: EditorialItem) => void
+  onSave: (id: string, updates: Partial<{ concept: string; notes: string; beat: string; priority: string; target_date: string; author_id: string; status: string }>) => Promise<void>
+}) {
+  const [concept, setConcept] = useState(item.concept)
+  const [notes, setNotes] = useState(item.notes ?? '')
+  const [beat, setBeat] = useState(item.beat ?? '')
+  const [priority, setPriority] = useState(item.priority ?? 'standard')
+  const [targetDate, setTargetDate] = useState(item.target_date ?? '')
+  const [authorId, setAuthorId] = useState(item.author_id ?? '')
+  const [saving, setSaving] = useState(false)
+  const [dirty, setDirty] = useState(false)
+
+  // Reset form when item changes
+  useEffect(() => {
+    setConcept(item.concept)
+    setNotes(item.notes ?? '')
+    setBeat(item.beat ?? '')
+    setPriority(item.priority ?? 'standard')
+    setTargetDate(item.target_date ?? '')
+    setAuthorId(item.author_id ?? '')
+    setDirty(false)
+  }, [item.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track dirty state
+  useEffect(() => {
+    const changed =
+      concept !== item.concept ||
+      notes !== (item.notes ?? '') ||
+      beat !== (item.beat ?? '') ||
+      priority !== (item.priority ?? 'standard') ||
+      targetDate !== (item.target_date ?? '') ||
+      authorId !== (item.author_id ?? '')
+    setDirty(changed)
+  }, [concept, notes, beat, priority, targetDate, authorId, item])
+
+  const handleSave = async () => {
+    if (!dirty || !user) return
+    setSaving(true)
+    try {
+      const updates: Record<string, string> = {}
+      if (concept !== item.concept) updates.concept = concept
+      if (notes !== (item.notes ?? '')) updates.notes = notes
+      if (beat !== (item.beat ?? '')) updates.beat = beat
+      if (priority !== (item.priority ?? 'standard')) updates.priority = priority
+      if (targetDate !== (item.target_date ?? '')) updates.target_date = targetDate
+      if (authorId !== (item.author_id ?? '')) updates.author_id = authorId
+      await onSave(item.id, updates)
+      setDirty(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const nextStatus = (() => {
+    const idx = STATUS_FLOW.indexOf(item.status)
+    return idx >= 0 && idx < STATUS_FLOW.length - 1 ? STATUS_FLOW[idx + 1] : null
+  })()
+
+  return (
+    <div className="w-[380px] shrink-0 bg-[var(--color-surface)] border-l border-[var(--color-border)] h-full overflow-y-auto -mr-6 -my-6 ml-0">
+      {/* Drawer header */}
+      <div className="sticky top-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)] px-5 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold text-white"
+              style={{ backgroundColor: PUB_COLORS[item.pub_slug] ?? '#6366f1' }}
+            >
+              {PUB_SHORT[item.pub_slug] ?? item.pub_slug}
+            </span>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusColor(item.status)}`}>
+              {item.status}
+            </span>
+          </div>
+          <button onClick={onClose} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Article actions — prominent */}
+        {item.post_id ? (
           <button
-            onClick={() => setShowCreate(!showCreate)}
-            className="flex items-center gap-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            onClick={() => onNavigateToPost(item.post_id!)}
+            className="w-full flex items-center justify-center gap-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
           >
-            {showCreate ? <X size={14} /> : <Plus size={14} />}
-            {showCreate ? 'Cancel' : 'New Concept'}
+            <ExternalLink size={14} /> Open Article in Editor
+          </button>
+        ) : (
+          <button
+            onClick={() => onCreateArticle(item)}
+            className="w-full flex items-center justify-center gap-2 bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 text-[var(--color-accent-hover)] border border-[var(--color-accent)]/20 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors"
+          >
+            <FileText size={14} /> Create Article from This
           </button>
         )}
       </div>
 
-      {/* Create form */}
-      {showCreate && <CreateForm pubs={pubs.data ?? []} authors={authors.data ?? []} onSubmit={create.mutate} loading={create.isPending} />}
-
-      {/* Error banner */}
-      {mutError && (
-        <div className="flex items-center gap-2 px-4 py-2.5 mb-6 bg-red-400/10 border border-red-400/20 rounded-lg text-xs text-red-400">
-          <AlertCircle size={14} /> {mutError}
-          <button onClick={() => setMutError(null)} className="ml-auto hover:text-red-300"><X size={12} /></button>
+      {/* Drawer body */}
+      <div className="px-5 py-5 space-y-5">
+        {/* Concept */}
+        <div>
+          <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1.5">Concept</label>
+          <input
+            type="text"
+            value={concept}
+            onChange={(e) => setConcept(e.target.value)}
+            disabled={!user}
+            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none transition-colors disabled:opacity-60"
+          />
         </div>
-      )}
 
-      {/* Status filter pills */}
-      <div className="flex gap-1 mb-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-1 w-fit">
-        {STATUSES.map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
-              statusFilter === s
-                ? 'bg-[var(--color-accent)] text-white'
-                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-            }`}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+        {/* Notes */}
+        <div>
+          <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1.5">Notes</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            disabled={!user}
+            rows={4}
+            placeholder="Context, sources, angles, timing..."
+            className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] resize-none focus:border-[var(--color-accent)] focus:outline-none transition-colors disabled:opacity-60"
+          />
+        </div>
 
-      {/* Bulk actions bar */}
-      {selectedItems.size > 0 && user && (
-        <div className="mb-6 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 rounded-lg p-4 flex items-center justify-between">
-          <span className="text-sm font-medium text-[var(--color-accent-hover)]">{selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected</span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => advanceAllStatus.mutate()}
-              disabled={advanceAllStatus.isPending}
-              className="px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+        {/* Two-column fields */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1.5">Priority</label>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              disabled={!user}
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] disabled:opacity-60"
             >
-              {advanceAllStatus.isPending ? 'Advancing...' : 'Advance All'}
-            </button>
-            <button
-              onClick={() => {
-                if (confirm('Kill all selected items?')) killAll.mutate()
-              }}
-              disabled={killAll.isPending}
-              className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
-            >
-              {killAll.isPending ? 'Killing...' : 'Kill All'}
-            </button>
-            <button
-              onClick={() => setSelectedItems(new Set())}
-              className="px-3 py-1.5 bg-[var(--color-surface-2)] hover:bg-[var(--color-border)] text-[var(--color-text-muted)] text-xs font-medium rounded-lg transition-colors"
-            >
-              Clear
-            </button>
+              <option value="primary">Primary</option>
+              <option value="standard">Standard</option>
+              <option value="secondary">Secondary</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1.5">Target Date</label>
+            <input
+              type="date"
+              value={targetDate}
+              onChange={(e) => setTargetDate(e.target.value)}
+              disabled={!user}
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] disabled:opacity-60"
+            />
           </div>
         </div>
-      )}
 
-      {isLoading && <p className="text-sm text-[var(--color-text-muted)]">Loading editorial calendar...</p>}
-
-      {/* Timeline view */}
-      <div className="space-y-6">
-        {sortedDates.map((date) => {
-          const items = grouped[date]!
-          const isPast = date !== 'unscheduled' && date < today
-          return (
-            <div key={date}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`text-sm font-semibold ${isPast ? 'text-red-400' : date === today ? 'text-green-400' : 'text-[var(--color-text)]'}`}>
-                  {date === 'unscheduled' ? 'Unscheduled' : date === today ? `Today — ${formatDate(date)}` : formatDate(date)}
-                </div>
-                {isPast && (
-                  <span className="text-[10px] bg-red-400/10 text-red-400 px-2 py-0.5 rounded-full font-semibold uppercase">Overdue</span>
-                )}
-                <div className="flex-1 h-px bg-[var(--color-border)]" />
-                <span className="text-[11px] text-[var(--color-text-muted)]">{items.length} items</span>
-              </div>
-
-              <div className="space-y-2 ml-1">
-                {items.map((item) => {
-                  const nextStatus = getNextStatus(item.status)
-                  const isSelected = selectedItems.has(item.id)
-                  const isEditing = editingId === item.id
-                  return (
-                    <div key={item.id} className={`bg-[var(--color-surface)] border rounded-lg p-4 transition-colors group ${isSelected ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5' : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/50'}`}>
-                      <div className="flex items-start justify-between gap-4">
-                        {user && (
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={(e) => {
-                              const newSet = new Set(selectedItems)
-                              if (e.target.checked) {
-                                newSet.add(item.id)
-                              } else {
-                                newSet.delete(item.id)
-                              }
-                              setSelectedItems(newSet)
-                            }}
-                            className="mt-1 shrink-0 cursor-pointer w-4 h-4"
-                          />
-                        )}
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span
-                              className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold text-white shrink-0"
-                              style={{ backgroundColor: PUB_COLORS[item.pub_slug] ?? '#6366f1' }}
-                            >
-                              {PUB_SHORT[item.pub_slug] ?? item.pub_slug}
-                            </span>
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusColor(item.status)}`}>
-                              {item.status}
-                            </span>
-                            {item.priority && (
-                              <span className={`text-[10px] font-medium capitalize ${item.priority === 'primary' ? 'text-amber-400' : 'text-[var(--color-text-muted)]'}`}>
-                                {item.priority}
-                              </span>
-                            )}
-                          </div>
-                          {isEditing ? (
-                            <div className="flex gap-2 mb-1">
-                              <input
-                                autoFocus
-                                type="text"
-                                value={editingText}
-                                onChange={(e) => setEditingText(e.target.value)}
-                                onBlur={() => {
-                                  if (editingText && editingText !== item.concept) {
-                                    updateConcept.mutate({ id: item.id, concept: editingText })
-                                  } else {
-                                    setEditingId(null)
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    if (editingText && editingText !== item.concept) {
-                                      updateConcept.mutate({ id: item.id, concept: editingText })
-                                    } else {
-                                      setEditingId(null)
-                                    }
-                                  } else if (e.key === 'Escape') {
-                                    setEditingId(null)
-                                  }
-                                }}
-                                className="flex-1 bg-[var(--color-surface-2)] border border-[var(--color-accent)] rounded px-2 py-1 text-sm text-[var(--color-text)]"
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <h3
-                                onClick={() => {
-                                  setEditingId(item.id)
-                                  setEditingText(item.concept)
-                                }}
-                                className="text-sm font-medium leading-snug cursor-pointer hover:text-[var(--color-accent-hover)] transition-colors"
-                              >
-                                {item.concept}
-                              </h3>
-                              {item.post_id && (
-                                <Link
-                                  to={`/posts/${item.post_id}`}
-                                  className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-green-400/10 text-green-400 hover:bg-green-400/20 transition-colors shrink-0"
-                                  title="Edit post"
-                                >
-                                  <Pencil size={10} /> Edit Post
-                                </Link>
-                              )}
-                            </div>
-                          )}
-                          {item.notes && (
-                            <p className="text-[12px] text-[var(--color-text-muted)] mt-1 leading-relaxed">{item.notes}</p>
-                          )}
-                        </div>
-
-                        {/* Actions (visible on hover for authed users) */}
-                        {user && (
-                          <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {nextStatus && (
-                              <button
-                                onClick={() => advanceStatus.mutate({ id: item.id, status: nextStatus, concept: item.concept })}
-                                title={`Advance to ${nextStatus}`}
-                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/20 transition-colors"
-                              >
-                                <ArrowRight size={10} /> {nextStatus}
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                const newDate = prompt('New target date (YYYY-MM-DD):', item.target_date)
-                                if (newDate) bumpDate.mutate({ id: item.id, date: newDate })
-                              }}
-                              title="Change date"
-                              className="px-2 py-1 rounded text-[10px] font-semibold bg-blue-400/10 text-blue-400 hover:bg-blue-400/20 transition-colors"
-                            >
-                              <CalendarDays size={10} />
-                            </button>
-                            <button
-                              onClick={() => duplicate.mutate(item.id)}
-                              title="Duplicate tomorrow"
-                              className="px-2 py-1 rounded text-[10px] font-semibold bg-purple-400/10 text-purple-400 hover:bg-purple-400/20 transition-colors"
-                            >
-                              <Copy size={10} />
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (confirm('Kill this item?')) kill.mutate(item.id)
-                              }}
-                              title="Kill"
-                              className="px-2 py-1 rounded text-[10px] font-semibold bg-red-400/10 text-red-400 hover:bg-red-400/20 transition-colors"
-                            >
-                              <Trash2 size={10} />
-                            </button>
-                          </div>
-                        )}
-
-                        <div className="text-right shrink-0">
-                          {item.author_name && <p className="text-[11px] text-[var(--color-text-muted)]">{item.author_name}</p>}
-                          {item.beat && <p className="text-[10px] text-[var(--color-text-muted)] capitalize mt-0.5">{item.beat}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
-      {data?.length === 0 && !isLoading && (
-        <div className="text-center py-16 text-[var(--color-text-muted)]">
-          <p className="text-sm">No editorial items found for this filter.</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1.5">Beat</label>
+            <input
+              type="text"
+              value={beat}
+              onChange={(e) => setBeat(e.target.value)}
+              disabled={!user}
+              placeholder="sports, government..."
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] disabled:opacity-60"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1.5">Author</label>
+            <select
+              value={authorId}
+              onChange={(e) => setAuthorId(e.target.value)}
+              disabled={!user}
+              className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] disabled:opacity-60"
+            >
+              <option value="">Unassigned</option>
+              {authors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
         </div>
-      )}
+
+        {/* Save button */}
+        {user && dirty && (
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full flex items-center justify-center gap-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-medium py-2.5 rounded-lg text-sm transition-colors disabled:opacity-50"
+          >
+            <Save size={14} /> {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        )}
+
+        {/* Status advancement */}
+        {user && (
+          <div className="pt-3 border-t border-[var(--color-border)]">
+            <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-2">Workflow</label>
+            <div className="flex flex-wrap gap-2">
+              {nextStatus && (
+                <button
+                  onClick={() => onAdvance(item.id, nextStatus, item.concept)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/20 transition-colors"
+                >
+                  <ArrowRight size={12} /> Advance to {nextStatus}
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  const newDate = prompt('New target date (YYYY-MM-DD):', item.target_date)
+                  if (newDate) onBumpDate(item.id, newDate)
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-400/10 text-blue-400 hover:bg-blue-400/20 transition-colors"
+              >
+                <CalendarDays size={12} /> Reschedule
+              </button>
+              <button
+                onClick={() => onDuplicate(item.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-400/10 text-purple-400 hover:bg-purple-400/20 transition-colors"
+              >
+                <Copy size={12} /> Duplicate
+              </button>
+              <button
+                onClick={() => onKill(item.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-400/10 text-red-400 hover:bg-red-400/20 transition-colors"
+              >
+                <Trash2 size={12} /> Kill
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

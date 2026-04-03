@@ -106,7 +106,7 @@ export async function getPublicationEditorial(pubId: string): Promise<EditorialI
   const { data, error } = await supabase
     .from('editorial_calendar')
     .select(`
-      id, concept, status, target_date, priority, beat, notes, post_id,
+      id, concept, status, target_date, priority, beat, notes, post_id, publication_id, author_id,
       publications!inner(name, slug),
       authors(name)
     `)
@@ -124,6 +124,8 @@ export async function getPublicationEditorial(pubId: string): Promise<EditorialI
     beat: row.beat,
     notes: row.notes,
     post_id: row.post_id,
+    publication_id: row.publication_id,
+    author_id: row.author_id ?? null,
     pub_name: row.publications?.name ?? '',
     pub_slug: row.publications?.slug ?? '',
     author_name: row.authors?.name ?? null,
@@ -355,7 +357,9 @@ export interface EditorialItem {
   notes: string | null
   pub_name: string
   pub_slug: string
+  publication_id: string
   author_name: string | null
+  author_id: string | null
   post_id: string | null
 }
 
@@ -363,7 +367,7 @@ export async function getEditorialCalendar(filter?: { status?: string; pubSlug?:
   let query = supabase
     .from('editorial_calendar')
     .select(`
-      id, concept, status, target_date, priority, beat, notes, post_id,
+      id, concept, status, target_date, priority, beat, notes, post_id, publication_id, author_id,
       publications!inner(name, slug),
       authors(name)
     `)
@@ -385,6 +389,8 @@ export async function getEditorialCalendar(filter?: { status?: string; pubSlug?:
     beat: row.beat,
     notes: row.notes,
     post_id: row.post_id,
+    publication_id: row.publication_id,
+    author_id: row.author_id ?? null,
     pub_name: row.publications?.name ?? '',
     pub_slug: row.publications?.slug ?? '',
     author_name: row.authors?.name ?? null,
