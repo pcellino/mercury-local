@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getCompetitors, getCompetitorArticles, getPublications } from '../lib/queries'
 import { createCompetitor, updateCompetitor, deleteCompetitor } from '../lib/mutations'
 import { formatRelative } from '../lib/utils'
-import { Shield, Plus, X, Trash2, ExternalLink, AlertTriangle, CheckCircle, Globe } from 'lucide-react'
+import { Shield, Plus, X, Trash2, ExternalLink, AlertTriangle, CheckCircle, Globe, AlertCircle } from 'lucide-react'
 
 export default function Competitors() {
   const queryClient = useQueryClient()
@@ -24,17 +24,22 @@ export default function Competitors() {
     enabled: !!selectedComp,
   })
 
+  const [mutError, setMutError] = useState<string | null>(null)
+
   const deleteMut = useMutation({
     mutationFn: deleteCompetitor,
     onSuccess: () => {
+      setMutError(null)
       queryClient.invalidateQueries({ queryKey: ['competitors'] })
       setSelectedComp(null)
     },
+    onError: (err: any) => setMutError(err.message ?? 'Failed to delete competitor'),
   })
 
   const toggleMut = useMutation({
     mutationFn: ({ id, active }: { id: string; active: boolean }) => updateCompetitor(id, { is_active: active }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['competitors'] }),
+    onSuccess: () => { setMutError(null); queryClient.invalidateQueries({ queryKey: ['competitors'] }) },
+    onError: (err: any) => setMutError(err.message ?? 'Failed to update competitor'),
   })
 
   return (
@@ -71,6 +76,14 @@ export default function Competitors() {
           ))}
         </select>
       </div>
+
+      {/* Error banner */}
+      {mutError && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-red-400/10 border border-red-400/20 rounded-lg text-xs text-red-400">
+          <AlertCircle size={14} /> {mutError}
+          <button onClick={() => setMutError(null)} className="ml-auto hover:text-red-300"><X size={12} /></button>
+        </div>
+      )}
 
       <div className="grid grid-cols-12 gap-6">
         {/* Competitor List */}
@@ -239,11 +252,13 @@ function AddCompetitorModal({ publications, onClose, onCreated }: {
   const [region, setRegion] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name || !domain || !pubId) return
     setSaving(true)
+    setError(null)
     try {
       await createCompetitor({
         publication_id: pubId,
@@ -254,8 +269,8 @@ function AddCompetitorModal({ publications, onClose, onCreated }: {
         notes: notes || undefined,
       })
       onCreated()
-    } catch (err) {
-      console.error('Failed to create competitor:', err)
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to add competitor')
       setSaving(false)
     }
   }
@@ -326,6 +341,12 @@ function AddCompetitorModal({ publications, onClose, onCreated }: {
               className="w-full px-3 py-2 text-sm bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg text-[var(--color-text)] focus:outline-none"
             />
           </div>
+          {error && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-red-400/10 border border-red-400/20 rounded-lg text-xs text-red-400">
+              <AlertCircle size={14} /> {error}
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)]">Cancel</button>
             <button

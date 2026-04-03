@@ -5,7 +5,7 @@ import { getPostById, getPublications, getAuthors, getAllTags } from '../lib/que
 import { updatePost, addTagToPost, removeTagFromPost, type UpdatePostPayload } from '../lib/mutations'
 import { getPathStats, siteIdForPub, postPathname } from '../lib/fathom'
 import { useAuth } from '../lib/auth'
-import { statusColor, PUB_COLORS, PUB_SHORT } from '../lib/utils'
+import { statusColor, PUB_COLORS, PUB_SHORT, PUB_DOMAINS } from '../lib/utils'
 import { ArrowLeft, Save, ExternalLink, X, Plus, Image, FileText, Settings, Tag, AlertCircle, Check, Eye, Users, Clock } from 'lucide-react'
 
 type TabId = 'content' | 'meta' | 'seo' | 'tags' | 'settings'
@@ -115,16 +115,7 @@ export default function PostEditor() {
   // Build the live URL for this post
   const liveUrl = useMemo(() => {
     if (!post) return null
-    const domainMap: Record<string, string> = {
-      'charlotte-mercury': 'cltmercury.com',
-      'farmington-mercury': 'farmingtonmercury.com',
-      'strolling-ballantyne': 'strollingballantyne.com',
-      'strolling-firethorne': 'strollingfirethorne.com',
-      'grand-national-today': 'grandnationaltoday.com',
-      'mercury-local': 'mercurylocal.com',
-      'peter-cellino': 'petercellino.com',
-    }
-    const domain = domainMap[post.pub_slug ?? ''] ?? 'cltmercury.com'
+    const domain = PUB_DOMAINS[post.pub_slug ?? ''] ?? 'cltmercury.com'
     const beatPath = post.beat ? `${post.beat}/` : ''
     return `https://${domain}/${beatPath}${post.slug}`
   }, [post])
