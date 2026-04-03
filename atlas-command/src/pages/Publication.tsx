@@ -75,8 +75,8 @@ export default function Publication() {
     staleTime: 30_000,
   })
 
-  const visitorCount = pub?.fathom_site_id
-    ? currentVisitors.data?.find(v => v.siteId === pub.fathom_site_id)?.visitors ?? 0
+  const visitorCount = slug
+    ? currentVisitors.data?.find(v => v.pubSlug === slug)?.visitors ?? 0
     : 0
 
   const topPagesData = useQuery({
