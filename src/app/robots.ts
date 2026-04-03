@@ -19,7 +19,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/_next/"],
+        disallow: ["/api/", "/_next/", "/newsroom", "/search"],
       },
       {
         userAgent: "Googlebot-News",

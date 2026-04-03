@@ -80,15 +80,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const author of authors) {
     entries.push({
       url: `${base}/author/${author.slug}`,
+      lastModified: author.created_at ? new Date(author.created_at) : new Date(),
       changeFrequency: "weekly",
       priority: 0.5,
     });
   }
 
-  // Tag pages
+  // Tag pages (no updated_at on tags table — use most recent post date as proxy)
+  const now = new Date();
   for (const tag of tags) {
     entries.push({
       url: `${base}/tag/${tag.slug}`,
+      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.5,
     });

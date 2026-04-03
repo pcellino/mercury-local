@@ -314,10 +314,10 @@ export async function getAuthorsByPublication(
   }));
 }
 
-export async function getAllAuthors(publicationId: string): Promise<{ slug: string }[]> {
+export async function getAllAuthors(publicationId: string): Promise<{ slug: string; created_at: string | null }[]> {
   const { data, error } = await supabase
     .from("authors")
-    .select("slug")
+    .select("slug, created_at")
     .eq("publication_id", publicationId)
     .order("name");
 
@@ -326,7 +326,7 @@ export async function getAllAuthors(publicationId: string): Promise<{ slug: stri
     return [];
   }
 
-  return (data || []) as { slug: string }[];
+  return (data || []) as { slug: string; created_at: string | null }[];
 }
 
 // -------------------------------------------------------
