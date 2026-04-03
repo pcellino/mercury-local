@@ -11,6 +11,7 @@ const SHORTCUTS: Record<string, string> = {
   s: '/status',     // Status & Alerts
   n: '/posts/new',  // New Post
   g: '/tags',       // Tags
+  i: '/insights',   // Insights
 }
 
 export function useKeyboardShortcuts() {

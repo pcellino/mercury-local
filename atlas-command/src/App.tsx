@@ -19,6 +19,7 @@ import Tags from './pages/Tags'
 import Authors from './pages/Authors'
 import Hubs from './pages/Hubs'
 import Activity from './pages/Activity'
+import Insights from './pages/Insights'
 import Login from './pages/Login'
 
 const queryClient = new QueryClient({
@@ -67,6 +68,7 @@ function AppRoutes() {
           <Route path="authors" element={<Authors />} />
           <Route path="hubs" element={<Hubs />} />
           <Route path="activity" element={<Activity />} />
+          <Route path="insights" element={<Insights />} />
         </Route>
       </Routes>
     </BrowserRouter>

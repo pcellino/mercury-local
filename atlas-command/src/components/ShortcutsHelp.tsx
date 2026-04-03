@@ -10,6 +10,7 @@ const SHORTCUTS = [
   { key: 'T', label: 'Transcripts' },
   { key: 'G', label: 'Tags' },
   { key: 'S', label: 'Status & Alerts' },
+  { key: 'I', label: 'Insights' },
   { key: 'N', label: 'New Post' },
   { key: '?', label: 'Show this help' },
 ]

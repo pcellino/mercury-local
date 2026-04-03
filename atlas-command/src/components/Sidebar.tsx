@@ -19,6 +19,7 @@ const NAV = [
   { to: '/authors', icon: Users, label: 'Authors' },
   { to: '/hubs', icon: Layout, label: 'Hub Pages' },
   { to: '/activity', icon: History, label: 'Activity Log' },
+  { to: '/insights', icon: BarChart3, label: 'Insights' },
   { to: '/status', icon: Activity, label: 'Status & Alerts' },
 ]
 
@@ -137,7 +138,7 @@ export default function Sidebar() {
             <p className="text-[10px] text-[var(--color-text-muted)]">Sign in for write access</p>
           </div>
         )}
-        <p className="text-[10px] text-[var(--color-text-muted)] mt-2">Phase 10 · v0.10.0</p>
+        <p className="text-[10px] text-[var(--color-text-muted)] mt-2">Phase 11 · v0.11.0</p>
       </div>
     </aside>
   )
