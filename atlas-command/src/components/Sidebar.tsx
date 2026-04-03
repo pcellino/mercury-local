@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications } from '../lib/queries'
-import { LayoutDashboard, Calendar, Newspaper, Activity, LogOut, BarChart3, ChevronDown, ChevronRight, FileText, FolderOpen, Rss, Shield, PlusCircle, Tag, Users, Layout, History, Settings } from 'lucide-react'
+import { LayoutDashboard, Calendar, CalendarDays, Newspaper, Activity, LogOut, BarChart3, ChevronDown, ChevronRight, FileText, FolderOpen, Rss, Shield, PlusCircle, Tag, Users, Layout, History, Settings } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
 
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Newsroom' },
   { to: '/editorial', icon: Calendar, label: 'Editorial Calendar' },
   { to: '/recent', icon: Newspaper, label: 'Recent Posts' },
+  { to: '/schedule', icon: CalendarDays, label: 'Schedule' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/feeds', icon: Rss, label: 'Feed Monitor' },
   { to: '/transcripts', icon: FileText, label: 'Transcripts' },

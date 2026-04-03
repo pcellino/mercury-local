@@ -15,6 +15,7 @@ const NAV_ITEMS: SearchResult[] = [
   { id: 'nav-home', type: 'nav', title: 'Newsroom', subtitle: 'Dashboard home', path: '/' },
   { id: 'nav-editorial', type: 'nav', title: 'Editorial Calendar', subtitle: 'Plan and track stories', path: '/editorial' },
   { id: 'nav-recent', type: 'nav', title: 'Recent Posts', subtitle: 'Browse all posts', path: '/recent' },
+  { id: 'nav-schedule', type: 'nav', title: 'Schedule', subtitle: 'Visual editorial calendar', path: '/schedule' },
   { id: 'nav-analytics', type: 'nav', title: 'Analytics', subtitle: 'Fathom pageviews', path: '/analytics' },
   { id: 'nav-feeds', type: 'nav', title: 'Feed Monitor', subtitle: 'RSS feeds and story leads', path: '/feeds' },
   { id: 'nav-transcripts', type: 'nav', title: 'Transcripts', subtitle: 'Government meetings', path: '/transcripts' },
