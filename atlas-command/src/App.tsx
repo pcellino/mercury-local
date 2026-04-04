@@ -1,19 +1,30 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './lib/auth'
 import Layout from './components/Layout'
-import PublishersDesk from './pages/PublishersDesk'
-import Newsroom from './pages/Newsroom'
-import Editorial from './pages/Editorial'
-import Content from './pages/Content'
-import Intel from './pages/Intel'
-import PostEditor from './pages/PostEditor'
-import PageEditor from './pages/PageEditor'
-import Publication from './pages/Publication'
-import PostCreate from './pages/PostCreate'
-import Settings from './pages/Settings'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
+
+// Lazy-loaded page components — each gets its own chunk
+const PublishersDesk = lazy(() => import('./pages/PublishersDesk'))
+const Newsroom = lazy(() => import('./pages/Newsroom'))
+const Editorial = lazy(() => import('./pages/Editorial'))
+const Content = lazy(() => import('./pages/Content'))
+const Intel = lazy(() => import('./pages/Intel'))
+const PostEditor = lazy(() => import('./pages/PostEditor'))
+const PageEditor = lazy(() => import('./pages/PageEditor'))
+const Publication = lazy(() => import('./pages/Publication'))
+const PostCreate = lazy(() => import('./pages/PostCreate'))
+const Settings = lazy(() => import('./pages/Settings'))
+
+function PageLoader() {
+  return (
+    <div className="flex-1 flex items-center justify-center py-20">
+      <div className="w-6 h-6 border-2 border-[var(--color-accent)]/30 border-t-[var(--color-accent)] rounded-full animate-spin" />
+    </div>
+  )
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +52,7 @@ function AppRoutes() {
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route element={<Layout />}>
           {/* Primary nav */}
@@ -78,6 +90,7 @@ function AppRoutes() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

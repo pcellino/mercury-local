@@ -4,6 +4,7 @@ import { getPublicationStats, getAggregateStats, getRecentPosts } from '../lib/q
 import { PUB_COLORS, PUB_SHORT, formatRelative } from '../lib/utils'
 import HealthScores from '../components/HealthScores'
 import GNTCountdown from '../components/GNTCountdown'
+import QueryGuard from '../components/QueryGuard'
 import { ExternalLink, ChevronRight } from 'lucide-react'
 
 export default function Newsroom() {
@@ -12,6 +13,7 @@ export default function Newsroom() {
   const recent = useQuery({ queryKey: ['recent-posts'], queryFn: () => getRecentPosts(6) })
 
   return (
+    <QueryGuard queries={[stats, agg]}>
     <div>
       {/* Header + Hero Stat */}
       <div className="mb-8">
@@ -148,6 +150,7 @@ export default function Newsroom() {
         </div>
       )}
     </div>
+    </QueryGuard>
   )
 }
 

@@ -930,13 +930,29 @@ export interface HealthScore {
   }
 }
 
+/**
+ * Health score weights — tune these without redeploying by moving to
+ * a `publication_settings` table in Supabase later.
+ */
+export const HEALTH_WEIGHTS = {
+  velocity: 0.35,
+  beatCoverage: 0.25,
+  hubFreshness: 0.20,
+  pipelineDepth: 0.20,
+} as const
+
+export const HEALTH_DEFAULTS = {
+  weeklyTarget: 3,
+  pipelineTarget: 5,
+} as const
+
 export async function getPublicationHealthScores(): Promise<HealthScore[]> {
   const { data, error } = await supabase.rpc('get_publication_health_scores')
   if (error) throw error
 
   return (data ?? []).map((row: any) => {
-    const wt = row.weekly_target || 3
-    const pt = row.pipeline_target || 5
+    const wt = row.weekly_target || HEALTH_DEFAULTS.weeklyTarget
+    const pt = row.pipeline_target || HEALTH_DEFAULTS.pipelineTarget
     const pw = Number(row.posts_this_week)
     const ab = Number(row.active_beats)
     const tb = Number(row.total_beats)
@@ -950,10 +966,10 @@ export async function getPublicationHealthScores(): Promise<HealthScore[]> {
     const pipelineDepthScore = Math.min(100, Math.round((pi / pt) * 100))
 
     const overall = Math.round(
-      velocityScore * 0.35 +
-      beatCoverageScore * 0.25 +
-      hubFreshnessScore * 0.20 +
-      pipelineDepthScore * 0.20
+      velocityScore * HEALTH_WEIGHTS.velocity +
+      beatCoverageScore * HEALTH_WEIGHTS.beatCoverage +
+      hubFreshnessScore * HEALTH_WEIGHTS.hubFreshness +
+      pipelineDepthScore * HEALTH_WEIGHTS.pipelineDepth
     )
 
     return {

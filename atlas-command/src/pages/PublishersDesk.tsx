@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 import { getRecentPosts, getEditorialPipeline, getActiveTasks, completeTask, getDocuments, getPinnedDocuments, type RecentPost, type EditorialItem, type ProjectGroup, type Document } from '../lib/queries'
 import { updateEditorialStatus, logActivity } from '../lib/mutations'
 import { getAllSiteStats, getAllCurrentVisitors, type SiteStats, type CurrentVisitors } from '../lib/fathom'
-import { PUB_COLORS, PUB_SHORT, PUB_DOMAINS, formatRelative, statusColor } from '../lib/utils'
+import { PUB_COLORS, PUB_SHORT, PUB_DOMAINS, formatRelative, statusColor, todayET } from '../lib/utils'
 import { ExternalLink, ChevronRight, AlertTriangle, Clock, CheckCircle, Circle, Eye, ArrowRight, FileText, Pin, BookOpen } from 'lucide-react'
 import MarkdownViewer, { DocSection, DocTypeBadge } from '../components/MarkdownViewer'
+import QueryGuard from '../components/QueryGuard'
 
 const STATUS_FLOW = ['concept', 'assigned', 'drafting', 'review', 'scheduled', 'published']
 
@@ -21,8 +22,8 @@ export default function PublishersDesk() {
   const pinnedDocs = useQuery({ queryKey: ['desk-pinned-docs'], queryFn: getPinnedDocuments })
   const allDocs = useQuery({ queryKey: ['desk-all-docs'], queryFn: () => getDocuments() })
 
-  // Fathom: today's traffic
-  const today = new Date().toISOString().split('T')[0]
+  // Fathom: today's traffic (ET-aware)
+  const today = todayET()
   const traffic = useQuery({
     queryKey: ['desk-traffic', today],
     queryFn: () => getAllSiteStats(today, today),
@@ -66,6 +67,7 @@ export default function PublishersDesk() {
   }
 
   return (
+    <QueryGuard queries={[recent, pipeline, projects]} inline>
     <div className="space-y-6">
       {/* ── Traffic strip ── */}
       <TrafficStrip
@@ -158,6 +160,7 @@ export default function PublishersDesk() {
       {/* ── Document Viewer (slide-over) ── */}
       <MarkdownViewer docId={viewingDoc} onClose={() => setViewingDoc(null)} />
     </div>
+    </QueryGuard>
   )
 }
 
