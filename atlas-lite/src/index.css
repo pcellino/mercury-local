@@ -1,0 +1,63 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-mercury-ink: #1a1a1a;
+  --color-mercury-paper: #ffffff;
+  --color-mercury-cream: #faf8f4;
+  --color-mercury-accent: #c41e3a;
+  --color-mercury-accent-dark: #a01830;
+  --color-mercury-muted: #6b7280;
+  --color-mercury-rule: #d1d5db;
+  --color-mercury-highlight: #fef3c7;
+  --color-mercury-surface: #f9fafb;
+  --color-mercury-success: #059669;
+  --color-mercury-warning: #d97706;
+  --color-mercury-danger: #dc2626;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-mercury-cream);
+  color: var(--color-mercury-ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-mercury-rule); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-mercury-muted); }
+
+/* Selection */
+::selection {
+  background: var(--color-mercury-accent);
+  color: white;
+}
+
+/* Tabular figures */
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Newspaper rule */
+.rule-top { border-top: 1px solid var(--color-mercury-rule); }
+.rule-bottom { border-bottom: 1px solid var(--color-mercury-rule); }
+.rule-double { border-top: 3px double var(--color-mercury-ink); }
