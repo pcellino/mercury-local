@@ -342,7 +342,7 @@ function ProjectCard({ group, onComplete, docs, onViewDoc }: {
   const statusClass = group.status === 'blocked' ? 'text-red-400' : 'text-green-400'
 
   return (
-    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 hover:border-[var(--color-border-hover,var(--color-accent))]/40 transition-colors">
+    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-accent)]/30 hover:shadow-[var(--shadow-md)]">
       <div className="flex items-center gap-2 mb-3">
         {statusIcon}
         <span className="text-[14px] font-medium flex-1 truncate">{group.project}</span>

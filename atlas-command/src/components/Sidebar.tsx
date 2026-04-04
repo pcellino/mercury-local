@@ -50,7 +50,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[var(--color-border)] flex items-center justify-between">
+      <div className="px-5 py-5 border-b border-[var(--color-border)] flex items-center justify-between" style={{ boxShadow: 'var(--shadow-sm)' }}>
         <h1 className="text-[15px] font-semibold tracking-tight">
           <span className="text-[var(--color-accent-hover)]">ATLAS</span>{' '}
           <span className="text-[var(--color-text-muted)] font-normal text-[13px]">Command</span>

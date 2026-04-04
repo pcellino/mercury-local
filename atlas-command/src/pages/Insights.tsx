@@ -18,7 +18,7 @@ const FUNNEL_COLORS: Record<string, string> = {
 }
 
 const BEAT_COLORS = [
-  '#6366f1', '#f59e0b', '#22c55e', '#ef4444', '#8b5cf6', '#3b82f6',
+  '#D97757', '#f59e0b', '#22c55e', '#ef4444', '#8b5cf6', '#3b82f6',
   '#14b8a6', '#ec4899', '#f97316', '#06b6d4', '#84cc16', '#a855f7',
 ]
 

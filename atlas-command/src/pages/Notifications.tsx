@@ -235,7 +235,7 @@ export default function Notifications() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-4 gap-3">
-        <SummaryCard label="Total" count={counts.total} color="#6366f1" active={severityFilter === 'all'} onClick={() => setSeverityFilter('all')} />
+        <SummaryCard label="Total" count={counts.total} color="#D97757" active={severityFilter === 'all'} onClick={() => setSeverityFilter('all')} />
         <SummaryCard label="Critical" count={counts.critical} color="#ef4444" active={severityFilter === 'critical'} onClick={() => setSeverityFilter('critical')} />
         <SummaryCard label="Warnings" count={counts.warning} color="#f59e0b" active={severityFilter === 'warning'} onClick={() => setSeverityFilter('warning')} />
         <SummaryCard label="Info" count={counts.info} color="#3b82f6" active={severityFilter === 'info'} onClick={() => setSeverityFilter('info')} />

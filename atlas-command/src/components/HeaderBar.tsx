@@ -27,7 +27,7 @@ export default function HeaderBar({ onOpenActivity, onToggleNotifications, notif
   })
 
   return (
-    <header className="h-12 shrink-0 border-b border-[var(--color-border)] bg-[var(--color-surface)] flex items-center justify-between px-3 sm:px-5">
+    <header className="h-12 shrink-0 border-b border-[var(--color-border)] bg-[var(--color-surface)] flex items-center justify-between px-3 sm:px-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
       {/* Left: hamburger + search */}
       <div className="flex items-center gap-2">
         {onOpenMobileNav && (

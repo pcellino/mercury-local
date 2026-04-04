@@ -192,7 +192,7 @@ const DOC_TYPE_COLORS: Record<string, string> = {
   voice: 'bg-green-400/10 text-green-400',
   beat: 'bg-teal-400/10 text-teal-400',
   reference: 'bg-gray-400/10 text-gray-400',
-  template: 'bg-indigo-400/10 text-indigo-400',
+  template: 'bg-orange-400/10 text-orange-400',
   guideline: 'bg-pink-400/10 text-pink-400',
 }
 

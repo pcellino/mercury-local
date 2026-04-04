@@ -47,7 +47,7 @@ export default function Newsroom() {
             return (
               <div
                 key={pub.publication_id}
-                className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-border-hover,var(--color-accent))]/40 transition-colors group"
+                className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-accent)]/30 group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">

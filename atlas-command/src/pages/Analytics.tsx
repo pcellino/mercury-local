@@ -75,8 +75,8 @@ export default function Analytics() {
     : ''
 
   const BEAT_COLORS = [
-    '#6366f1',
-    '#818cf8',
+    '#D97757',
+    '#e8956f',
     '#22c55e',
     '#10b981',
     '#3b82f6',
