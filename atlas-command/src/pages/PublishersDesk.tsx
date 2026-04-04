@@ -9,7 +9,7 @@ import { ExternalLink, ChevronRight, AlertTriangle, Clock, CheckCircle, Circle, 
 import MarkdownViewer, { DocSection, DocTypeBadge } from '../components/MarkdownViewer'
 import QueryGuard from '../components/QueryGuard'
 
-const STATUS_FLOW = ['concept', 'assigned', 'drafting', 'review', 'scheduled', 'published']
+const STATUS_FLOW = ['idea', 'in-progress', 'published']
 
 export default function PublishersDesk() {
   const queryClient = useQueryClient()

@@ -16,6 +16,7 @@ const PostEditor = lazy(() => import('./pages/PostEditor'))
 const PageEditor = lazy(() => import('./pages/PageEditor'))
 const Publication = lazy(() => import('./pages/Publication'))
 const PostCreate = lazy(() => import('./pages/PostCreate'))
+const Events = lazy(() => import('./pages/Events'))
 const Settings = lazy(() => import('./pages/Settings'))
 
 function PageLoader() {
@@ -59,6 +60,7 @@ function AppRoutes() {
           <Route index element={<PublishersDesk />} />
           <Route path="newsroom" element={<Newsroom />} />
           <Route path="editorial" element={<Editorial />} />
+          <Route path="events" element={<Events />} />
           <Route path="content" element={<Content />} />
           <Route path="intel" element={<Intel />} />
           <Route path="settings" element={<Settings />} />

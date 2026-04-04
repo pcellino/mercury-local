@@ -49,11 +49,8 @@ export default function Compare() {
     return Object.entries(byPub).map(([slug, statuses]) => ({
       name: PUB_SHORT[slug] ?? slug.slice(0, 4).toUpperCase(),
       slug,
-      concept: statuses['concept'] ?? 0,
-      assigned: statuses['assigned'] ?? 0,
-      drafting: statuses['drafting'] ?? 0,
-      review: statuses['review'] ?? 0,
-      scheduled: statuses['scheduled'] ?? 0,
+      idea: statuses['idea'] ?? 0,
+      'in-progress': statuses['in-progress'] ?? 0,
     }))
   }, [editorial.data])
 
@@ -232,11 +229,8 @@ export default function Compare() {
                 <Tooltip
                   contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, fontSize: 11 }}
                 />
-                <Bar dataKey="concept" stackId="a" fill="#6b7280" name="Concept" />
-                <Bar dataKey="assigned" stackId="a" fill="#3b82f6" name="Assigned" />
-                <Bar dataKey="drafting" stackId="a" fill="#f59e0b" name="Drafting" />
-                <Bar dataKey="review" stackId="a" fill="#a855f7" name="Review" />
-                <Bar dataKey="scheduled" stackId="a" fill="#10b981" name="Scheduled" />
+                <Bar dataKey="idea" stackId="a" fill="#6b7280" name="Idea" />
+                <Bar dataKey="in-progress" stackId="a" fill="#3b82f6" name="In Progress" />
               </BarChart>
             </ResponsiveContainer>
           </div>

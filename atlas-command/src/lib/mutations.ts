@@ -19,7 +19,7 @@ export async function createEditorialItem(item: CreateEditorialItem) {
     .from('editorial_calendar')
     .insert({
       ...item,
-      status: item.status ?? 'concept',
+      status: item.status ?? 'idea',
     })
     .select()
     .single()
@@ -43,6 +43,14 @@ export async function updateEditorialDate(id: string, target_date: string) {
   if (error) throw error
 }
 
+export async function linkPostToEditorial(editorialId: string, postId: string) {
+  const { error } = await supabase
+    .from('editorial_calendar')
+    .update({ post_id: postId, status: 'in-progress', updated_at: new Date().toISOString() })
+    .eq('id', editorialId)
+  if (error) throw error
+}
+
 export async function updateEditorialItem(id: string, updates: Partial<{
   concept: string
   status: string
@@ -51,6 +59,7 @@ export async function updateEditorialItem(id: string, updates: Partial<{
   beat: string
   notes: string
   author_id: string
+  post_id: string
 }>) {
   const { error } = await supabase
     .from('editorial_calendar')
@@ -90,7 +99,7 @@ export async function duplicateEditorialItem(id: string) {
       beat: original.beat,
       author_id: original.author_id,
       notes: original.notes,
-      status: 'concept',
+      status: 'idea',
     })
 
   if (insertError) throw insertError
@@ -349,7 +358,7 @@ export async function promoteFeedItemToConcept(
       concept: data.concept,
       beat: data.beat,
       target_date: data.target_date,
-      status: 'concept',
+      status: 'idea',
       source_type: 'feed_monitor',
     })
     .select()

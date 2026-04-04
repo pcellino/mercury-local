@@ -6,10 +6,8 @@ import { ChevronLeft, ChevronRight, Calendar, List, Plus, X } from 'lucide-react
 import { PUB_COLORS } from '../lib/utils'
 
 const STATUS_COLORS: Record<string, string> = {
-  concept: '#6b7280',
-  assigned: '#3b82f6',
-  drafting: '#f59e0b',
-  review: '#a855f7',
+  idea: '#6b7280',
+  'in-progress': '#3b82f6',
   scheduled: '#10b981',
   published: '#22c55e',
   killed: '#ef4444',
@@ -80,7 +78,7 @@ export default function Schedule() {
         target_date: form.date,
         priority: form.priority || 'normal',
         beat: form.beat || null,
-        status: 'concept',
+        status: 'idea',
       })
       if (error) throw error
     },

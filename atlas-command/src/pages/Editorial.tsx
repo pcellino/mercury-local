@@ -7,8 +7,8 @@ import { statusColor, formatDate, PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import { CalendarDays, Plus, X, Trash2, ArrowRight, Copy, AlertCircle, FileText, ExternalLink, Save, ChevronRight, Star, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 
-const STATUSES = ['all', 'concept', 'assigned', 'drafting', 'review', 'scheduled']
-const STATUS_FLOW = ['concept', 'assigned', 'drafting', 'review', 'scheduled', 'published']
+const STATUSES = ['all', 'idea', 'in-progress']
+const STATUS_FLOW = ['idea', 'in-progress', 'published']
 const SORT_FIELDS = [
   { value: 'target_date', label: 'Date' },
   { value: 'status', label: 'Status' },
@@ -38,7 +38,12 @@ const FACTORY_DEFAULTS: EditorialDefaults = {
 function loadDefaults(): EditorialDefaults {
   try {
     const raw = localStorage.getItem(DEFAULTS_KEY)
-    if (raw) return { ...FACTORY_DEFAULTS, ...JSON.parse(raw) }
+    if (raw) {
+      const saved = { ...FACTORY_DEFAULTS, ...JSON.parse(raw) }
+      // Guard against stale status filter values from old 6-status flow
+      if (!STATUSES.includes(saved.statusFilter)) saved.statusFilter = 'all'
+      return saved
+    }
   } catch { /* ignore */ }
   return FACTORY_DEFAULTS
 }
@@ -150,11 +155,8 @@ export default function Editorial() {
   const advanceAllStatus = useMutation({
     mutationFn: async () => {
       const nextStatuses: Record<string, string> = {
-        concept: 'assigned',
-        assigned: 'drafting',
-        drafting: 'review',
-        review: 'scheduled',
-        scheduled: 'published',
+        idea: 'in-progress',
+        'in-progress': 'published',
       }
       for (const id of selectedItems) {
         const item = (data ?? []).find((i) => i.id === id)
@@ -229,7 +231,7 @@ export default function Editorial() {
               className="flex items-center gap-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             >
               {showCreate ? <X size={14} /> : <Plus size={14} />}
-              {showCreate ? 'Cancel' : 'New Concept'}
+              {showCreate ? 'Cancel' : 'New Idea'}
             </button>
           )}
         </div>
@@ -736,7 +738,7 @@ function CreateForm({
 
   return (
     <form onSubmit={handleSubmit} className="bg-[var(--color-surface)] border border-[var(--color-accent)]/30 rounded-xl p-5 mb-6">
-      <h3 className="text-sm font-semibold mb-4 text-[var(--color-accent-hover)]">New Editorial Concept</h3>
+      <h3 className="text-sm font-semibold mb-4 text-[var(--color-accent-hover)]">New Editorial Idea</h3>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-[11px] text-[var(--color-text-muted)] uppercase tracking-wide font-semibold mb-1">Publication *</label>
@@ -780,7 +782,7 @@ function CreateForm({
         <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Context, sources, timing..." className="w-full bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] resize-none" />
       </div>
       <button type="submit" disabled={loading} className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-medium py-2 px-5 rounded-lg text-sm transition-colors disabled:opacity-50">
-        {loading ? 'Creating...' : 'Create Concept'}
+        {loading ? 'Creating...' : 'Create Idea'}
       </button>
     </form>
   )

@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications } from '../lib/queries'
-import { LayoutDashboard, Calendar, Newspaper, Radio, Settings, PlusCircle, LogOut, ChevronDown, ChevronRight, X } from 'lucide-react'
+import { LayoutDashboard, Calendar, CalendarRange, Newspaper, Radio, Settings, PlusCircle, LogOut, ChevronDown, ChevronRight, X } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
 import { useState, useEffect } from 'react'
@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Desk' },
   { to: '/editorial', icon: Calendar, label: 'Editorial' },
+  { to: '/events', icon: CalendarRange, label: 'Events' },
   { to: '/content', icon: Newspaper, label: 'Content' },
   { to: '/intel', icon: Radio, label: 'Intel' },
   { to: '/settings', icon: Settings, label: 'Settings' },

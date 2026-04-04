@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getPostById, getPublications, getAuthors, getAllTags } from '../lib/queries'
-import { updatePost, addTagToPost, removeTagFromPost, logActivity, type UpdatePostPayload } from '../lib/mutations'
+import { getPostById, getPublications, getAuthors, getAllTags, findEditorialByPostId } from '../lib/queries'
+import { updatePost, addTagToPost, removeTagFromPost, logActivity, updateEditorialStatus, type UpdatePostPayload } from '../lib/mutations'
 import { getPathStats, siteIdForPub, postPathname } from '../lib/fathom'
 import { useAuth } from '../lib/auth'
 import { statusColor, PUB_COLORS, PUB_SHORT, PUB_DOMAINS } from '../lib/utils'
@@ -216,9 +216,22 @@ export default function PostEditor() {
         details: { status, tags_added: toAdd.length, tags_removed: toRemove.length },
       })
 
+      // Sync linked editorial calendar item
+      try {
+        const editorial = await findEditorialByPostId(id)
+        if (editorial) {
+          if (status === 'published' && editorial.status !== 'published') {
+            await updateEditorialStatus(editorial.id, 'published')
+          } else if (status === 'draft' && editorial.status === 'idea') {
+            await updateEditorialStatus(editorial.id, 'in-progress')
+          }
+        }
+      } catch { /* editorial sync is non-blocking */ }
+
       // Invalidate caches
       queryClient.invalidateQueries({ queryKey: ['post', id] })
       queryClient.invalidateQueries({ queryKey: ['recent-posts-full'] })
+      queryClient.invalidateQueries({ queryKey: ['editorial'] })
 
       setSaved(true)
       setDirty(false)

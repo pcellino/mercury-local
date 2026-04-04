@@ -45,7 +45,7 @@ export default function Insights() {
     for (const item of editorialData.data ?? []) {
       counts[item.status] = (counts[item.status] ?? 0) + 1
     }
-    return ['concept', 'assigned', 'drafting', 'review', 'scheduled', 'published']
+    return ['idea', 'in-progress', 'published']
       .filter(s => (counts[s] ?? 0) > 0)
       .map(status => ({
         name: status,

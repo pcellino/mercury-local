@@ -427,6 +427,90 @@ export async function getDistinctBeats(): Promise<string[]> {
   return [...new Set((data ?? []).map((r: any) => r.beat).filter(Boolean))] as string[]
 }
 
+// ---------- Community Events (via edge function) ----------
+export interface CommunityEvent {
+  id: string
+  title: string
+  event_date: string
+  event_time: string | null
+  end_time: string | null
+  all_day: boolean
+  category: string
+  subcategory: string | null
+  location: string | null
+  description: string | null
+  url: string | null
+  source: 'gcal' | 'manual'
+  source_calendar: string | null
+}
+
+export async function getCommunityEvents(startDate: string, endDate: string): Promise<CommunityEvent[]> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+
+  const res = await fetch(
+    `${supabaseUrl}/functions/v1/calendar-events?start=${startDate}&end=${endDate}`,
+    {
+      headers: {
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`calendar-events failed: ${res.status} ${text}`)
+  }
+
+  return res.json()
+}
+
+export interface PublishedCoverage {
+  concept: string
+  target_date: string
+  beat: string | null
+  post_id: string | null
+}
+
+export async function getPublishedCoverage(startDate: string, endDate: string): Promise<PublishedCoverage[]> {
+  const { data, error } = await supabase
+    .from('editorial_calendar')
+    .select('concept, target_date, beat, post_id')
+    .eq('status', 'published')
+    .gte('target_date', startDate)
+    .lte('target_date', endDate)
+  if (error) throw error
+  return data ?? []
+}
+
+export async function generateEventPlaceholders(): Promise<{ created: number; skipped: number }> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+
+  const res = await fetch(`${supabaseUrl}/functions/v1/generate-event-placeholders`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+    },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`generate-event-placeholders failed: ${res.status} ${text}`)
+  }
+  return res.json()
+}
+
+export async function findEditorialByPostId(postId: string) {
+  const { data } = await supabase
+    .from('editorial_calendar')
+    .select('id, status')
+    .eq('post_id', postId)
+    .maybeSingle()
+  return data
+}
+
 // ---------- Recent Posts ----------
 export interface RecentPost {
   id: string

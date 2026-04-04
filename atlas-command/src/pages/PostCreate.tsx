@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications, getAuthors } from '../lib/queries'
-import { createPostWithLog, type CreatePostPayload } from '../lib/mutations'
+import { createPostWithLog, linkPostToEditorial, type CreatePostPayload } from '../lib/mutations'
 import { ArrowLeft, Plus } from 'lucide-react'
 
 function toSlug(title: string): string {
@@ -14,15 +14,25 @@ function toSlug(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
+interface EditorialState {
+  editorial_calendar_id?: string
+  concept?: string
+  publication_id?: string
+  beat?: string
+  author_id?: string
+}
+
 export default function PostCreate() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const editorialState = (location.state as EditorialState | null) ?? {}
 
-  const [title, setTitle] = useState('')
-  const [slug, setSlug] = useState('')
+  const [title, setTitle] = useState(editorialState.concept ?? '')
+  const [slug, setSlug] = useState(editorialState.concept ? toSlug(editorialState.concept) : '')
   const [slugManual, setSlugManual] = useState(false)
-  const [publicationId, setPublicationId] = useState('')
-  const [authorId, setAuthorId] = useState('')
-  const [beat, setBeat] = useState('')
+  const [publicationId, setPublicationId] = useState(editorialState.publication_id ?? '')
+  const [authorId, setAuthorId] = useState(editorialState.author_id ?? '')
+  const [beat, setBeat] = useState(editorialState.beat ?? '')
   const [status, setStatus] = useState('draft')
   const [excerpt, setExcerpt] = useState('')
   const [content, setContent] = useState('')
@@ -54,6 +64,10 @@ export default function PostCreate() {
         content: content || null,
       }
       const newId = await createPostWithLog(payload)
+      // Link post back to editorial calendar item if created from one
+      if (editorialState.editorial_calendar_id) {
+        try { await linkPostToEditorial(editorialState.editorial_calendar_id, newId) } catch { /* non-blocking */ }
+      }
       navigate(`/posts/${newId}`)
     } catch (err: any) {
       setError(err.message ?? 'Failed to create post')
