@@ -1,32 +1,102 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, Link } from 'react-router-dom'
-import { getEditorialCalendar, getPublications, getAuthors, type EditorialItem } from '../lib/queries'
+import { getEditorialCalendar, getPublications, getAuthors, getDistinctBeats, type EditorialItem, type EditorialFilter } from '../lib/queries'
 import { createEditorialItem, updateEditorialStatus, updateEditorialDate, killEditorialItem, duplicateEditorialItem, updateEditorialItem, logActivity, type CreateEditorialItem } from '../lib/mutations'
 import { statusColor, formatDate, PUB_COLORS, PUB_SHORT } from '../lib/utils'
-import { CalendarDays, Plus, X, Trash2, ArrowRight, Copy, AlertCircle, FileText, ExternalLink, Save, ChevronRight } from 'lucide-react'
+import { CalendarDays, Plus, X, Trash2, ArrowRight, Copy, AlertCircle, FileText, ExternalLink, Save, ChevronRight, Star, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 
 const STATUSES = ['all', 'concept', 'assigned', 'drafting', 'review', 'scheduled']
 const STATUS_FLOW = ['concept', 'assigned', 'drafting', 'review', 'scheduled', 'published']
+const SORT_FIELDS = [
+  { value: 'target_date', label: 'Date' },
+  { value: 'status', label: 'Status' },
+  { value: 'priority', label: 'Priority' },
+] as const
+
+const DEFAULTS_KEY = 'atlas-editorial-defaults'
+
+interface EditorialDefaults {
+  statusFilter: string
+  pubFilter: string
+  authorFilter: string
+  beatFilter: string
+  sortField: string
+  sortDir: 'asc' | 'desc'
+}
+
+const FACTORY_DEFAULTS: EditorialDefaults = {
+  statusFilter: 'all',
+  pubFilter: 'all',
+  authorFilter: 'all',
+  beatFilter: 'all',
+  sortField: 'target_date',
+  sortDir: 'asc',
+}
+
+function loadDefaults(): EditorialDefaults {
+  try {
+    const raw = localStorage.getItem(DEFAULTS_KEY)
+    if (raw) return { ...FACTORY_DEFAULTS, ...JSON.parse(raw) }
+  } catch { /* ignore */ }
+  return FACTORY_DEFAULTS
+}
 
 export default function Editorial() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const [statusFilter, setStatusFilter] = useState('all')
+
+  const saved = loadDefaults()
+  const [statusFilter, setStatusFilter] = useState(saved.statusFilter)
+  const [pubFilter, setPubFilter] = useState(saved.pubFilter)
+  const [authorFilter, setAuthorFilter] = useState(saved.authorFilter)
+  const [beatFilter, setBeatFilter] = useState(saved.beatFilter)
+  const [sortField, setSortField] = useState(saved.sortField)
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>(saved.sortDir)
+
   const [showCreate, setShowCreate] = useState(false)
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [activeItem, setActiveItem] = useState<EditorialItem | null>(null)
   const [mutError, setMutError] = useState<string | null>(null)
+  const [savedToast, setSavedToast] = useState(false)
+
+  const filter: EditorialFilter = {
+    status: statusFilter,
+    pubSlug: pubFilter,
+    authorId: authorFilter,
+    beat: beatFilter,
+    sortField: sortField as EditorialFilter['sortField'],
+    sortDir,
+  }
 
   const { data, isLoading } = useQuery({
-    queryKey: ['editorial', statusFilter],
-    queryFn: () => getEditorialCalendar({ status: statusFilter }),
+    queryKey: ['editorial', filter],
+    queryFn: () => getEditorialCalendar(filter),
   })
 
   const pubs = useQuery({ queryKey: ['publications'], queryFn: getPublications })
   const authors = useQuery({ queryKey: ['authors'], queryFn: getAuthors })
+  const beats = useQuery({ queryKey: ['distinct-beats'], queryFn: getDistinctBeats })
+
+  function saveDefaults() {
+    localStorage.setItem(DEFAULTS_KEY, JSON.stringify({
+      statusFilter, pubFilter, authorFilter, beatFilter, sortField, sortDir,
+    }))
+    setSavedToast(true)
+    setTimeout(() => setSavedToast(false), 2000)
+  }
+
+  function resetDefaults() {
+    localStorage.removeItem(DEFAULTS_KEY)
+    setStatusFilter(FACTORY_DEFAULTS.statusFilter)
+    setPubFilter(FACTORY_DEFAULTS.pubFilter)
+    setAuthorFilter(FACTORY_DEFAULTS.authorFilter)
+    setBeatFilter(FACTORY_DEFAULTS.beatFilter)
+    setSortField(FACTORY_DEFAULTS.sortField)
+    setSortDir(FACTORY_DEFAULTS.sortDir)
+  }
 
   // Keep activeItem in sync with refreshed data
   useEffect(() => {
@@ -115,18 +185,21 @@ export default function Editorial() {
     onError: (err: any) => setMutError(err.message ?? 'Failed to kill items'),
   })
 
-  // Group by target_date
-  const grouped = (data ?? []).reduce<Record<string, typeof data>>((acc, item) => {
-    const key = item.target_date ?? 'unscheduled'
-    if (!acc[key]) acc[key] = []
-    acc[key]!.push(item)
-    return acc
-  }, {})
+  // Group by target_date (only when sorting by date)
+  const groupByDate = sortField === 'target_date'
+  const grouped = groupByDate
+    ? (data ?? []).reduce<Record<string, typeof data>>((acc, item) => {
+        const key = item.target_date ?? 'unscheduled'
+        if (!acc[key]) acc[key] = []
+        acc[key]!.push(item)
+        return acc
+      }, {})
+    : {}
 
   const sortedDates = Object.keys(grouped).sort((a, b) => {
     if (a === 'unscheduled') return 1
     if (b === 'unscheduled') return -1
-    return a.localeCompare(b)
+    return sortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
   })
 
   const today = new Date().toISOString().slice(0, 10)
@@ -172,21 +245,99 @@ export default function Editorial() {
           </div>
         )}
 
-        {/* Status filter pills */}
-        <div className="flex gap-1 mb-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-1 w-fit">
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
-                statusFilter === s
-                  ? 'bg-[var(--color-accent)] text-white'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-              }`}
+        {/* Filter toolbar */}
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          {/* Status pills */}
+          <div className="flex gap-0.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-0.5">
+            {STATUSES.map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
+                  statusFilter === s
+                    ? 'bg-[var(--color-accent)] text-white'
+                    : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {/* Dropdowns */}
+          <select
+            value={pubFilter}
+            onChange={(e) => setPubFilter(e.target.value)}
+            className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+          >
+            <option value="all">All Pubs</option>
+            {(pubs.data ?? []).filter(p => p.slug).map((p: any) => (
+              <option key={p.slug} value={p.slug}>{p.name}</option>
+            ))}
+          </select>
+
+          <select
+            value={authorFilter}
+            onChange={(e) => setAuthorFilter(e.target.value)}
+            className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+          >
+            <option value="all">All Authors</option>
+            {(authors.data ?? []).map((a: any) => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+          </select>
+
+          <select
+            value={beatFilter}
+            onChange={(e) => setBeatFilter(e.target.value)}
+            className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
+          >
+            <option value="all">All Beats</option>
+            {(beats.data ?? []).sort().map((b) => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+
+          <div className="h-5 w-px bg-[var(--color-border)] mx-1 hidden sm:block" />
+
+          {/* Sort */}
+          <div className="flex items-center gap-1">
+            <ArrowUpDown size={12} className="text-[var(--color-text-muted)]" />
+            <select
+              value={sortField}
+              onChange={(e) => setSortField(e.target.value)}
+              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
             >
-              {s}
+              {SORT_FIELDS.map(f => (
+                <option key={f.value} value={f.value}>{f.label}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+              className="p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] transition-colors"
+              title={sortDir === 'asc' ? 'Ascending (oldest first)' : 'Descending (newest first)'}
+            >
+              {sortDir === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />}
             </button>
-          ))}
+          </div>
+
+          <div className="h-5 w-px bg-[var(--color-border)] mx-1 hidden sm:block" />
+
+          {/* Save / Reset */}
+          <button
+            onClick={saveDefaults}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/10 transition-colors"
+            title="Save current filters as default view"
+          >
+            <Star size={12} /> {savedToast ? 'Saved!' : 'Save Default'}
+          </button>
+          <button
+            onClick={resetDefaults}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] transition-colors"
+            title="Reset all filters to defaults"
+          >
+            <RotateCcw size={12} /> Reset
+          </button>
         </div>
 
         {/* Bulk actions bar */}
@@ -222,134 +373,45 @@ export default function Editorial() {
 
         {isLoading && <p className="text-sm text-[var(--color-text-muted)]">Loading editorial calendar...</p>}
 
-        {/* Timeline view */}
+        {/* Items list */}
         <div className="space-y-6">
-          {sortedDates.map((date) => {
-            const items = grouped[date]!
-            const isPast = date !== 'unscheduled' && date < today
-            return (
-              <div key={date}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`text-sm font-semibold ${isPast ? 'text-red-400' : date === today ? 'text-green-400' : 'text-[var(--color-text)]'}`}>
-                    {date === 'unscheduled' ? 'Unscheduled' : date === today ? `Today — ${formatDate(date)}` : formatDate(date)}
+          {groupByDate ? (
+            /* Date-grouped timeline */
+            sortedDates.map((date) => {
+              const items = grouped[date]!
+              const isPast = date !== 'unscheduled' && date < today
+              return (
+                <div key={date}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`text-sm font-semibold ${isPast ? 'text-red-400' : date === today ? 'text-green-400' : 'text-[var(--color-text)]'}`}>
+                      {date === 'unscheduled' ? 'Unscheduled' : date === today ? `Today — ${formatDate(date)}` : formatDate(date)}
+                    </div>
+                    {isPast && (
+                      <span className="text-[10px] bg-red-400/10 text-red-400 px-2 py-0.5 rounded-full font-semibold uppercase">Overdue</span>
+                    )}
+                    <div className="flex-1 h-px bg-[var(--color-border)]" />
+                    <span className="text-[11px] text-[var(--color-text-muted)]">{items.length} items</span>
                   </div>
-                  {isPast && (
-                    <span className="text-[10px] bg-red-400/10 text-red-400 px-2 py-0.5 rounded-full font-semibold uppercase">Overdue</span>
-                  )}
-                  <div className="flex-1 h-px bg-[var(--color-border)]" />
-                  <span className="text-[11px] text-[var(--color-text-muted)]">{items.length} items</span>
+                  <div className="space-y-2 ml-1">
+                    {items.map((item) => (
+                      <ItemCard key={item.id} item={item} user={user} activeItem={activeItem} selectedItems={selectedItems}
+                        setActiveItem={setActiveItem} setSelectedItems={setSelectedItems} getNextStatus={getNextStatus}
+                        advanceStatus={advanceStatus} duplicate={duplicate} today={today} showDate={false} />
+                    ))}
+                  </div>
                 </div>
-
-                <div className="space-y-2 ml-1">
-                  {items.map((item) => {
-                    const nextStatus = getNextStatus(item.status)
-                    const isSelected = selectedItems.has(item.id)
-                    const isActive = activeItem?.id === item.id
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={(e) => {
-                          // Don't open drawer when clicking checkbox or action buttons
-                          if ((e.target as HTMLElement).closest('input[type="checkbox"], button, a')) return
-                          setActiveItem(isActive ? null : item)
-                        }}
-                        className={`bg-[var(--color-surface)] border rounded-lg p-4 transition-all group cursor-pointer ${
-                          isActive
-                            ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5 ring-1 ring-[var(--color-accent)]/30'
-                            : isSelected
-                              ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
-                              : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/50'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          {user && (
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={(e) => {
-                                const newSet = new Set(selectedItems)
-                                if (e.target.checked) {
-                                  newSet.add(item.id)
-                                } else {
-                                  newSet.delete(item.id)
-                                }
-                                setSelectedItems(newSet)
-                              }}
-                              className="mt-1 shrink-0 cursor-pointer w-4 h-4"
-                            />
-                          )}
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span
-                                className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold text-white shrink-0"
-                                style={{ backgroundColor: PUB_COLORS[item.pub_slug] ?? '#6366f1' }}
-                              >
-                                {PUB_SHORT[item.pub_slug] ?? item.pub_slug}
-                              </span>
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusColor(item.status)}`}>
-                                {item.status}
-                              </span>
-                              {item.priority && (
-                                <span className={`text-[10px] font-medium capitalize ${item.priority === 'primary' ? 'text-amber-400' : 'text-[var(--color-text-muted)]'}`}>
-                                  {item.priority}
-                                </span>
-                              )}
-                              {item.post_id && (
-                                <Link
-                                  to={`/posts/${item.post_id}`}
-                                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-green-400/10 text-green-400 hover:bg-green-400/20 transition-colors shrink-0"
-                                  title="Open linked article"
-                                >
-                                  <FileText size={9} /> Article
-                                </Link>
-                              )}
-                            </div>
-                            <h3 className="text-sm font-medium leading-snug">
-                              {item.concept}
-                            </h3>
-                            {item.notes && (
-                              <p className="text-[12px] text-[var(--color-text-muted)] mt-1 leading-relaxed line-clamp-2">{item.notes}</p>
-                            )}
-                          </div>
-
-                          {/* Inline actions */}
-                          {user && (
-                            <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              {nextStatus && (
-                                <button
-                                  onClick={() => advanceStatus.mutate({ id: item.id, status: nextStatus, concept: item.concept })}
-                                  title={`Advance to ${nextStatus}`}
-                                  className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/20 transition-colors"
-                                >
-                                  <ArrowRight size={10} /> {nextStatus}
-                                </button>
-                              )}
-                              <button
-                                onClick={() => duplicate.mutate(item.id)}
-                                title="Duplicate tomorrow"
-                                className="px-2 py-1 rounded text-[10px] font-semibold bg-purple-400/10 text-purple-400 hover:bg-purple-400/20 transition-colors"
-                              >
-                                <Copy size={10} />
-                              </button>
-                            </div>
-                          )}
-
-                          <div className="flex items-center gap-3 shrink-0">
-                            <div className="text-right">
-                              {item.author_name && <p className="text-[11px] text-[var(--color-text-muted)]">{item.author_name}</p>}
-                              {item.beat && <p className="text-[10px] text-[var(--color-text-muted)] capitalize mt-0.5">{item.beat}</p>}
-                            </div>
-                            <ChevronRight size={14} className={`text-[var(--color-text-muted)] transition-transform ${isActive ? 'rotate-90 text-[var(--color-accent-hover)]' : ''}`} />
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })}
+              )
+            })
+          ) : (
+            /* Flat sorted list */
+            <div className="space-y-2">
+              {(data ?? []).map((item) => (
+                <ItemCard key={item.id} item={item} user={user} activeItem={activeItem} selectedItems={selectedItems}
+                  setActiveItem={setActiveItem} setSelectedItems={setSelectedItems} getNextStatus={getNextStatus}
+                  advanceStatus={advanceStatus} duplicate={duplicate} today={today} showDate={true} />
+              ))}
+            </div>
+          )}
         </div>
 
         {data?.length === 0 && !isLoading && (
@@ -721,5 +783,127 @@ function CreateForm({
         {loading ? 'Creating...' : 'Create Concept'}
       </button>
     </form>
+  )
+}
+
+// ---------- Item Card (shared between grouped and flat views) ----------
+
+function ItemCard({
+  item, user, activeItem, selectedItems, setActiveItem, setSelectedItems,
+  getNextStatus, advanceStatus, duplicate, today, showDate,
+}: {
+  item: EditorialItem
+  user: any
+  activeItem: EditorialItem | null
+  selectedItems: Set<string>
+  setActiveItem: (item: EditorialItem | null) => void
+  setSelectedItems: (fn: Set<string> | ((prev: Set<string>) => Set<string>)) => void
+  getNextStatus: (status: string) => string | null
+  advanceStatus: { mutate: (args: { id: string; status: string; concept: string }) => void }
+  duplicate: { mutate: (id: string) => void }
+  today: string
+  showDate: boolean
+}) {
+  const nextStatus = getNextStatus(item.status)
+  const isSelected = selectedItems.has(item.id)
+  const isActive = activeItem?.id === item.id
+
+  return (
+    <div
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest('input[type="checkbox"], button, a')) return
+        setActiveItem(isActive ? null : item)
+      }}
+      className={`bg-[var(--color-surface)] border rounded-lg p-4 transition-all group cursor-pointer ${
+        isActive
+          ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5 ring-1 ring-[var(--color-accent)]/30'
+          : isSelected
+            ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
+            : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/50'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        {user && (
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(e) => {
+              const newSet = new Set(selectedItems)
+              if (e.target.checked) newSet.add(item.id)
+              else newSet.delete(item.id)
+              setSelectedItems(newSet)
+            }}
+            className="mt-1 shrink-0 cursor-pointer w-4 h-4"
+          />
+        )}
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span
+              className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold text-white shrink-0"
+              style={{ backgroundColor: PUB_COLORS[item.pub_slug] ?? '#6366f1' }}
+            >
+              {PUB_SHORT[item.pub_slug] ?? item.pub_slug}
+            </span>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusColor(item.status)}`}>
+              {item.status}
+            </span>
+            {item.priority && (
+              <span className={`text-[10px] font-medium capitalize ${item.priority === 'primary' ? 'text-amber-400' : 'text-[var(--color-text-muted)]'}`}>
+                {item.priority}
+              </span>
+            )}
+            {showDate && item.target_date && (
+              <span className={`text-[10px] ${item.target_date < today ? 'text-red-400 font-semibold' : 'text-[var(--color-text-muted)]'}`}>
+                {formatDate(item.target_date)}
+              </span>
+            )}
+            {item.post_id && (
+              <Link
+                to={`/posts/${item.post_id}`}
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-green-400/10 text-green-400 hover:bg-green-400/20 transition-colors shrink-0"
+                title="Open linked article"
+              >
+                <FileText size={9} /> Article
+              </Link>
+            )}
+          </div>
+          <h3 className="text-sm font-medium leading-snug">{item.concept}</h3>
+          {item.notes && (
+            <p className="text-[12px] text-[var(--color-text-muted)] mt-1 leading-relaxed line-clamp-2">{item.notes}</p>
+          )}
+        </div>
+
+        {/* Inline actions */}
+        {user && (
+          <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            {nextStatus && (
+              <button
+                onClick={() => advanceStatus.mutate({ id: item.id, status: nextStatus, concept: item.concept })}
+                title={`Advance to ${nextStatus}`}
+                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/20 transition-colors"
+              >
+                <ArrowRight size={10} /> {nextStatus}
+              </button>
+            )}
+            <button
+              onClick={() => duplicate.mutate(item.id)}
+              title="Duplicate tomorrow"
+              className="px-2 py-1 rounded text-[10px] font-semibold bg-purple-400/10 text-purple-400 hover:bg-purple-400/20 transition-colors"
+            >
+              <Copy size={10} />
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="text-right">
+            {item.author_name && <p className="text-[11px] text-[var(--color-text-muted)]">{item.author_name}</p>}
+            {item.beat && <p className="text-[10px] text-[var(--color-text-muted)] capitalize mt-0.5">{item.beat}</p>}
+          </div>
+          <ChevronRight size={14} className={`text-[var(--color-text-muted)] transition-transform ${isActive ? 'rotate-90 text-[var(--color-accent-hover)]' : ''}`} />
+        </div>
+      </div>
+    </div>
   )
 }

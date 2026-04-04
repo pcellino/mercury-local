@@ -363,7 +363,19 @@ export interface EditorialItem {
   post_id: string | null
 }
 
-export async function getEditorialCalendar(filter?: { status?: string; pubSlug?: string }): Promise<EditorialItem[]> {
+export interface EditorialFilter {
+  status?: string
+  pubSlug?: string
+  authorId?: string
+  beat?: string
+  sortField?: 'target_date' | 'status' | 'priority'
+  sortDir?: 'asc' | 'desc'
+}
+
+export async function getEditorialCalendar(filter?: EditorialFilter): Promise<EditorialItem[]> {
+  const sortField = filter?.sortField ?? 'target_date'
+  const sortDir = filter?.sortDir ?? 'asc'
+
   let query = supabase
     .from('editorial_calendar')
     .select(`
@@ -371,10 +383,19 @@ export async function getEditorialCalendar(filter?: { status?: string; pubSlug?:
       publications!inner(name, slug),
       authors(name)
     `)
-    .order('target_date', { ascending: true })
+    .order(sortField, { ascending: sortDir === 'asc' })
 
   if (filter?.status && filter.status !== 'all') {
     query = query.eq('status', filter.status)
+  }
+  if (filter?.pubSlug && filter.pubSlug !== 'all') {
+    query = query.eq('publications.slug', filter.pubSlug)
+  }
+  if (filter?.authorId && filter.authorId !== 'all') {
+    query = query.eq('author_id', filter.authorId)
+  }
+  if (filter?.beat && filter.beat !== 'all') {
+    query = query.eq('beat', filter.beat)
   }
 
   const { data, error } = await query
@@ -395,6 +416,15 @@ export async function getEditorialCalendar(filter?: { status?: string; pubSlug?:
     pub_slug: row.publications?.slug ?? '',
     author_name: row.authors?.name ?? null,
   }))
+}
+
+export async function getDistinctBeats(): Promise<string[]> {
+  const { data } = await supabase
+    .from('editorial_calendar')
+    .select('beat')
+    .not('beat', 'is', null)
+    .not('status', 'in', '("published","killed")')
+  return [...new Set((data ?? []).map((r: any) => r.beat).filter(Boolean))] as string[]
 }
 
 // ---------- Recent Posts ----------
