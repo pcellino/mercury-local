@@ -13,6 +13,7 @@ import Publication from './pages/Publication'
 import PostCreate from './pages/PostCreate'
 import Settings from './pages/Settings'
 import Login from './pages/Login'
+import NotFound from './pages/NotFound'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,6 +73,9 @@ function AppRoutes() {
           <Route path="status" element={<Navigate to="/settings?tab=system" replace />} />
           <Route path="notifications" element={<Navigate to="/settings?tab=system" replace />} />
           <Route path="schedule" element={<Navigate to="/editorial" replace />} />
+
+          {/* 404 catch-all */}
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>

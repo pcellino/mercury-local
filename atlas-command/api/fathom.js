@@ -1,11 +1,20 @@
 // Vercel Serverless Function — proxies Fathom Analytics API requests
 // Keeps FATHOM_API_KEY server-side (never exposed to browser)
 
+const ALLOWED_ORIGINS = [
+  'https://atlas.cltmercury.com',
+  'http://localhost:5173',   // Vite dev server
+  'http://localhost:4173',   // Vite preview
+]
+
 export default async function handler(req, res) {
-  // CORS headers for the SPA
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  // CORS headers — locked to known origins
+  const origin = req.headers.origin ?? ''
+  const corsOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  res.setHeader('Access-Control-Allow-Origin', corsOrigin)
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Vary', 'Origin')
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end()

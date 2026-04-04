@@ -315,9 +315,9 @@ export interface PubStats {
 
 export async function getPublicationStats(): Promise<PubStats[]> {
   const { data, error } = await supabase.rpc('get_publication_stats')
-  // Fallback: if RPC doesn't exist, do it client-side
+  // Fallback: if RPC doesn't exist, do it client-side (N+1 — should not happen in production)
   if (error) {
-    // Client-side fallback
+    console.warn('[Atlas Command] get_publication_stats RPC failed, using slow client-side fallback:', error.message)
     const pubs = await getPublications()
     const stats: PubStats[] = []
     for (const pub of pubs) {

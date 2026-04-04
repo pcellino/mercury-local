@@ -5,6 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Returns today's date string (YYYY-MM-DD) in Eastern Time.
+ *  Supabase runs UTC — after 8 PM ET, UTC date is tomorrow.
+ *  Always use this instead of `new Date().toISOString().split('T')[0]`. */
+export function todayET(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' })
+}
+
 export function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—'
   const d = new Date(dateStr)

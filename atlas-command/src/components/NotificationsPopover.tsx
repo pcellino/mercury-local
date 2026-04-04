@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { todayET } from '../lib/utils'
 import { AlertTriangle, Clock, FileText, BookOpen } from 'lucide-react'
 
 interface NotificationsPopoverProps {
@@ -24,11 +25,11 @@ export default function NotificationsPopover({ open, onClose }: NotificationsPop
     queryFn: async (): Promise<Alert[]> => {
       const results: Alert[] = []
 
-      // Overdue editorial items
+      // Overdue editorial items (ET-aware — avoids undercounting after 8 PM)
       const { data: overdue } = await supabase
         .from('editorial_calendar')
         .select('id')
-        .lt('target_date', new Date().toISOString().split('T')[0])
+        .lt('target_date', todayET())
         .not('status', 'in', '("published","killed")')
       if (overdue && overdue.length > 0) {
         results.push({

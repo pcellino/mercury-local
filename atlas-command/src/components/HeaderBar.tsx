@@ -1,6 +1,7 @@
 import { Search, Bell, History } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
+import { todayET } from '../lib/utils'
 
 interface HeaderBarProps {
   onOpenActivity: () => void
@@ -13,7 +14,7 @@ export default function HeaderBar({ onOpenActivity, onToggleNotifications, notif
   const alertCount = useQuery({
     queryKey: ['alert-count'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0]
+      const today = todayET()
       const { count } = await supabase
         .from('editorial_calendar')
         .select('id', { count: 'exact', head: true })

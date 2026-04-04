@@ -6,6 +6,7 @@ import CommandPalette from './CommandPalette'
 import HeaderBar from './HeaderBar'
 import ActivityDrawer from './ActivityDrawer'
 import NotificationsPopover from './NotificationsPopover'
+import ErrorBoundary from './ErrorBoundary'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 
 export default function Layout() {
@@ -23,6 +24,7 @@ export default function Layout() {
           notificationsOpen={notificationsOpen}
         />
         <main className="flex-1 overflow-y-auto relative">
+          <ErrorBoundary>
           <div className="max-w-[1120px] mx-auto px-8 py-6">
             <Outlet />
           </div>
@@ -31,6 +33,7 @@ export default function Layout() {
             open={notificationsOpen}
             onClose={() => setNotificationsOpen(false)}
           />
+          </ErrorBoundary>
         </main>
       </div>
 
