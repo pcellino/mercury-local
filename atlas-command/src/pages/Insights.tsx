@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getPostsByWeek, getAuthorStats, getBeatStats, getEditorialCalendar } from '../lib/queries'
 import { PUB_COLORS } from '../lib/utils'
@@ -28,15 +29,18 @@ export default function Insights() {
   const editorialData = useQuery({ queryKey: ['editorial-all'], queryFn: () => getEditorialCalendar() })
 
   // Derive pub slugs from weekly data
-  const pubSlugs = new Set<string>()
-  for (const row of weeklyData.data ?? []) {
-    for (const key of Object.keys(row)) {
-      if (key !== 'week' && key !== 'date') pubSlugs.add(key)
+  const pubSlugs = useMemo(() => {
+    const slugs = new Set<string>()
+    for (const row of weeklyData.data ?? []) {
+      for (const key of Object.keys(row)) {
+        if (key !== 'week' && key !== 'date') slugs.add(key)
+      }
     }
-  }
+    return slugs
+  }, [weeklyData.data])
 
   // Editorial pipeline funnel
-  const funnelData = (() => {
+  const funnelData = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const item of editorialData.data ?? []) {
       counts[item.status] = (counts[item.status] ?? 0) + 1
@@ -48,21 +52,27 @@ export default function Insights() {
         value: counts[status] ?? 0,
         fill: FUNNEL_COLORS[status] ?? '#6366f1',
       }))
-  })()
+  }, [editorialData.data])
 
   // Beat treemap data
-  const treemapData = (beatData.data ?? [])
-    .filter(b => b.beat && b.count > 0)
-    .map((b, i) => ({
-      name: b.beat,
-      size: b.count,
-      fill: BEAT_COLORS[i % BEAT_COLORS.length],
-    }))
+  const treemapData = useMemo(() =>
+    (beatData.data ?? [])
+      .filter(b => b.beat && b.count > 0)
+      .map((b, i) => ({
+        name: b.beat,
+        size: b.count,
+        fill: BEAT_COLORS[i % BEAT_COLORS.length],
+      })),
+    [beatData.data],
+  )
 
   // Author bar chart (top 10)
-  const authorChartData = (authorData.data ?? [])
-    .sort((a, b) => b.post_count - a.post_count)
-    .slice(0, 10)
+  const authorChartData = useMemo(() =>
+    (authorData.data ?? [])
+      .sort((a, b) => b.post_count - a.post_count)
+      .slice(0, 10),
+    [authorData.data],
+  )
 
   return (
     <div>

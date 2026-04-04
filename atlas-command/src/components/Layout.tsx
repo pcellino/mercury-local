@@ -13,19 +13,21 @@ export default function Layout() {
   useKeyboardShortcuts()
   const [activityOpen, setActivityOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <>
-      <Sidebar />
+      <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <HeaderBar
           onOpenActivity={() => { setActivityOpen(true); setNotificationsOpen(false) }}
           onToggleNotifications={() => { setNotificationsOpen(prev => !prev); setActivityOpen(false) }}
           notificationsOpen={notificationsOpen}
+          onOpenMobileNav={() => setMobileNavOpen(true)}
         />
         <main className="flex-1 overflow-y-auto relative">
           <ErrorBoundary>
-          <div className="max-w-[1120px] mx-auto px-8 py-6">
+          <div className="max-w-[1120px] mx-auto px-4 sm:px-8 py-6">
             <Outlet />
           </div>
           {/* Notifications popover - anchored to the header bell */}

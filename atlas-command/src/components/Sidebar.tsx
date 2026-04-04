@@ -1,10 +1,10 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getPublications } from '../lib/queries'
-import { LayoutDashboard, Calendar, Newspaper, Radio, Settings, PlusCircle, LogOut, ChevronDown, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Calendar, Newspaper, Radio, Settings, PlusCircle, LogOut, ChevronDown, ChevronRight, X } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { PUB_COLORS, PUB_SHORT } from '../lib/utils'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Desk' },
@@ -14,22 +14,56 @@ const NAV = [
   { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean
+  onMobileClose?: () => void
+}
+
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { signOut } = useAuth()
   const [pubsOpen, setPubsOpen] = useState(true)
+  const location = useLocation()
   const { data: publications } = useQuery({
     queryKey: ['publications'],
     queryFn: getPublications,
   })
 
+  // Close mobile sidebar on navigation
+  useEffect(() => {
+    onMobileClose?.()
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
-    <aside className="w-52 shrink-0 bg-[var(--color-surface)] border-r border-[var(--color-border)] flex flex-col">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onMobileClose}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-52 bg-[var(--color-surface)] border-r border-[var(--color-border)] flex flex-col
+        transform transition-transform duration-200 ease-in-out
+        lg:relative lg:translate-x-0 lg:z-auto
+        ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[var(--color-border)]">
+      <div className="px-5 py-5 border-b border-[var(--color-border)] flex items-center justify-between">
         <h1 className="text-[15px] font-semibold tracking-tight">
           <span className="text-[var(--color-accent-hover)]">ATLAS</span>{' '}
           <span className="text-[var(--color-text-muted)] font-normal text-[13px]">Command</span>
         </h1>
+        {onMobileClose && (
+          <button
+            onClick={onMobileClose}
+            className="lg:hidden p-1 rounded-md text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] transition-colors"
+            aria-label="Close navigation menu"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
@@ -72,6 +106,8 @@ export default function Sidebar() {
           <button
             onClick={() => setPubsOpen(!pubsOpen)}
             className="flex items-center justify-between w-full px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-muted)] uppercase tracking-wider hover:text-[var(--color-text)] transition-colors"
+            aria-label={pubsOpen ? 'Collapse publications list' : 'Expand publications list'}
+            aria-expanded={pubsOpen}
           >
             Publications
             {pubsOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -113,10 +149,12 @@ export default function Sidebar() {
           onClick={() => signOut()}
           className="text-[var(--color-text-muted)] hover:text-red-400 transition-colors p-1 rounded-md hover:bg-red-400/5"
           title="Sign out"
+          aria-label="Sign out"
         >
           <LogOut size={14} />
         </button>
       </div>
     </aside>
+    </>
   )
 }
