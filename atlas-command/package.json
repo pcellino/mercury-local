@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "analyze": "ANALYZE=true vite build"
+    "analyze": "npm install --no-save rollup-plugin-visualizer && ANALYZE=true vite build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",
@@ -41,7 +41,6 @@
     "vitest": "^3.2.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "jsdom": "^26.1.0",
-    "rollup-plugin-visualizer": "^5.14.0"
+    "jsdom": "^26.1.0"
   }
 }
