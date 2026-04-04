@@ -1,9 +1,13 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublicationFromRequest } from "@/lib/publication";
 import { getTagBySlug, getPostsByTag } from "@/lib/queries";
 import { generateCollectionPageJsonLd } from "@/lib/jsonld";
 import PostCard from "@/components/PostCard";
+
+// Cache per-request so generateMetadata and the page component share the same fetch.
+const getCachedPostsByTag = cache(getPostsByTag);
 
 export const dynamic = "force-dynamic"; // Multi-tenant: each domain must render its own content
 
@@ -25,7 +29,7 @@ export async function generateMetadata({
     `Coverage and news about ${tag.name} from ${publication.name}.`;
 
   // Check if any published posts exist for this tag to decide noindex
-  const tagPosts = await getPostsByTag(publication.id, tag.id);
+  const tagPosts = await getCachedPostsByTag(publication.id, tag.id);
   const noindex = tagPosts.length === 0;
 
   return {
@@ -59,7 +63,7 @@ export default async function TagPage({ params }: TagPageProps) {
   const tag = await getTagBySlug(publication.id, slug);
   if (!tag) notFound();
 
-  const posts = await getPostsByTag(publication.id, tag.id);
+  const posts = await getCachedPostsByTag(publication.id, tag.id);
 
   // JSON-LD structured data
   const jsonLd = generateCollectionPageJsonLd(tag, posts, publication);

@@ -322,6 +322,25 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            // unsafe-inline required for Next.js inline scripts; upgrade-insecure-requests for mixed content.
+            // Fathom CDN allowed for analytics. Supabase + Directus for images/assets.
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://cdn.usefathom.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https://uyxqtfnijwhebryuauaf.supabase.co https://directus-production-0598.up.railway.app https://i0.wp.com https://*.wp.com",
+              "font-src 'self'",
+              "connect-src 'self' https://uyxqtfnijwhebryuauaf.supabase.co https://cdn.usefathom.com",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
         ],
       },
     ];

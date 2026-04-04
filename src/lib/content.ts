@@ -24,13 +24,11 @@ function isHtmlContent(content: string): boolean {
 // -------------------------------------------------------
 
 function renderMarkdown(md: string): string {
-  // Configure marked for editorial content
-  marked.setOptions({
-    gfm: true,       // GitHub-flavored markdown (tables, strikethrough, etc.)
-    breaks: false,    // Don't convert single newlines to <br> (editorial style)
-  });
-
-  return marked.parse(md) as string;
+  // Pass options per-call — avoids mutating global marked state across requests.
+  return marked.parse(md, {
+    gfm: true,     // GitHub-flavored markdown (tables, strikethrough, etc.)
+    breaks: false, // Don't convert single newlines to <br> (editorial style)
+  }) as string;
 }
 
 // -------------------------------------------------------

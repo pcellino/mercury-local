@@ -294,7 +294,7 @@ export default async function RootLayout({
                 </span>
                 <span className="font-sans font-bold text-gnt-accent tracking-wider text-[10px] uppercase">On Air</span>
               </div>
-              <div className="flex-1 mx-4 overflow-hidden">
+              <div className="flex-1 mx-4 overflow-hidden" aria-hidden="true">
                 <div className="whitespace-nowrap animate-marquee font-sans text-[10px] tracking-widest text-gnt-muted uppercase">
                   Grand National Today &middot; Developmental Stock Car Racing &middot; O&apos;Reilly Auto Parts Grand National Series &middot; CARS Tour &middot; Virginia Triple Crown coverage &mdash; TheSportsmanShow.com &mdash; Est. 2026
                 </div>
@@ -512,8 +512,8 @@ export default async function RootLayout({
                 </div>
               )}
 
-              {/* Resources column — utility pages residents bookmark */}
-              {!isCustomLayout && (
+              {/* Resources column — utility pages residents bookmark (Strolling Ballantyne only) */}
+              {slug === "strolling-ballantyne" && (
                 <div>
                   <p className="font-sans text-xs font-bold uppercase tracking-wider text-mercury-muted mb-3">
                     Resources

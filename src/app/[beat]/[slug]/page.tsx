@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { getPublicationFromRequest } from "@/lib/publication";
 import {
   getPostByBeatAndSlug,
@@ -259,12 +260,13 @@ export default async function PostPage({ params }: PostPageProps) {
         {/* ---- HERO IMAGE OR EDITORIAL ILLUSTRATION ---- */}
         <figure className="mb-8">
           {post.hero_image_url ? (
-            <img
+            <Image
               src={post.hero_image_url}
               alt={post.hero_image_alt || ""}
-              className="w-full"
-              loading="eager"
-              decoding="async"
+              width={post.hero_image_width || 1536}
+              height={post.hero_image_height || 1024}
+              className="w-full h-auto"
+              priority
             />
           ) : (
             <BeatIllustration

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="max-w-2xl mx-auto text-center py-20">
-      <h1 className="font-serif text-5xl font-bold text-mercury-ink">404</h1>
+      <h1 className="font-display text-5xl font-black text-mercury-ink">404</h1>
       <p className="text-mercury-muted text-lg mt-4">
         This page doesn&apos;t exist, or may have moved.
       </p>

@@ -176,7 +176,7 @@ export default async function StaticPage({ params }: PageProps) {
                 href={`/${page.hub_beat}`}
                 className="text-sm font-sans font-semibold text-mercury-accent hover:underline uppercase tracking-wide"
               >
-                View all {page.hub_beat} coverage â
+                View all {page.hub_beat} coverage &rarr;
               </Link>
             </div>
           )}

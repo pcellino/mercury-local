@@ -126,13 +126,9 @@ export async function middleware(request: NextRequest) {
   // Set cookie for server components that read cookies()
   response.cookies.set("publication-slug", publicationSlug, {
     path: "/",
-    httpOnly: false,
+    httpOnly: true,
     sameSite: "lax",
   });
-
-  // Debug headers - visible in browser DevTools Network tab
-  response.headers.set("x-debug-hostname", hostname);
-  response.headers.set("x-debug-slug", publicationSlug);
 
   return response;
 }

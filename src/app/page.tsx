@@ -2,7 +2,6 @@ import { getPublicationFromRequest } from "@/lib/publication";
 import {
   getLatestPostsWithAuthors,
   getBeatsForPublication,
-  getPostCountByBeat,
   getPostsByBeatWithAuthors,
   getHubPages,
   getTagBySlug,
@@ -92,10 +91,9 @@ export default async function HomePage() {
   // -------------------------------------------------------
   // Default newspaper homepage (Charlotte Mercury, Farmington, etc.)
   // -------------------------------------------------------
-  const [posts, beats, beatCounts, hubPages] = await Promise.all([
+  const [posts, beats, hubPages] = await Promise.all([
     getLatestPostsWithAuthors(publication.id, 20),
     Promise.resolve(getBeatsForPublication(slug)),
-    getPostCountByBeat(publication.id),
     getHubPages(publication.id),
   ]);
 
@@ -192,7 +190,7 @@ export default async function HomePage() {
                     {post.beat}
                   </Link>
                 )}
-                <h3 className="font-display text-xl md:text-2xl font-bold mt-2 leading-snugt">
+                <h3 className="font-display text-xl md:text-2xl font-bold mt-2 leading-snug">
                   <Link
                     href={`/${post.beat}/${post.slug}`}
                     className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
@@ -327,7 +325,7 @@ export default async function HomePage() {
         </div>
 
         {/* Right sidebar — Opinion + Guides + Topics */}
-        <aside className="md:col-span-4 md:pl-6">
+        <aside className="md:col-span-4 md:pl-6" aria-label="Opinion and guides">
           {/* Opinion section */}
           {opinionPosts.length > 0 && (
             <div className="mb-8">
