@@ -358,7 +358,7 @@ export default async function RootLayout({
                   </h1>
                 </Link>
                 {/* #Beta \u2014 the only thing under the title */}
-                {!isCustomLayout && <BetaBanner />}
+                {!isCustomLayout && <BetaBanner tagline={publication.tagline} />}
               </div>
 
               {/* Beat navigation with hub dropdowns \u2014 news publications */}
