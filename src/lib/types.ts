@@ -12,6 +12,7 @@ export interface Database {
       tags: { Row: Tag };
       pages: { Row: Page };
       post_tags: { Row: PostTag };
+      subscribers: { Row: Subscriber };
     };
   };
 }
@@ -112,6 +113,17 @@ export interface Page {
 export interface PostTag {
   post_id: string;
   tag_id: string;
+}
+
+export interface Subscriber {
+  id: string;
+  email: string;
+  publication_id: string;
+  status: "active" | "unsubscribed" | "bounced";
+  source: string | null;
+  subscribed_at: string;
+  unsubscribed_at: string | null;
+  created_at: string;
 }
 
 // -------------------------------------------------------

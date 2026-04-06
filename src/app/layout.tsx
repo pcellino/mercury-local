@@ -396,6 +396,31 @@ export default async function RootLayout({
           </header>
         )}
 
+        {/* ---- UNDER CONSTRUCTION BANNER ---- */}
+        {!isCustomLayout && (
+          <div className="relative overflow-hidden bg-mercury-ink" role="status">
+            {/* Diagonal stripe overlay — construction tape effect */}
+            <div
+              className="absolute inset-0 opacity-[0.06]"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(135deg, transparent, transparent 18px, #c41e3a 18px, #c41e3a 22px)",
+              }}
+            />
+            <div className="relative max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-center">
+              <span className="inline-block w-3 h-3 rounded-sm bg-mercury-accent animate-pulse" aria-hidden="true" />
+              <p className="font-sans text-xs md:text-sm font-semibold text-gray-200 tracking-wide">
+                Under construction.{" "}
+                <span className="italic text-mercury-accent">Words first.</span>
+                <span className="hidden md:inline text-gray-400 ml-2 font-normal">
+                  — Real images are coming. The journalism is already here.
+                </span>
+              </p>
+              <span className="inline-block w-3 h-3 rounded-sm bg-mercury-accent animate-pulse" aria-hidden="true" />
+            </div>
+          </div>
+        )}
+
         {/* ---- MAIN CONTENT ---- */}
         <main className={`flex-1 max-w-7xl mx-auto px-4 py-6 w-full ${isGNT ? "bg-gnt-dark" : ""}`}>
           {children}
