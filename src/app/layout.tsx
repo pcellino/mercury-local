@@ -396,27 +396,28 @@ export default async function RootLayout({
           </header>
         )}
 
-        {/* ---- UNDER CONSTRUCTION BANNER ---- */}
+        {/* ---- UNDER CONSTRUCTION BANNER (blueprint) ---- */}
         {!isCustomLayout && (
-          <div className="relative overflow-hidden bg-mercury-ink" role="status">
-            {/* Diagonal stripe overlay — construction tape effect */}
-            <div
-              className="absolute inset-0 opacity-[0.06]"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(135deg, transparent, transparent 18px, #c41e3a 18px, #c41e3a 22px)",
-              }}
-            />
-            <div className="relative max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-center">
-              <span className="inline-block w-3 h-3 rounded-sm bg-mercury-accent animate-pulse" aria-hidden="true" />
-              <p className="font-sans text-xs md:text-sm font-semibold text-gray-200 tracking-wide">
-                Under construction.{" "}
-                <span className="italic text-mercury-accent">Words first.</span>
-                <span className="hidden md:inline text-gray-400 ml-2 font-normal">
-                  — Real images are coming. The journalism is already here.
+          <div
+            className="relative overflow-hidden"
+            role="status"
+            style={{
+              backgroundColor: "#1e3a5f",
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          >
+            <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-center">
+              {/* Blueprint crosshair mark */}
+              <span className="text-[10px] text-blue-300 opacity-60 font-mono" aria-hidden="true">&#x2295;</span>
+              <p className="font-sans text-xs md:text-sm font-semibold text-blue-100 tracking-wide">
+                Ink is wet. Pages are live.
+                <span className="hidden md:inline text-blue-300 ml-2 font-normal">
+                  — Pardon our dust — the stories are real.
                 </span>
               </p>
-              <span className="inline-block w-3 h-3 rounded-sm bg-mercury-accent animate-pulse" aria-hidden="true" />
+              <span className="text-[10px] text-blue-300 opacity-60 font-mono" aria-hidden="true">&#x2295;</span>
             </div>
           </div>
         )}
