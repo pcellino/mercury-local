@@ -396,28 +396,37 @@ export default async function RootLayout({
           </header>
         )}
 
-        {/* ---- UNDER CONSTRUCTION BANNER (blueprint) ---- */}
+        {/* ---- UNDER CONSTRUCTION CORNER RIBBON ---- */}
         {!isCustomLayout && (
           <div
-            className="relative overflow-hidden"
+            className="fixed top-0 right-0 z-50 overflow-hidden pointer-events-none"
+            style={{ width: "150px", height: "150px" }}
             role="status"
-            style={{
-              backgroundColor: "#1e3a5f",
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
-            }}
+            aria-label="Site under construction"
           >
-            <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-center">
-              {/* Blueprint crosshair mark */}
-              <span className="text-[10px] text-blue-300 opacity-60 font-mono" aria-hidden="true">&#x2295;</span>
-              <p className="font-sans text-xs md:text-sm font-semibold text-blue-100 tracking-wide">
-                Ink is wet. Pages are live.
-                <span className="hidden md:inline text-blue-300 ml-2 font-normal">
-                  — Pardon our dust — the stories are real.
-                </span>
-              </p>
-              <span className="text-[10px] text-blue-300 opacity-60 font-mono" aria-hidden="true">&#x2295;</span>
+            <div
+              className="absolute font-sans text-[10px] font-black uppercase tracking-[0.15em] text-center"
+              style={{
+                width: "200px",
+                top: "32px",
+                right: "-50px",
+                transform: "rotate(45deg)",
+                padding: "5px 0",
+                color: "#000",
+                background:
+                  "repeating-linear-gradient(-45deg, #fbbf24, #fbbf24 10px, #111 10px, #111 20px)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              }}
+            >
+              <span
+                style={{
+                  background: "#fbbf24",
+                  padding: "1px 8px",
+                  display: "inline-block",
+                }}
+              >
+                Under Construction
+              </span>
             </div>
           </div>
         )}
