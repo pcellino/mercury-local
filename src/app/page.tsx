@@ -123,22 +123,14 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Lead headline + excerpt */}
             <div className="md:col-span-7">
-              {lead.beat && (
-                <Link
-                  href={`/${lead.beat}`}
-                  className="text-xs font-sans font-bold uppercase tracking-wider text-mercury-accent hover:underline"
-                >
-                  {lead.beat}
-                </Link>
-              )}
-              <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
                 <Link
                   href={`/${lead.beat}/${lead.slug}`}
                   className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
                 >
                   {decodeHtmlEntities(lead.title)}
                 </Link>
-              </h3>
+              </h2>
               {lead.excerpt && (
                 <p className="text-mercury-muted text-lg mt-3 leading-relaxed font-serif">
                   {cleanExcerpt(lead.excerpt, 280).slice(0, 300)}
@@ -220,8 +212,8 @@ export default async function HomePage() {
 
       {/* ---- THREE-COLUMN GRID ---- */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-        {/* Left column */}
-        <div className="md:col-span-4 md:pr-8 md:border-r md:border-mercury-rule">
+        {/* Left column — primary stories */}
+        <div className="md:col-span-5 md:pr-8 md:border-r md:border-mercury-rule">
           {columnLeft.map((post, i) => (
             <article
               key={post.id}
@@ -273,7 +265,7 @@ export default async function HomePage() {
         </div>
 
         {/* Center column */}
-        <div className="md:col-span-4 md:px-6 md:border-r md:border-mercury-rule">
+        <div className="md:col-span-4 md:px-5 md:border-r md:border-mercury-rule">
           {columnRight.map((post, i) => (
             <article
               key={post.id}
@@ -325,11 +317,11 @@ export default async function HomePage() {
         </div>
 
         {/* Right sidebar — Opinion + Guides + Topics */}
-        <aside className="md:col-span-4 md:pl-6" aria-label="Opinion and guides">
+        <aside className="md:col-span-3 md:pl-5" aria-label="Opinion and guides">
           {/* Opinion section */}
           {opinionPosts.length > 0 && (
-            <div className="mb-8">
-              <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
+            <div className="mb-8 bg-stone-50 -mx-5 px-5 py-5 border-l-2 border-mercury-accent">
+              <h2 className="font-display text-lg font-black uppercase tracking-wide text-mercury-ink mb-4">
                 Opinion
               </h2>
               {opinionPosts.map((post, i) => (
@@ -355,32 +347,67 @@ export default async function HomePage() {
             </div>
           )}
 
-          {/* Guides section */}
-          {hubPages.length > 0 && (
-            <div className="mb-8">
-              <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
-                Guides
-              </h2>
-              <nav className="space-y-0">
-                {hubPages.map((hub, i) => (
-                  <Link
-                    key={hub.slug}
-                    href={`/page/${hub.slug}`}
-                    className={`flex items-center justify-between py-2.5 hover:text-mercury-accent transition-colors no-underline ${i < hubPages.length - 1 ? "border-b border-mercury-rule" : ""}`}
-                  >
-                    <span className="font-sans text-sm font-medium text-mercury-ink">
-                      {decodeHtmlEntities(hub.title)}
-                    </span>
-                    {hub.hub_beat && (
-                      <span className="text-[10px] text-mercury-muted font-sans uppercase tracking-wider">
-                        {hub.hub_beat}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          )}
+          {/* Guides section — grouped by beat, capped at 8 visible */}
+          {hubPages.length > 0 && (() => {
+            const GUIDE_LIMIT = 8;
+            // Group guides by hub_beat (or "General" if no beat)
+            const grouped: Record<string, typeof hubPages> = {};
+            for (const hub of hubPages) {
+              const group = hub.hub_beat || "general";
+              if (!grouped[group]) grouped[group] = [];
+              grouped[group].push(hub);
+            }
+            // Priority order for groups
+            const groupOrder = ["government", "sports", "elections", "community", "general"];
+            const sortedGroups = Object.keys(grouped).sort(
+              (a, b) => (groupOrder.indexOf(a) === -1 ? 99 : groupOrder.indexOf(a)) - (groupOrder.indexOf(b) === -1 ? 99 : groupOrder.indexOf(b))
+            );
+            let shown = 0;
+            return (
+              <div className="mb-8">
+                <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-mercury-ink border-b-2 border-mercury-ink pb-2 mb-4">
+                  Guides
+                </h2>
+                <nav>
+                  {sortedGroups.map((group) => {
+                    if (shown >= GUIDE_LIMIT) return null;
+                    const items = grouped[group];
+                    const remaining = GUIDE_LIMIT - shown;
+                    const visibleItems = items.slice(0, remaining);
+                    shown += visibleItems.length;
+                    return (
+                      <div key={group} className="mb-3">
+                        {group !== "general" && (
+                          <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-mercury-muted mt-2 mb-1">
+                            {group}
+                          </p>
+                        )}
+                        {visibleItems.map((hub, i) => (
+                          <Link
+                            key={hub.slug}
+                            href={`/page/${hub.slug}`}
+                            className={`flex items-center py-2 hover:text-mercury-accent transition-colors no-underline ${i < visibleItems.length - 1 ? "border-b border-mercury-rule" : ""}`}
+                          >
+                            <span className="font-sans text-sm font-medium text-mercury-ink">
+                              {decodeHtmlEntities(hub.title)}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    );
+                  })}
+                  {hubPages.length > GUIDE_LIMIT && (
+                    <Link
+                      href="/search"
+                      className="block text-xs font-sans font-semibold text-mercury-accent hover:underline mt-2 uppercase tracking-wider"
+                    >
+                      View All Guides &rarr;
+                    </Link>
+                  )}
+                </nav>
+              </div>
+            );
+          })()}
 
           {/* Neighborhood Resources — utility pages residents bookmark */}
           {(() => {
@@ -412,6 +439,40 @@ export default async function HomePage() {
         </aside>
       </div>
 
+      {/* ---- NEWSLETTER CTA ---- */}
+      <section className="mt-10 mb-2 py-8 px-6 bg-mercury-ink text-white text-center">
+        <h2 className="font-display text-2xl md:text-3xl font-black tracking-tight">
+          Stay informed. Stay local.
+        </h2>
+        <p className="font-sans text-sm text-gray-300 mt-2 max-w-lg mx-auto">
+          Get the stories that matter in Charlotte — delivered straight to your inbox. No algorithms, no paywalls, no noise.
+        </p>
+        <form
+          className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto"
+          action="/api/subscribe"
+          method="POST"
+        >
+          <label htmlFor="newsletter-email" className="sr-only">Email address</label>
+          <input
+            id="newsletter-email"
+            name="email"
+            type="email"
+            required
+            placeholder="you@example.com"
+            className="w-full sm:flex-1 px-4 py-2.5 text-sm font-sans text-mercury-ink bg-white border-0 focus:ring-2 focus:ring-mercury-accent outline-none"
+          />
+          <button
+            type="submit"
+            className="w-full sm:w-auto px-6 py-2.5 text-sm font-sans font-bold uppercase tracking-wider bg-mercury-accent text-white hover:bg-red-700 transition-colors"
+          >
+            Subscribe
+          </button>
+        </form>
+        <p className="text-[10px] text-gray-500 mt-3 font-sans">
+          Free. No spam. Unsubscribe anytime.
+        </p>
+      </section>
+
       {/* ---- MORE STORIES ---- */}
       {moreStories.length > 0 && (
         <section className="mt-8 pt-6 border-t-2 border-mercury-ink">
@@ -421,15 +482,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x md:divide-mercury-rule">
             {moreStories.slice(0, 6).map((post, i) => (
               <article key={post.id} className={`${i > 0 ? "md:pl-6" : ""}`}>
-                <h3 className="font-display text-base font-bold leading-snug">
-                  <Link
-                    href={`/${post.beat}/${post.slug}`}
-                    className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
-                  >
-                    {decodeHtmlEntities(post.title)}
-                  </Link>
-                </h3>
-                <p className="text-[11px] text-mercury-muted mt-1.5 font-sans">
+                <p className="text-[11px] text-mercury-muted font-sans mb-1">
                   {post.beat && (
                     <span className="uppercase font-bold tracking-wider text-mercury-accent">
                       {post.beat}
@@ -442,6 +495,19 @@ export default async function HomePage() {
                     </>
                   )}
                 </p>
+                <h3 className="font-display text-base font-bold leading-snug">
+                  <Link
+                    href={`/${post.beat}/${post.slug}`}
+                    className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"
+                  >
+                    {decodeHtmlEntities(post.title)}
+                  </Link>
+                </h3>
+                {post.excerpt && (
+                  <p className="text-mercury-muted text-sm mt-1 leading-relaxed font-serif line-clamp-2">
+                    {cleanExcerpt(post.excerpt, 120)}
+                  </p>
+                )}
               </article>
             ))}
           </div>
