@@ -396,40 +396,38 @@ export default async function RootLayout({
           </header>
         )}
 
-        {/* ---- UNDER CONSTRUCTION CORNER RIBBON ---- */}
-        {!isCustomLayout && (
+        {/* ---- UNDER CONSTRUCTION CORNER RIBBON (all pubs) ---- */}
+        <div
+          className="fixed top-0 right-0 z-50 overflow-hidden pointer-events-none"
+          style={{ width: "412px", height: "412px" }}
+          role="status"
+          aria-label="Site under construction"
+        >
           <div
-            className="fixed top-0 right-0 z-50 overflow-hidden pointer-events-none"
-            style={{ width: "150px", height: "150px" }}
-            role="status"
-            aria-label="Site under construction"
+            className="absolute font-sans text-[25px] font-black uppercase tracking-[0.15em] text-center"
+            style={{
+              width: "549px",
+              top: "88px",
+              right: "-137px",
+              transform: "rotate(45deg)",
+              padding: "14px 0",
+              color: "#000",
+              background:
+                "repeating-linear-gradient(-45deg, #fbbf24, #fbbf24 28px, #111 28px, #111 56px)",
+              boxShadow: "0 5px 18px rgba(0,0,0,0.3)",
+            }}
           >
-            <div
-              className="absolute font-sans text-[10px] font-black uppercase tracking-[0.15em] text-center"
+            <span
               style={{
-                width: "200px",
-                top: "32px",
-                right: "-50px",
-                transform: "rotate(45deg)",
-                padding: "5px 0",
-                color: "#000",
-                background:
-                  "repeating-linear-gradient(-45deg, #fbbf24, #fbbf24 10px, #111 10px, #111 20px)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                background: "#fbbf24",
+                padding: "4px 21px",
+                display: "inline-block",
               }}
             >
-              <span
-                style={{
-                  background: "#fbbf24",
-                  padding: "1px 8px",
-                  display: "inline-block",
-                }}
-              >
-                Under Construction
-              </span>
-            </div>
+              Under Construction
+            </span>
           </div>
-        )}
+        </div>
 
         {/* ---- MAIN CONTENT ---- */}
         <main className={`flex-1 max-w-7xl mx-auto px-4 py-6 w-full ${isGNT ? "bg-gnt-dark" : ""}`}>
