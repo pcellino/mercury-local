@@ -399,28 +399,28 @@ export default async function RootLayout({
         {/* ---- UNDER CONSTRUCTION CORNER RIBBON (all pubs) ---- */}
         <div
           className="fixed top-0 right-0 z-50 overflow-hidden pointer-events-none"
-          style={{ width: "412px", height: "412px" }}
+          style={{ width: "264px", height: "264px" }}
           role="status"
           aria-label="Site under construction"
         >
           <div
-            className="absolute font-sans text-[25px] font-black uppercase tracking-[0.15em] text-center"
+            className="absolute font-sans text-[16px] font-black uppercase tracking-[0.15em] text-center"
             style={{
-              width: "549px",
-              top: "88px",
-              right: "-137px",
+              width: "351px",
+              top: "56px",
+              right: "-88px",
               transform: "rotate(45deg)",
-              padding: "14px 0",
+              padding: "9px 0",
               color: "#000",
               background:
-                "repeating-linear-gradient(-45deg, #fbbf24, #fbbf24 28px, #111 28px, #111 56px)",
-              boxShadow: "0 5px 18px rgba(0,0,0,0.3)",
+                "repeating-linear-gradient(-45deg, #fbbf24, #fbbf24 18px, #111 18px, #111 36px)",
+              boxShadow: "0 3px 11px rgba(0,0,0,0.3)",
             }}
           >
             <span
               style={{
                 background: "#fbbf24",
-                padding: "4px 21px",
+                padding: "2px 14px",
                 display: "inline-block",
               }}
             >
