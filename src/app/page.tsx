@@ -150,7 +150,7 @@ export default async function HomePage() {
             {/* Lead image or beat illustration */}
             <div className="md:col-span-5">
               <Link href={`/${lead.beat}/${lead.slug}`}>
-                <div className="w-full aspect-video overflow-hidden">
+                <div className="mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">
                   {lead.hero_image_url ? (
                     <img
                       src={lead.hero_image_url}
@@ -221,8 +221,8 @@ export default async function HomePage() {
               key={post.id}
               className={`pb-6 mb-6 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
-              <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
-                <div className="w-full aspect-video overflow-hidden">
+              <Link href={`/${post.beat}/${post.slug}`} className="block mb-5">
+                <div className="mx-2 aspect-[2/1] overflow-hidden">
                   {post.hero_image_url ? (
                     <img
                       src={post.hero_image_url}
@@ -275,8 +275,8 @@ export default async function HomePage() {
               key={post.id}
               className={`pb-6 mb-6 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
-              <Link href={`/${post.beat}/${post.slug}`} className="block mb-3">
-                <div className="w-full aspect-video overflow-hidden">
+              <Link href={`/${post.beat}/${post.slug}`} className="block mb-5">
+                <div className="mx-2 aspect-[2/1] overflow-hidden">
                   {post.hero_image_url ? (
                     <img
                       src={post.hero_image_url}
