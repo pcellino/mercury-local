@@ -258,8 +258,7 @@ export default async function RootLayout({
                 },
                 "parentOrganization": {
                   "@type": "Organization",
-                  "name": "Mercury Local",
-                  "url": "https://www.mercurylocal.com",
+                  "name": "Queen City Garage",
                 },
               }),
             }}

@@ -112,6 +112,7 @@ export function generateBreadcrumbJsonLd(
 
 export function generateOrganizationJsonLd(publication: Publication) {
   const domain = publication.domain || "localhost:3000";
+  const isGNT = publication.slug === "grand-national-today";
 
   return {
     "@context": "https://schema.org",
@@ -127,11 +128,10 @@ export function generateOrganizationJsonLd(publication: Publication) {
     ...(publication.tagline && {
       description: publication.tagline,
     }),
-    foundingDate: "2024",
-    parentOrganization: {
-      "@type": "Organization",
-      name: "Mercury Local, LLC",
-    },
+    foundingDate: isGNT ? "2026" : "2024",
+    parentOrganization: isGNT
+      ? { "@type": "Organization", name: "Queen City Garage" }
+      : { "@type": "Organization", name: "Mercury Local, LLC" },
   };
 }
 
