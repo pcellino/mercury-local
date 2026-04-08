@@ -1,12 +1,7 @@
 // supabase/functions/me-standup/index.ts
-// v2 — adds cal_events (today's games/races/meetings) to Supabase pull
-// Deploy: supabase functions deploy me-standup
+// v3 — defensive version, simplified queries, better error handling
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY')!
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,184 +12,107 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
+    const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+    const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+    if (!ANTHROPIC_KEY) throw new Error('ANTHROPIC_API_KEY not set')
+    if (!SUPABASE_URL) throw new Error('SUPABASE_URL not set')
+    if (!SUPABASE_SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY not set')
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
-    // Today's date in ET (Supabase stores timestamps as UTC)
-    const now = new Date()
-    const etOffset = -4 * 60 // EDT; use -5 for EST
-    const etNow = new Date(now.getTime() + etOffset * 60000)
-    const today = etNow.toISOString().split('T')[0]
-    const yesterday = new Date(etNow.getTime() - 86400000).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
-    // All five queries run in parallel
-    const [slateRes, overdueRes, recentRes, stalePitchRes, calEventsRes] = await Promise.all([
+    const { data: slate } = await supabase
+      .from('editorial_calendar')
+      .select('id, concept, beat, status, priority, notes, publication_id, author_id')
+      .eq('target_date', today)
+      .in('status', ['idea', 'in-progress'])
+      .limit(10)
 
-      // Today's editorial slate (planned stories)
-      supabase
-        .from('editorial_calendar')
-        .select(`
-          id, concept, beat, status, priority, notes,
-          publications ( name, slug ),
-          authors ( name )
-        `)
-        .eq('target_date', today)
-        .in('status', ['idea', 'in-progress'])
-        .order('priority', { ascending: false }),
+    const { data: overdue } = await supabase
+      .from('editorial_calendar')
+      .select('id, concept, beat, target_date, status, priority, publication_id')
+      .lt('target_date', today)
+      .in('status', ['idea', 'in-progress'])
+      .limit(5)
 
-      // Overdue items (past target date, still open)
-      supabase
-        .from('editorial_calendar')
-        .select(`
-          id, concept, beat, target_date, status, priority,
-          publications ( name ),
-          authors ( name )
-        `)
-        .lt('target_date', today)
-        .in('status', ['idea', 'in-progress'])
-        .order('target_date'),
+    const { data: recentPublished } = await supabase
+      .from('editorial_calendar')
+      .select('concept, target_date, publication_id')
+      .eq('status', 'published')
+      .gte('updated_at', `${yesterday}T00:00:00Z`)
+      .limit(6)
 
-      // What we published in the last 48h
-      supabase
-        .from('editorial_calendar')
-        .select(`concept, target_date, publications ( name )`)
-        .eq('status', 'published')
-        .gte('updated_at', `${yesterday}T00:00:00Z`)
-        .order('updated_at', { ascending: false })
-        .limit(8),
+    const { data: todayEvents } = await supabase
+      .from('cal_events')
+      .select('title, beat_name, event_category, start_at, opponent, venue, home_away, status, result')
+      .gte('start_at', `${today}T00:00:00Z`)
+      .lte('start_at', `${today}T23:59:59Z`)
+      .order('start_at')
 
-      // Open pitches with no response after 24h
-      supabase
-        .from('pitches')
-        .select(`
-          id,
-          entities ( name ),
-          contacted_at, contact_name, questions_sent, notes
-        `)
-        .eq('response_received', false)
-        .lt('contacted_at', new Date(now.getTime() - 86400000).toISOString()),
-
-      // TODAY'S events from cal_events — the master event schedule
-      // This is what drives editorial decisions: games tonight, meetings this afternoon
-      supabase
-        .from('cal_events')
-        .select(`
-          title, beat_name, event_category, status, result,
-          opponent, venue, home_away,
-          start_at
-        `)
-        .gte('start_at', `${today}T04:00:00Z`)  // 4am UTC = midnight ET
-        .lt('start_at',  `${today}T28:00:00Z`)  // next-day 4am UTC
-        .order('start_at'),
-    ])
-
-    // Format cal_events into a scannable array for the ME prompt
-    const todayEvents = (calEventsRes.data ?? []).map(e => {
-      const startET = new Date(e.start_at)
-        .toLocaleTimeString('en-US', {
-          hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York'
-        })
-      const desc = e.event_category === 'game'
-        ? `${e.title} — ${e.home_away === 'home' ? 'HOME' : 'AWAY'} @ ${e.venue} — ${startET}`
-        : `${e.title} — ${startET}`
-      return {
-        beat: e.beat_name,
-        category: e.event_category,
-        description: desc,
-        status: e.status,
-        result: e.result ?? null,
+    const eventsText = (todayEvents ?? []).map((e: any) => {
+      const time = new Date(e.start_at).toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York'
+      })
+      if (e.event_category === 'game') {
+        return `[${e.beat_name}] ${e.title} — ${e.home_away?.toUpperCase() ?? ''} @ ${e.venue ?? ''} — ${time} ET`
       }
-    })
+      return `[${e.beat_name}] ${e.title} — ${time} ET`
+    }).join('\n') || 'No events today'
 
-    const context = {
-      today,
-      todayEvents,
-      slate: slateRes.data ?? [],
-      overdue: overdueRes.data ?? [],
-      recentPublished: recentRes.data ?? [],
-      stalePitches: stalePitchRes.data ?? [],
-    }
+    const systemPrompt = `You are the Managing Editor of Mercury Local. Today is ${today}.
 
-    // ── SYSTEM PROMPT ─────────────────────────────────────────────────────────
-    const systemPrompt = `You are the Managing Editor of Mercury Local, a multi-publication
-civic journalism network in Charlotte NC and Farmington CT. The publisher is PC (Peter Cellino).
+Publications: Charlotte Mercury (CLT), Farmington Mercury (FM), Strolling Ballantyne (SB), Grand National Today (GNT — launches May 1 2026, do not assign articles yet).
 
-Publications:
-- The Charlotte Mercury (CLT) — Charlotte & Mecklenburg County civic journalism.
-  Beats: government, elections, business, community, education, culture, sports, opinion.
-  House byline: Jack Beckett. Sports/NASCAR: John Speedway.
-- The Farmington Mercury (FM) — Farmington CT hyperlocal.
-  Beats: police, government, development, education, elections, community. Byline: Henry Whitfield.
-- Strolling Ballantyne (SB) — South Charlotte neighborhood. Byline: Nell Thomas.
-- Grand National Today (GNT) — NASCAR & short-track motorsports. Launch: May 1, 2026.
-  Byline: John Speedway. Do NOT assign GNT articles until May 1.
+TODAY'S EVENTS (from cal_events master schedule):
+${eventsText}
 
-TODAY IS ${today}.
+TODAY'S EDITORIAL SLATE (${(slate ?? []).length} items):
+${JSON.stringify(slate ?? [], null, 2)}
 
-TODAY'S EVENTS from cal_events (master schedule — these drive editorial decisions):
-${todayEvents.length > 0
-  ? todayEvents.map(e => `  [${e.beat}] ${e.description}${e.result ? ` → RESULT: ${e.result}` : ''}`).join('\n')
-  : '  (No events in cal_events for today)'}
+OVERDUE (${(overdue ?? []).length} items past target):
+${JSON.stringify(overdue ?? [], null, 2)}
 
-EDITORIAL CALENDAR — Today's slate:
-${JSON.stringify(context.slate.slice(0, 8), null, 2)}
-
-OVERDUE (past target date, still open):
-${JSON.stringify(context.overdue.slice(0, 5), null, 2)}
-
-PUBLISHED in last 48h:
-${JSON.stringify(context.recentPublished, null, 2)}
-
-OPEN PITCHES (no response 24h+):
-${JSON.stringify(context.stalePitches, null, 2)}
-
-RULES:
-1. Decisions must be grounded in TODAY'S EVENTS and EDITORIAL CALENDAR data above.
-   If a game is tonight, a decision about coverage assignment is appropriate.
-   If a government meeting is today, a decision about transcript collection is appropriate.
-2. Do not assign GNT articles until May 1, 2026.
-3. If there are overdue items, the first decision must address them.
-4. Decisions should be actionable — assign, approve, kill, flag, or concept.
-5. Use real beat_names and publication names from the data above — not invented ones.
-
-ALWAYS respond with valid JSON only. No markdown, no preamble, no backticks.
+Generate a morning standup. Respond ONLY with valid JSON — no markdown, no backticks, no preamble.
 
 {
-  "date": "Wednesday, April 8, 2026",
+  "date": "${today}",
   "decisions": [
     {
       "id": 1,
-      "tag": "assign|approve|kill|stale|concept|pitch|gate",
+      "tag": "assign|approve|kill|stale|concept|pitch",
       "body": "one actionable sentence",
-      "pub": "CLT · govt",
-      "note": "why this decision, grounded in the data above",
+      "pub": "CLT",
+      "note": "context grounded in data above",
       "actions": [
-        { "label": "Assign to Jack", "outcome": "Assigned — Jack Beckett drafting" },
-        { "label": "Hold", "outcome": "Held — revisit tomorrow" },
-        { "label": "Kill", "outcome": "Killed — not worth chasing", "danger": true }
+        {"label": "Assign to Jack", "outcome": "Assigned — Jack Beckett drafting"},
+        {"label": "Hold", "outcome": "Held for tomorrow"},
+        {"label": "Kill", "outcome": "Killed", "danger": true}
       ]
     }
   ],
   "radar": [
     {
-      "beat": "govt",
-      "headline": "Story angle headline",
-      "body": "2-3 sentences of context and why it matters",
+      "beat": "sports",
+      "headline": "Story angle",
+      "body": "2-3 sentences of context",
       "sources": "Source names"
     }
   ],
   "health": [
-    { "beat": "NASCAR Cup", "days": 1, "threshold": 2 },
-    { "beat": "Hornets", "days": 0, "threshold": 2 },
-    { "beat": "Charlotte FC", "days": 3, "threshold": 2 },
-    { "beat": "BOCC", "days": 4, "threshold": 7 },
-    { "beat": "Farmington Govt", "days": 1, "threshold": 7 },
-    { "beat": "Knights", "days": 0, "threshold": 2 },
-    { "beat": "Police", "days": 1, "threshold": 3 }
+    {"beat": "NASCAR Cup", "days": 1, "threshold": 2},
+    {"beat": "Hornets", "days": 2, "threshold": 2},
+    {"beat": "Knights", "days": 0, "threshold": 2},
+    {"beat": "Charlotte Govt", "days": 4, "threshold": 7},
+    {"beat": "Farmington Govt", "days": 1, "threshold": 7},
+    {"beat": "Police", "days": 1, "threshold": 3}
   ],
-  "tomorrow_priority": "One sentence about the single most important editorial task tomorrow."
+  "tomorrow_priority": "One sentence about tomorrow's most important task."
 }`
 
-    // ── ANTHROPIC CALL ────────────────────────────────────────────────────────
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -204,43 +122,43 @@ ALWAYS respond with valid JSON only. No markdown, no preamble, no backticks.
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2800,
+        max_tokens: 2000,
         system: systemPrompt,
-        messages: [{
-          role: 'user',
-          content: `Generate the morning standup for ${today}. Start with any overdue items,
-then address tonight's games/meetings from cal_events, then fill remaining decisions from
-the editorial calendar. Radar should cover 3-4 beats that have real news movement today.`,
-        }],
+        messages: [{ role: 'user', content: `Generate the morning standup for ${today}. JSON only.` }],
       }),
     })
+
+    if (!anthropicRes.ok) {
+      const errText = await anthropicRes.text()
+      throw new Error(`Anthropic API error ${anthropicRes.status}: ${errText}`)
+    }
 
     const anthropicData = await anthropicRes.json()
     const raw = anthropicData.content?.find((b: any) => b.type === 'text')?.text ?? '{}'
     const clean = raw.replace(/```json|```/g, '').trim()
 
-    let standup: any
+    let standup: any = {}
     try {
       standup = JSON.parse(clean)
     } catch {
-      // If Claude returned garbage, return a fallback rather than a 500
-      standup = {
-        date: today,
-        decisions: [],
-        radar: [],
-        health: [],
-        tomorrow_priority: 'Check Anthropic response — parse error.',
-        _parse_error: true,
-        _raw: raw.slice(0, 500),
-      }
+      standup = { _parse_error: true, _raw: raw.slice(0, 300) }
     }
 
-    // Attach raw Supabase data so the UI can render the slate/pitches panels
-    standup.slate = context.slate
-    standup.overdue = context.overdue
-    standup.recentPublished = context.recentPublished
-    standup.pitches = context.stalePitches
-    standup.todayEvents = context.todayEvents
+    standup.slate = slate ?? []
+    standup.overdue = overdue ?? []
+    standup.recentPublished = recentPublished ?? []
+    standup.pitches = []
+    standup.todayEvents = (todayEvents ?? []).map((e: any) => ({
+      beat: e.beat_name,
+      category: e.event_category,
+      description: e.title + (e.opponent ? ` vs ${e.opponent}` : '') + (e.venue ? ` @ ${e.venue}` : ''),
+      status: e.status,
+      result: e.result ?? null,
+    }))
+
+    if (!standup.decisions) standup.decisions = []
+    if (!standup.radar) standup.radar = []
+    if (!standup.health) standup.health = []
 
     return new Response(JSON.stringify(standup), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -248,9 +166,9 @@ the editorial calendar. Radar should cover 3-4 beats that have real news movemen
 
   } catch (err) {
     console.error('ME standup error:', err)
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({ error: String(err), decisions: [], radar: [], health: [], slate: [], overdue: [], recentPublished: [], pitches: [], todayEvents: [] }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
 })
