@@ -18,6 +18,7 @@ const Publication = lazy(() => import('./pages/Publication'))
 const PostCreate = lazy(() => import('./pages/PostCreate'))
 const Events = lazy(() => import('./pages/Events'))
 const Settings = lazy(() => import('./pages/Settings'))
+const MEStandupPage = lazy(() => import('./pages/MEStandupPage'))
 
 function PageLoader() {
   return (
@@ -55,7 +56,9 @@ function AppRoutes() {
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
       <Routes>
+        {/* Full-screen routes — no sidebar Layout */}
         <Route path="me" element={<MEStandupPage />} />
+
         <Route element={<Layout />}>
           {/* Primary nav */}
           <Route index element={<PublishersDesk />} />
