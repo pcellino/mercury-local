@@ -155,7 +155,7 @@ export default function GrandNationalTodayHome({
             <div className="md:col-span-5">
               <Link href={`/${lead.beat}/${lead.slug}`}>
                 {lead.hero_image_url ? (
-                  <div className="w-full aspect-[2/1] overflow-hidden">
+                  <div className="mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">
                     <img
                       src={lead.hero_image_url}
                       alt={lead.hero_image_alt || ""}
@@ -163,7 +163,7 @@ export default function GrandNationalTodayHome({
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-[2/1] overflow-hidden">
+                  <div className="mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">
                     <BeatIllustration
                       beat={lead.beat}
                       className="w-full h-full object-cover object-center"
@@ -182,17 +182,17 @@ export default function GrandNationalTodayHome({
           <h2 className="font-sans text-xs font-bold uppercase tracking-widest text-gnt-gold border-b border-gnt-rule pb-2 mb-6">
             Latest Stories
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {grid.map((post) => (
               <article
                 key={post.id}
-                className="bg-gnt-surface border border-gnt-rule p-5 hover:border-gnt-gold/30 transition-colors"
+                className="bg-gnt-surface border border-gnt-rule p-6 hover:border-gnt-gold/30 transition-colors"
               >
                 <Link
                   href={`/${post.beat}/${post.slug}`}
-                  className="block mb-3"
+                  className="block mb-5"
                 >
-                  <div className="w-full aspect-[2/1] overflow-hidden">
+                  <div className="mx-2 aspect-[2/1] overflow-hidden">
                     {post.hero_image_url ? (
                       <img
                         src={post.hero_image_url}
