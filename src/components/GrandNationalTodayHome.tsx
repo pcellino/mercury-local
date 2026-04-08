@@ -155,11 +155,13 @@ export default function GrandNationalTodayHome({
             <div className="md:col-span-5">
               <Link href={`/${lead.beat}/${lead.slug}`}>
                 {lead.hero_image_url ? (
-                  <img
-                    src={lead.hero_image_url}
-                    alt={lead.hero_image_alt || ""}
-                    className="w-full h-48 md:h-56 object-cover object-center"
-                  />
+                  <div className="w-full aspect-video overflow-hidden">
+                    <img
+                      src={lead.hero_image_url}
+                      alt={lead.hero_image_alt || ""}
+                      className="w-full h-full object-cover object-center"
+                    />
+                  </div>
                 ) : (
                   <BeatIllustration
                     beat={lead.beat}
