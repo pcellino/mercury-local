@@ -55,6 +55,7 @@ function AppRoutes() {
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
       <Routes>
+        <Route path="me" element={<MEStandupPage />} />
         <Route element={<Layout />}>
           {/* Primary nav */}
           <Route index element={<PublishersDesk />} />
