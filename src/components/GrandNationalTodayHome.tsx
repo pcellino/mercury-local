@@ -158,7 +158,7 @@ export default function GrandNationalTodayHome({
                   <img
                     src={lead.hero_image_url}
                     alt={lead.hero_image_alt || ""}
-                    className="w-full h-64 md:h-80 object-cover"
+                    className="w-full h-48 md:h-56 object-cover object-center"
                   />
                 ) : (
                   <BeatIllustration
