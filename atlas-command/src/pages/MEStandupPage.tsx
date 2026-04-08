@@ -2,7 +2,7 @@
 // v2 — adds Today's Events panel (from cal_events), parse error fallback UI
 // Route: /me
 
-import { useMEStandup, MEDecision } from '../hooks/useMEStandup'
+import { useMEStandup } from '../hooks/useMEStandup'
 import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
