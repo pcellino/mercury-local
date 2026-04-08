@@ -163,10 +163,12 @@ export default function GrandNationalTodayHome({
                     />
                   </div>
                 ) : (
-                  <BeatIllustration
-                    beat={lead.beat}
-                    className="w-full h-64 md:h-80 object-cover"
-                  />
+                  <div className="w-full aspect-video overflow-hidden">
+                    <BeatIllustration
+                      beat={lead.beat}
+                      className="w-full h-full object-cover object-center"
+                    />
+                  </div>
                 )}
               </Link>
             </div>
@@ -190,19 +192,21 @@ export default function GrandNationalTodayHome({
                   href={`/${post.beat}/${post.slug}`}
                   className="block mb-3"
                 >
-                  {post.hero_image_url ? (
-                    <img
-                      src={post.hero_image_url}
-                      alt={post.hero_image_alt || ""}
-                      className="w-full h-40 object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <BeatIllustration
-                      beat={post.beat}
-                      className="w-full h-40 object-cover"
-                    />
-                  )}
+                  <div className="w-full aspect-video overflow-hidden">
+                    {post.hero_image_url ? (
+                      <img
+                        src={post.hero_image_url}
+                        alt={post.hero_image_alt || ""}
+                        className="w-full h-full object-cover object-center"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <BeatIllustration
+                        beat={post.beat}
+                        className="w-full h-full object-cover object-center"
+                      />
+                    )}
+                  </div>
                 </Link>
                 {post.beat && (
                   <Link
