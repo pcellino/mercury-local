@@ -6,6 +6,7 @@ import { getBaseUrl, CUSTOM_LAYOUT_SLUGS } from "@/lib/domains";
 import Link from "next/link";
 import { decodeHtmlEntities } from "@/lib/content";
 import BeatDropdownNav from "@/components/BeatDropdownNav";
+import SimpleNav from "@/components/SimpleNav";
 import BetaBanner from "@/components/BetaBanner";
 import GNTHeader from "@/components/GNTHeader";
 import "./globals.css";
@@ -282,6 +283,13 @@ export default async function RootLayout({
         />
       </head>
       <body className={`min-h-screen flex flex-col ${isGNT ? "pub-gnt bg-gnt-dark text-gnt-text" : isSF ? "pub-sf bg-sf-cream text-sf-ink" : "bg-white text-mercury-ink"}`}>
+        {/* Skip to main content — accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-mercury-ink focus:px-4 focus:py-2 focus:text-sm focus:font-sans focus:font-semibold focus:shadow-lg focus:outline-2 focus:outline-mercury-accent"
+        >
+          Skip to main content
+        </a>
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}
         {isGNT ? (
           <div className="bg-gnt-dark border-b border-gnt-rule overflow-hidden">
@@ -366,31 +374,7 @@ export default async function RootLayout({
               )}
 
               {/* Simplified nav for custom-layout publications */}
-              {isCustomLayout && (
-                <nav className="flex items-center justify-center gap-6 py-3 border-b-2 border-mercury-ink">
-                  {beats.map((beat) => (
-                    <Link
-                      key={beat.slug}
-                      href={`/${beat.slug}`}
-                      className="text-sm font-sans font-semibold text-mercury-ink hover:text-mercury-accent transition-colors uppercase tracking-wide"
-                    >
-                      {beat.label}
-                    </Link>
-                  ))}
-                  <Link
-                    href="/page/about"
-                    className="text-sm font-sans font-semibold text-mercury-ink hover:text-mercury-accent transition-colors uppercase tracking-wide"
-                  >
-                    About
-                  </Link>
-                  <Link
-                    href="/page/contact"
-                    className="text-sm font-sans font-semibold text-mercury-ink hover:text-mercury-accent transition-colors uppercase tracking-wide"
-                  >
-                    Contact
-                  </Link>
-                </nav>
-              )}
+              {isCustomLayout && <SimpleNav beats={beats} />}
             </div>
           </header>
         )}
@@ -429,7 +413,7 @@ export default async function RootLayout({
         </div>
 
         {/* ---- MAIN CONTENT ---- */}
-        <main className={`flex-1 max-w-7xl mx-auto px-4 py-6 w-full ${isGNT ? "bg-gnt-dark" : ""}`}>
+        <main id="main-content" className={`flex-1 max-w-7xl mx-auto px-4 py-6 w-full ${isGNT ? "bg-gnt-dark" : ""}`}>
           {children}
         </main>
 
@@ -663,27 +647,22 @@ export default async function RootLayout({
                 &copy; {new Date().getFullYear()} Mercury Local, LLC. All rights
                 reserved.
               </p>
-              <p className="mt-1 md:mt-0">
-                <Link href="/page/about" className="hover:text-mercury-ink">
+              <nav className="mt-2 md:mt-0 flex flex-wrap items-center gap-x-4 gap-y-1" aria-label="Footer links">
+                <Link href="/page/about" className="hover:text-mercury-ink py-1">
                   About
                 </Link>
-                <span className="mx-2">|</span>
                 {!isCustomLayout && (
-                  <>
-                    <Link href="/authors" className="hover:text-mercury-ink">
-                      Our Staff
-                    </Link>
-                    <span className="mx-2">|</span>
-                  </>
+                  <Link href="/authors" className="hover:text-mercury-ink py-1">
+                    Our Staff
+                  </Link>
                 )}
-                <Link href="/page/contact" className="hover:text-mercury-ink">
+                <Link href="/page/contact" className="hover:text-mercury-ink py-1">
                   Contact
                 </Link>
-                <span className="mx-2">|</span>
-                <Link href="/page/privacy" className="hover:text-mercury-ink">
+                <Link href="/page/privacy" className="hover:text-mercury-ink py-1">
                   Privacy
                 </Link>
-              </p>
+              </nav>
             </div>
             </>
             )}

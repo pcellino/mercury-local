@@ -227,9 +227,11 @@ export default async function PostPage({ params }: PostPageProps) {
             {post.author && (
               <>
                 {post.author.avatar_url && (
-                  <img
+                  <Image
                     src={post.author.avatar_url}
                     alt={post.author.name}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 )}
@@ -292,9 +294,11 @@ export default async function PostPage({ params }: PostPageProps) {
           <footer className="mt-12 pt-6 border-t-2 border-mercury-ink">
             <div className="flex items-start gap-4">
               {post.author.avatar_url && (
-                <img
+                <Image
                   src={post.author.avatar_url}
                   alt={post.author.name}
+                  width={56}
+                  height={56}
                   className="w-14 h-14 rounded-full object-cover"
                 />
               )}
