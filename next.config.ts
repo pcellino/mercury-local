@@ -327,6 +327,14 @@ const nextConfig: NextConfig = {
             value: "camera=(), microphone=(), geolocation=(), payment=()",
           },
           {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+          {
             key: "Content-Security-Policy",
             // unsafe-inline required for Next.js inline scripts; upgrade-insecure-requests for mixed content.
             // Fathom CDN allowed for analytics. Supabase + Directus for images/assets.

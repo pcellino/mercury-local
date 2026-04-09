@@ -219,7 +219,7 @@ export default async function HomePage() {
       {/* ---- THREE-COLUMN GRID ---- */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {/* Left column — primary stories */}
-        <div className="md:col-span-5 md:pr-8 md:border-r md:border-mercury-rule">
+        <div className="md:col-span-5 md:pr-8 md:border-r md:border-mercury-rule pb-6 md:pb-0">
           {columnLeft.map((post, i) => (
             <article
               key={post.id}
@@ -274,7 +274,7 @@ export default async function HomePage() {
         </div>
 
         {/* Center column */}
-        <div className="md:col-span-4 md:px-5 md:border-r md:border-mercury-rule">
+        <div className="border-t border-mercury-rule pt-6 md:border-t-0 md:pt-0 md:col-span-4 md:px-5 md:border-r md:border-mercury-rule">
           {columnRight.map((post, i) => (
             <article
               key={post.id}
@@ -329,7 +329,7 @@ export default async function HomePage() {
         </div>
 
         {/* Right sidebar — Opinion + Guides + Topics */}
-        <aside className="md:col-span-3 md:pl-5" aria-label="Opinion and guides">
+        <aside className="border-t border-mercury-rule pt-6 md:border-t-0 md:pt-0 md:col-span-3 md:pl-5" aria-label="Opinion and guides">
           {/* Opinion section */}
           {opinionPosts.length > 0 && (
             <div className="mb-8 bg-stone-50 -mx-5 px-5 py-5 border-l-2 border-mercury-accent">
