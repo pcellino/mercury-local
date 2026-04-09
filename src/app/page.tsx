@@ -9,6 +9,7 @@ import {
   getPageBySlug,
 } from "@/lib/queries";
 import Link from "next/link";
+import Image from "next/image";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
 import BeatIllustration from "@/components/BeatIllustration";
 import MercuryLocalHome from "@/components/MercuryLocalHome";
@@ -150,12 +151,15 @@ export default async function HomePage() {
             {/* Lead image or beat illustration */}
             <div className="md:col-span-5">
               <Link href={`/${lead.beat}/${lead.slug}`}>
-                <div className="mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">
+                <div className="relative mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">
                   {lead.hero_image_url ? (
-                    <img
+                    <Image
                       src={lead.hero_image_url}
                       alt={lead.hero_image_alt || ""}
-                      className="w-full h-full object-cover object-center"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 768px) 88vw, 40vw"
+                      priority
                     />
                   ) : (
                     <BeatIllustration
@@ -222,13 +226,14 @@ export default async function HomePage() {
               className={`pb-6 mb-6 ${i < columnLeft.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
               <Link href={`/${post.beat}/${post.slug}`} className="block mb-5">
-                <div className="mx-2 aspect-[2/1] overflow-hidden">
+                <div className="relative mx-2 aspect-[2/1] overflow-hidden">
                   {post.hero_image_url ? (
-                    <img
+                    <Image
                       src={post.hero_image_url}
                       alt={post.hero_image_alt || ""}
-                      className="w-full h-full object-cover object-center"
-                      loading="lazy"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 768px) 100vw, 40vw"
                     />
                   ) : (
                     <BeatIllustration
@@ -276,13 +281,14 @@ export default async function HomePage() {
               className={`pb-6 mb-6 ${i < columnRight.length - 1 ? "border-b border-mercury-rule" : ""}`}
             >
               <Link href={`/${post.beat}/${post.slug}`} className="block mb-5">
-                <div className="mx-2 aspect-[2/1] overflow-hidden">
+                <div className="relative mx-2 aspect-[2/1] overflow-hidden">
                   {post.hero_image_url ? (
-                    <img
+                    <Image
                       src={post.hero_image_url}
                       alt={post.hero_image_alt || ""}
-                      className="w-full h-full object-cover object-center"
-                      loading="lazy"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                     />
                   ) : (
                     <BeatIllustration

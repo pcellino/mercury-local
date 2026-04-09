@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { formatDateShort, decodeHtmlEntities } from "@/lib/content";
 import type { PostWithAuthor, Publication } from "@/lib/types";
 
@@ -109,10 +110,13 @@ export default function StrollingFirethorneHome({
         <div className="relative h-[60vh] min-h-[420px] max-h-[640px]">
           {/* Cover image */}
           {coverImageUrl ? (
-            <img
+            <Image
               src={coverImageUrl}
               alt="Strolling Firethorne cover"
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="100vw"
+              priority
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-sf-terra/20 via-sf-surface to-sf-cream" />
@@ -217,12 +221,15 @@ export default function StrollingFirethorneHome({
                 <div className="md:col-span-4">
                   <Link href={`/${post.beat}/${post.slug}`}>
                     {post.hero_image_url ? (
-                      <img
-                        src={post.hero_image_url}
-                        alt={post.hero_image_alt || ""}
-                        className="w-full h-48 md:h-36 object-cover rounded-sm"
-                        loading="lazy"
-                      />
+                      <div className="relative w-full h-48 md:h-36 rounded-sm overflow-hidden">
+                        <Image
+                          src={post.hero_image_url}
+                          alt={post.hero_image_alt || ""}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      </div>
                     ) : (
                       <div className="w-full h-48 md:h-36 bg-sf-surface rounded-sm flex items-center justify-center">
                         <span className="font-display text-3xl text-sf-muted/30">
@@ -292,13 +299,14 @@ export default function StrollingFirethorneHome({
                   className="group flex items-start gap-4 p-4 rounded-sm bg-sf-surface hover:bg-sf-rule/40 transition-colors no-underline"
                 >
                   {/* Avatar placeholder */}
-                  <div className="flex-shrink-0 w-16 h-16 rounded-full bg-sf-rule flex items-center justify-center overflow-hidden">
+                  <div className="relative flex-shrink-0 w-16 h-16 rounded-full bg-sf-rule flex items-center justify-center overflow-hidden">
                     {post.hero_image_url ? (
-                      <img
+                      <Image
                         src={post.hero_image_url}
                         alt={post.hero_image_alt || ""}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
+                        fill
+                        className="object-cover"
+                        sizes="64px"
                       />
                     ) : (
                       <span className="font-display text-xl text-sf-muted/50">
