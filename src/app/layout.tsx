@@ -435,8 +435,8 @@ export default async function RootLayout({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 {/* Column 1 — Description */}
                 <div>
-                  <p className="font-display font-black text-2xl text-gnt-text">
-                    Grand <span className="text-gnt-accent">National</span> Today
+                  <p className="font-condensed font-bold text-2xl uppercase tracking-wide text-gnt-text">
+                    Grand National Today
                   </p>
                   <p className="text-sm text-gnt-muted mt-3 font-sans leading-relaxed">
                     Motorsports editorial covering the NASCAR O&apos;Reilly Auto Parts Series, CARS Tour, and Virginia Triple Crown.

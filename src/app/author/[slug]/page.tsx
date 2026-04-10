@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 
 export default async function AuthorPage({ params }: AuthorPageProps) {
   const { slug } = await params;
-  const { publication } = await getPublicationFromRequest();
+  const { publication, slug: pubSlug } = await getPublicationFromRequest();
+  const headlineFont = pubSlug === "grand-national-today" ? "font-condensed uppercase tracking-wide" : "font-display";
 
   const author = await getAuthorBySlug(slug);
   if (!author) notFound();
@@ -62,7 +63,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
               />
             )}
             <div>
-              <h1 className="font-display text-3xl font-black tracking-tight">{author.name}</h1>
+              <h1 className={`${headlineFont} text-3xl font-black tracking-tight`}>{author.name}</h1>
               {author.credentials && (
                 <p className="text-sm text-mercury-accent font-sans mt-1 font-semibold">
                   {author.credentials}

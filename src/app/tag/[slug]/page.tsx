@@ -58,7 +58,8 @@ export async function generateMetadata({
 
 export default async function TagPage({ params }: TagPageProps) {
   const { slug } = await params;
-  const { publication } = await getPublicationFromRequest();
+  const { publication, slug: pubSlug } = await getPublicationFromRequest();
+  const headlineFont = pubSlug === "grand-national-today" ? "font-condensed uppercase tracking-wide" : "font-display";
 
   const tag = await getTagBySlug(publication.id, slug);
   if (!tag) notFound();
@@ -80,7 +81,7 @@ export default async function TagPage({ params }: TagPageProps) {
         <p className="text-[11px] font-sans font-bold uppercase tracking-widest text-mercury-muted mb-2">
           Topic
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight">
+        <h1 className={`${headlineFont} text-3xl md:text-4xl font-black tracking-tight`}>
           {tag.name}
         </h1>
         {tag.description && (

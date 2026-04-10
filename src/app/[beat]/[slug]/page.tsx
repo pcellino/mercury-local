@@ -91,6 +91,8 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 export default async function PostPage({ params }: PostPageProps) {
   const { beat, slug } = await params;
   const { publication, slug: pubSlug } = await getPublicationFromRequest();
+  const isGNT = pubSlug === "grand-national-today";
+  const headlineFont = isGNT ? "font-condensed uppercase tracking-wide" : "font-display";
 
   // -------------------------------------------------------
   // Hub page detection — e.g., /sports/hornets → team page
@@ -128,7 +130,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
         {/* Page header */}
         <header className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
+          <h1 className={`${headlineFont} text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] ${isGNT ? "" : "tracking-tight"}`}>
             {decodeHtmlEntities(hubPage.title)}
           </h1>
         </header>
@@ -142,7 +144,7 @@ export default async function PostPage({ params }: PostPageProps) {
         {/* Hub post feed */}
         {hubPosts.length > 0 && (
           <section className="mt-12 pt-8 border-t-2 border-mercury-ink">
-            <h2 className="font-display text-2xl font-black tracking-tight mb-6">
+            <h2 className={`${headlineFont} text-2xl font-black ${isGNT ? "" : "tracking-tight"} mb-6`}>
               {hubPage.hub_heading || "Related Coverage"}
             </h2>
             <div className="max-w-3xl">
@@ -215,7 +217,7 @@ export default async function PostPage({ params }: PostPageProps) {
           >
             {beatConfig?.label || beat}
           </Link>
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-3 leading-[1.1] tracking-tight">
+          <h1 className={`${headlineFont} text-3xl md:text-4xl lg:text-5xl font-black mt-3 leading-[1.1] ${isGNT ? "" : "tracking-tight"}`}>
             {decodeHtmlEntities(post.title)}
           </h1>
           {post.excerpt && (
@@ -332,7 +334,7 @@ export default async function PostPage({ params }: PostPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-mercury-rule">
             {related.map((rp, i) => (
               <article key={rp.id} className={`${i > 0 ? "md:pl-6" : ""}`}>
-                <h3 className="font-display text-base font-bold leading-snug">
+                <h3 className={`${headlineFont} text-base font-bold leading-snug`}>
                   <Link
                     href={`/${rp.beat}/${rp.slug}`}
                     className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"

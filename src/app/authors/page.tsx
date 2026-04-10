@@ -58,7 +58,9 @@ function AuthorAvatar({
 }
 
 export default async function AuthorsPage() {
-  const { publication } = await getPublicationFromRequest();
+  const { publication, slug: pubSlug } = await getPublicationFromRequest();
+  const isGNT = pubSlug === "grand-national-today";
+  const headlineFont = isGNT ? "font-condensed uppercase tracking-wide" : "font-display";
   const authors = await getAuthorsByPublication(publication.id);
 
   return (
@@ -68,7 +70,7 @@ export default async function AuthorsPage() {
         <p className="text-xs font-sans font-bold uppercase tracking-widest text-mercury-accent mb-2">
           {publication.name}
         </p>
-        <h1 className="font-display text-4xl md:text-5xl font-black text-mercury-ink leading-tight">
+        <h1 className={`${headlineFont} text-4xl md:text-5xl font-black text-mercury-ink leading-tight`}>
           Our Staff
         </h1>
         <p className="text-mercury-muted font-sans mt-3 text-sm">
@@ -98,7 +100,7 @@ export default async function AuthorsPage() {
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <Link
                     href={`/author/${author.slug}`}
-                    className="font-display text-2xl font-black text-mercury-ink hover:text-mercury-accent transition-colors leading-tight no-underline"
+                    className={`${headlineFont} text-2xl font-black text-mercury-ink hover:text-mercury-accent transition-colors leading-tight no-underline`}
                   >
                     {author.name}
                   </Link>

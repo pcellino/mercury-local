@@ -56,6 +56,8 @@ export async function generateMetadata({
 export default async function BeatPage({ params }: BeatPageProps) {
   const { beat } = await params;
   const { publication, slug } = await getPublicationFromRequest();
+  const isGNT = slug === "grand-national-today";
+  const headlineFont = isGNT ? "font-condensed uppercase tracking-wide" : "font-display";
 
   // Validate beat exists for this publication
   const beats = getBeatsForPublication(slug);
@@ -115,7 +117,7 @@ export default async function BeatPage({ params }: BeatPageProps) {
         {/* Editorial content */}
         <article className="max-w-3xl mx-auto">
           <header className="mb-8">
-            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
+            <h1 className={`${headlineFont} text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] ${isGNT ? "" : "tracking-tight"}`}>
               {decodeHtmlEntities(hubPage.title)}
             </h1>
           </header>
@@ -157,7 +159,7 @@ export default async function BeatPage({ params }: BeatPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(beatJsonLd) }}
       />
       <header className="mb-6 pb-4 border-b-2 border-mercury-ink">
-        <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight">
+        <h1 className={`${headlineFont} text-3xl md:text-4xl font-black ${isGNT ? "" : "tracking-tight"}`}>
           {beatConfig.label}
         </h1>
         <p className="text-mercury-muted mt-2 font-serif">

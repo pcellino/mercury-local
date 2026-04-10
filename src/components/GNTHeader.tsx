@@ -61,7 +61,7 @@ export default function GNTHeader() {
           {/* Logo / site name — left */}
           <Link href="/" className="no-underline shrink-0">
             <span className="font-condensed text-2xl md:text-3xl font-bold uppercase tracking-wide text-gnt-text leading-none">
-              Grand <span className="text-gnt-accent">National</span> Today
+              Grand National Today
             </span>
           </Link>
 

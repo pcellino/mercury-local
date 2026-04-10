@@ -23,7 +23,8 @@ export async function generateMetadata({
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q } = await searchParams;
-  const { publication } = await getPublicationFromRequest();
+  const { publication, slug: pubSlug } = await getPublicationFromRequest();
+  const headlineFont = pubSlug === "grand-national-today" ? "font-condensed uppercase tracking-wide" : "font-display";
 
   const query = q?.trim() || "";
   const results = query ? await searchPosts(publication.id, query) : [];
@@ -61,7 +62,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {query ? (
         <>
           <header className="mb-6 pb-4 border-b-2 border-mercury-ink max-w-3xl">
-            <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight">
+            <h1 className={`${headlineFont} text-3xl md:text-4xl font-black tracking-tight`}>
               Search results for &ldquo;{query}&rdquo;
             </h1>
             <p className="text-mercury-muted mt-2 font-sans text-sm">

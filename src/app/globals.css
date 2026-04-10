@@ -262,6 +262,15 @@
   background-color: #0a0a0a;
 }
 
+/* GNT — Override font-display (Playfair) with font-condensed (Barlow)
+   on ALL shared components so PostCard, breadcrumbs, and any other
+   reused component automatically picks up the GNT type system. */
+.pub-gnt .font-display {
+  font-family: var(--font-barlow-condensed);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* -------------------------------------------------------
    GNT — Animations & Custom Styles
    ------------------------------------------------------- */

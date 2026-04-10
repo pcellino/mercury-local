@@ -76,7 +76,7 @@ export default function GrandNationalTodayHome({
             <p className="font-sans text-[11px] md:text-xs font-bold uppercase tracking-[0.3em] text-gnt-accent mb-8">
               Launching June 1, 2026
             </p>
-            <h2 className="font-display font-black text-4xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight text-gnt-text">
+            <h2 className="font-condensed font-black text-4xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight text-gnt-text">
               Covering racing before
               <br />
               it becomes famous.
@@ -127,7 +127,7 @@ export default function GrandNationalTodayHome({
                   {lead.beat}
                 </Link>
               )}
-              <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
+              <h3 className="font-condensed text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
                 <Link
                   href={`/${lead.beat}/${lead.slug}`}
                   className="text-gnt-text no-underline hover:text-gnt-gold transition-colors"
@@ -221,7 +221,7 @@ export default function GrandNationalTodayHome({
                     {post.beat}
                   </Link>
                 )}
-                <h3 className="font-display text-lg font-bold mt-1 leading-snug">
+                <h3 className="font-condensed text-lg font-bold mt-1 leading-snug">
                   <Link
                     href={`/${post.beat}/${post.slug}`}
                     className="text-gnt-text no-underline hover:text-gnt-gold transition-colors"
@@ -261,7 +261,7 @@ export default function GrandNationalTodayHome({
                 key={post.id}
                 className="bg-gnt-surface border border-gnt-rule p-5 hover:border-gnt-gold/30 transition-colors"
               >
-                <h3 className="font-display text-xl font-bold leading-snug">
+                <h3 className="font-condensed text-xl font-bold leading-snug">
                   <Link
                     href={`/${post.beat}/${post.slug}`}
                     className="text-gnt-text no-underline hover:text-gnt-gold transition-colors"
