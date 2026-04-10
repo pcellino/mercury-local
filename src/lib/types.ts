@@ -108,6 +108,8 @@ export interface Page {
   hub_tag: string | null;
   hub_limit: number | null;
   hub_heading: string | null;
+  // Layout
+  page_type: string | null;
 }
 
 export interface PostTag {

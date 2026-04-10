@@ -11,6 +11,7 @@ import {
 } from "@/lib/content";
 import { generatePageJsonLd, generatePageBreadcrumbJsonLd, generateFAQJsonLd } from "@/lib/jsonld";
 import PostCard from "@/components/PostCard";
+import GNTPageLayout from "@/components/GNTPageLayouts";
 
 export const dynamic = 'force-dynamic'; // Multi-tenant: each domain must render its own content
 
@@ -103,6 +104,9 @@ export default async function StaticPage({ params }: PageProps) {
   const breadcrumbJsonLd = generatePageBreadcrumbJsonLd(page, publication);
   const faqJsonLd = generateFAQJsonLd(page, publication);
 
+  // GNT gets its own layout system based on page_type
+  const isGNT = pubSlug === "grand-national-today";
+
   return (
     <>
       <script
@@ -119,70 +123,74 @@ export default async function StaticPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
-      <article className="max-w-3xl mx-auto">
-      {/* ---- BREADCRUMBS ---- */}
-      <nav
-        className="text-xs text-mercury-muted mb-6 font-sans uppercase tracking-wide"
-        aria-label="Breadcrumb"
-      >
-        <Link href="/" className="hover:text-mercury-ink">
-          Home
-        </Link>
-        <span className="mx-2">/</span>
-        <span>{decodeHtmlEntities(page.title)}</span>
-      </nav>
 
-      {/* ---- PAGE HEADER ---- */}
-      <header className="mb-8">
-        <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
-          {decodeHtmlEntities(page.title)}
-        </h1>
-        {(page.pub_date || readingTime > 1) && (
-          <div className="flex items-center gap-3 mt-5 pt-4 border-t border-mercury-rule text-sm text-mercury-muted font-sans">
-            {page.pub_date && (
-              <time dateTime={page.pub_date}>
-                {formatDate(page.pub_date)}
-              </time>
+      {isGNT && page.page_type ? (
+        <GNTPageLayout page={page} contentHtml={contentHtml} hubPosts={hubPosts} />
+      ) : (
+        <article className="max-w-3xl mx-auto">
+          {/* ---- BREADCRUMBS ---- */}
+          <nav
+            className="text-xs text-mercury-muted mb-6 font-sans uppercase tracking-wide"
+            aria-label="Breadcrumb"
+          >
+            <Link href="/" className="hover:text-mercury-ink">
+              Home
+            </Link>
+            <span className="mx-2">/</span>
+            <span>{decodeHtmlEntities(page.title)}</span>
+          </nav>
+
+          {/* ---- PAGE HEADER ---- */}
+          <header className="mb-8">
+            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight">
+              {decodeHtmlEntities(page.title)}
+            </h1>
+            {(page.pub_date || readingTime > 1) && (
+              <div className="flex items-center gap-3 mt-5 pt-4 border-t border-mercury-rule text-sm text-mercury-muted font-sans">
+                {page.pub_date && (
+                  <time dateTime={page.pub_date}>
+                    {formatDate(page.pub_date)}
+                  </time>
+                )}
+                {page.pub_date && readingTime > 1 && (
+                  <span className="text-mercury-rule">|</span>
+                )}
+                {readingTime > 1 && <span>{readingTime} min read</span>}
+              </div>
             )}
-            {page.pub_date && readingTime > 1 && (
-              <span className="text-mercury-rule">|</span>
-            )}
-            {readingTime > 1 && <span>{readingTime} min read</span>}
-          </div>
-        )}
-      </header>
+          </header>
 
-      {/* ---- PAGE BODY ---- */}
-      <div
-        className="article-content font-serif"
-        dangerouslySetInnerHTML={{ __html: contentHtml }}
-      />
+          {/* ---- PAGE BODY ---- */}
+          <div
+            className="article-content font-serif"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
 
-      {/* ---- HUB POST FEED ---- */}
-      {hubPosts.length > 0 && (
-        <section className="mt-12 pt-8 border-t-2 border-mercury-ink">
-          <h2 className="font-display text-2xl font-black tracking-tight mb-6">
-            {page.hub_heading || "Related Coverage"}
-          </h2>
-          <div className="max-w-3xl">
-            {hubPosts.map((post) => (
-              <PostCard key={post.id} post={post} showBeat={!page.hub_beat} />
-            ))}
-          </div>
-          {/* Link to the full beat page if this is a beat-based hub */}
-          {page.hub_beat && (
-            <div className="mt-6 pt-4 border-t border-mercury-rule">
-              <Link
-                href={`/${page.hub_beat}`}
-                className="text-sm font-sans font-semibold text-mercury-accent hover:underline uppercase tracking-wide"
-              >
-                View all {page.hub_beat} coverage &rarr;
-              </Link>
-            </div>
+          {/* ---- HUB POST FEED ---- */}
+          {hubPosts.length > 0 && (
+            <section className="mt-12 pt-8 border-t-2 border-mercury-ink">
+              <h2 className="font-display text-2xl font-black tracking-tight mb-6">
+                {page.hub_heading || "Related Coverage"}
+              </h2>
+              <div className="max-w-3xl">
+                {hubPosts.map((post) => (
+                  <PostCard key={post.id} post={post} showBeat={!page.hub_beat} />
+                ))}
+              </div>
+              {page.hub_beat && (
+                <div className="mt-6 pt-4 border-t border-mercury-rule">
+                  <Link
+                    href={`/${page.hub_beat}`}
+                    className="text-sm font-sans font-semibold text-mercury-accent hover:underline uppercase tracking-wide"
+                  >
+                    View all {page.hub_beat} coverage &rarr;
+                  </Link>
+                </div>
+              )}
+            </section>
           )}
-        </section>
+        </article>
       )}
-    </article>
     </>
   );
 }

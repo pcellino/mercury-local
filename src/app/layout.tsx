@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Barlow_Condensed } from "next/font/google";
 import { getPublicationFromRequest } from "@/lib/publication";
 import { getBeatsForPublication, getHubPages } from "@/lib/queries";
 import { getBaseUrl, CUSTOM_LAYOUT_SLUGS } from "@/lib/domains";
@@ -23,6 +23,13 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-barlow-condensed",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -98,7 +105,7 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable} ${barlowCondensed.variable}`}>
       <head>
         {/* Fonts self-hosted via next/font — no render-blocking external requests */}
         {slug === "peter-cellino" && (

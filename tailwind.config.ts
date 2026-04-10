@@ -9,6 +9,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         display: ["var(--font-playfair)", "Georgia", "Cambria", "Times New Roman", "serif"],
+        condensed: ["var(--font-barlow-condensed)", "Arial Narrow", "sans-serif"],
         serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
         sans: ["var(--font-inter)", "system-ui", "-apple-system", "sans-serif"],
         mono: ['"JetBrains Mono"', '"Fira Code"', "monospace"],
