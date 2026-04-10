@@ -472,7 +472,6 @@ export default async function RootLayout({
                   <div className="grid grid-cols-1 gap-1.5">
                     <Link href="/page/about" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">About</Link>
                     <Link href="/page/contact" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Contact</Link>
-                    <Link href="/page/advertise" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Advertise</Link>
                     <a href="https://thesportsmanshow.com" target="_blank" rel="noopener noreferrer" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">
                       TheSportsmanShow.com <span className="opacity-50 text-xs">&#x2197;</span>
                     </a>

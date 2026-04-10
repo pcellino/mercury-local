@@ -210,6 +210,59 @@
 }
 
 /* -------------------------------------------------------
+   GNT — Global Dark-Theme Overrides
+   Elements outside .article-content that use mercury-*
+   colors become invisible on the dark background.
+   ------------------------------------------------------- */
+
+/* PostCard and general link colors */
+.pub-gnt .text-mercury-ink {
+  color: #f5f5f5;
+}
+.pub-gnt .text-mercury-muted {
+  color: #8a8a8a;
+}
+.pub-gnt .text-mercury-accent {
+  color: #d4a574;
+}
+.pub-gnt .hover\:text-mercury-ink:hover {
+  color: #ffffff;
+}
+.pub-gnt .hover\:text-mercury-accent:hover {
+  color: #e8c49a;
+}
+
+/* Borders & dividers */
+.pub-gnt .border-mercury-rule {
+  border-color: #2a2a2a;
+}
+.pub-gnt .border-mercury-ink {
+  border-color: #3a3a3a;
+}
+.pub-gnt .border-black {
+  border-color: #2a2a2a;
+}
+.pub-gnt .border-t-2.border-mercury-ink {
+  border-color: #d4a574;
+}
+
+/* Divide utilities (related stories columns, PostCard separators) */
+.pub-gnt [class*="divide-mercury-rule"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #2a2a2a;
+}
+.pub-gnt [class*="divide-mercury-ink"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #3a3a3a;
+}
+
+/* Backgrounds that clash with dark theme */
+.pub-gnt .bg-stone-50 {
+  background-color: #0a0a0a;
+}
+.pub-gnt .bg-white {
+  background-color: #0a0a0a;
+}
+
+/* -------------------------------------------------------
    GNT — Animations & Custom Styles
    ------------------------------------------------------- */
 
