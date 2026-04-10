@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Page, Post } from "@/lib/types";
 import type { DirectoryItem } from "@/lib/queries";
-import { decodeHtmlEntities, formatDate, estimateReadingTime } from "@/lib/content";
+import { decodeHtmlEntities, formatDate } from "@/lib/content";
 import PostCard from "./PostCard";
 
 // -------------------------------------------------------
@@ -579,11 +579,42 @@ function ScheduleLayout({ page, contentHtml }: GNTLayoutProps) {
 }
 
 // -------------------------------------------------------
-// DEFAULT GNT LAYOUT (about, contact, staff, legal, etc.)
+// ABOUT / STAFF / CONTACT — Editorial pages with hero
 // -------------------------------------------------------
-function DefaultGNTLayout({ page, contentHtml }: GNTLayoutProps) {
+function EditorialInfoLayout({ page, contentHtml }: GNTLayoutProps) {
   return (
-    <div className="gnt-page gnt-default">
+    <div className="gnt-page gnt-editorial-info">
+      <div className="gnt-hero gnt-hero-gradient gnt-hero-center">
+        <div className="gnt-container">
+          <nav className="gnt-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>{decodeHtmlEntities(page.title)}</span>
+          </nav>
+          <h1 className="gnt-title gnt-title-xl">{decodeHtmlEntities(page.title)}</h1>
+          {page.meta_description && (
+            <p className="gnt-hero-sub">{page.meta_description}</p>
+          )}
+        </div>
+      </div>
+      <div className="gnt-container">
+        <div className="gnt-narrow-content">
+          <div
+            className="gnt-article-content article-content font-serif"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------
+// LEGAL — minimal, no hero
+// -------------------------------------------------------
+function LegalLayout({ page, contentHtml }: GNTLayoutProps) {
+  return (
+    <div className="gnt-page gnt-legal">
       <div className="gnt-container">
         <nav className="gnt-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -593,6 +624,34 @@ function DefaultGNTLayout({ page, contentHtml }: GNTLayoutProps) {
         <header className="gnt-page-header">
           <h1 className="gnt-title gnt-title-lg">{decodeHtmlEntities(page.title)}</h1>
         </header>
+        <div className="gnt-narrow-content">
+          <div
+            className="gnt-article-content article-content font-serif"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------
+// DEFAULT GNT LAYOUT (fallback for untyped pages)
+// -------------------------------------------------------
+function DefaultGNTLayout({ page, contentHtml }: GNTLayoutProps) {
+  return (
+    <div className="gnt-page gnt-default">
+      <div className="gnt-hero gnt-hero-gradient">
+        <div className="gnt-container">
+          <nav className="gnt-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>{decodeHtmlEntities(page.title)}</span>
+          </nav>
+          <h1 className="gnt-title gnt-title-xl">{decodeHtmlEntities(page.title)}</h1>
+        </div>
+      </div>
+      <div className="gnt-container">
         <div className="gnt-narrow-content">
           <div
             className="gnt-article-content article-content font-serif"
@@ -681,6 +740,12 @@ export default function GNTPageLayout(props: GNTLayoutProps) {
       return <ScheduleLayout {...props} />;
     case "hub":
       return <HubPageLayout {...props} />;
+    case "about":
+    case "contact":
+    case "staff":
+      return <EditorialInfoLayout {...props} />;
+    case "legal":
+      return <LegalLayout {...props} />;
     default:
       return <DefaultGNTLayout {...props} />;
   }

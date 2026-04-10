@@ -60,7 +60,7 @@ export default function GNTHeader() {
         <div className="flex items-center justify-between h-14">
           {/* Logo / site name — left */}
           <Link href="/" className="no-underline shrink-0">
-            <span className="font-display text-xl md:text-2xl font-black text-gnt-text tracking-tight leading-none">
+            <span className="font-condensed text-2xl md:text-3xl font-bold uppercase tracking-wide text-gnt-text leading-none">
               Grand <span className="text-gnt-accent">National</span> Today
             </span>
           </Link>
@@ -71,7 +71,7 @@ export default function GNTHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors no-underline"
+                className="font-condensed text-sm font-semibold uppercase tracking-wider text-gnt-muted hover:text-gnt-text transition-colors no-underline"
               >
                 {link.label}
               </Link>
@@ -81,7 +81,7 @@ export default function GNTHeader() {
             <div ref={moreRef} className="relative">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="font-sans text-xs font-semibold uppercase tracking-widest text-gnt-muted hover:text-gnt-text transition-colors flex items-center gap-1"
+                className="font-condensed text-sm font-semibold uppercase tracking-wider text-gnt-muted hover:text-gnt-text transition-colors flex items-center gap-1"
                 aria-expanded={moreOpen}
                 aria-haspopup="true"
               >
