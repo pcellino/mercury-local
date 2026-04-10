@@ -300,7 +300,7 @@ export default async function RootLayout({
         {/* ---- DARK UTILITY BAR / GNT BROADCAST BAR ---- */}
         {isGNT ? (
           <div className="bg-gnt-dark border-b border-gnt-rule overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-xs">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-2 flex items-center justify-between text-xs">
               <div className="gnt-on-air-badge shrink-0">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gnt-accent opacity-75"></span>
@@ -318,7 +318,7 @@ export default async function RootLayout({
           </div>
         ) : (
           <div className="bg-mercury-ink text-white">
-            <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between text-xs">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-1.5 flex items-center justify-between text-xs">
               <span className="font-sans text-gray-300">{today}</span>
               <div className="flex items-center gap-4">
                 {publication.region && (
@@ -364,7 +364,7 @@ export default async function RootLayout({
           <GNTHeader />
         ) : (
           <header className="bg-white">
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
               <div className="py-6 text-center border-b border-black">
                 <Link href="/" className="no-underline">
                   <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-black text-mercury-ink tracking-tight leading-none">
@@ -420,7 +420,7 @@ export default async function RootLayout({
         </div>
 
         {/* ---- MAIN CONTENT ---- */}
-        <main id="main-content" className={`flex-1 max-w-7xl mx-auto px-4 py-6 w-full ${isGNT ? "bg-gnt-dark" : ""}`}>
+        <main id="main-content" className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-6 w-full ${isGNT ? "bg-gnt-dark" : ""}`}>
           {children}
         </main>
 
@@ -428,7 +428,7 @@ export default async function RootLayout({
         <footer className={isGNT ? "bg-gnt-dark mt-16" : "bg-stone-50 border-t border-mercury-rule mt-16"}>
           {/* Red top border for GNT */}
           {isGNT && <div className="h-1 bg-gnt-accent" />}
-          <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-12 md:py-16">
             {/* GNT custom footer content */}
             {isGNT ? (
               <>

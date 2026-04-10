@@ -124,7 +124,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Lead headline + excerpt */}
             <div className="md:col-span-7">
-              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight">
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2 leading-[1.1] tracking-tight max-w-2xl">
                 <Link
                   href={`/${lead.beat}/${lead.slug}`}
                   className="text-mercury-ink no-underline hover:text-mercury-accent transition-colors"

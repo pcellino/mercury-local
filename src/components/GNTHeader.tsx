@@ -56,7 +56,7 @@ export default function GNTHeader() {
 
   return (
     <header className="bg-gnt-surface/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gnt-rule">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="flex items-center justify-between h-14">
           {/* Logo / site name — left */}
           <Link href="/" className="no-underline shrink-0">
@@ -166,7 +166,7 @@ export default function GNTHeader() {
       {/* Mobile slide-down menu */}
       {mobileOpen && (
         <nav className="md:hidden border-t border-gnt-rule bg-gnt-surface">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-4 flex flex-col gap-1">
             {/* Main sections */}
             {MOBILE_NAV.filter((l) => l.section === "main").map((link) => (
               <Link
