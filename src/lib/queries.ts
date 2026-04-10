@@ -518,6 +518,38 @@ async function getHubPostsByTag(
   return (data || []) as PostWithAuthor[];
 }
 
+
+// -------------------------------------------------------
+// Pages by type — for directory card grids
+// -------------------------------------------------------
+
+export interface DirectoryItem {
+  slug: string;
+  title: string;
+  meta_description: string | null;
+  content: string;
+  page_type: string | null;
+}
+
+export async function getPagesByType(
+  publicationId: string,
+  pageType: string
+): Promise<DirectoryItem[]> {
+  const { data, error } = await supabase
+    .from("pages")
+    .select("slug, title, meta_description, content, page_type")
+    .eq("publication_id", publicationId)
+    .eq("page_type", pageType)
+    .eq("status", "published")
+    .order("title");
+
+  if (error) {
+    console.error("getPagesByType error:", error);
+    return [];
+  }
+  return (data || []) as DirectoryItem[];
+}
+
 // -------------------------------------------------------
 // Hub page navigation â fetch hub pages for nav/sidebar
 // -------------------------------------------------------

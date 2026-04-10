@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPageBySlug, getBeatsForPublication, getHubPosts } from "@/lib/queries";
+import { getPageBySlug, getBeatsForPublication, getHubPosts, getPagesByType } from "@/lib/queries";
 import {
   sanitizeContent,
   formatDate,
@@ -68,6 +68,15 @@ function isHubPage(page: { hub_beat: string | null; hub_tag: string | null }): b
 }
 
 // -------------------------------------------------------
+// Helper: determine which page_type to query for directory cards
+// -------------------------------------------------------
+function getDirectoryItemType(slug: string): string | null {
+  if (slug === "driver-directory") return "driver_profile";
+  if (slug === "team-directory") return "team_profile";
+  return null;
+}
+
+// -------------------------------------------------------
 // Page component
 // -------------------------------------------------------
 export default async function StaticPage({ params }: PageProps) {
@@ -99,13 +108,17 @@ export default async function StaticPage({ params }: PageProps) {
       )
     : [];
 
+  // If this is a directory page, fetch the items for the card grid
+  const isGNT = pubSlug === "grand-national-today";
+  const directoryItemType = isGNT ? getDirectoryItemType(slug) : null;
+  const directoryItems = directoryItemType
+    ? await getPagesByType(publication.id, directoryItemType)
+    : undefined;
+
   // JSON-LD structured data
   const pageJsonLd = generatePageJsonLd(page, publication);
   const breadcrumbJsonLd = generatePageBreadcrumbJsonLd(page, publication);
   const faqJsonLd = generateFAQJsonLd(page, publication);
-
-  // GNT gets its own layout system based on page_type
-  const isGNT = pubSlug === "grand-national-today";
 
   return (
     <>
@@ -125,7 +138,12 @@ export default async function StaticPage({ params }: PageProps) {
       )}
 
       {isGNT && page.page_type ? (
-        <GNTPageLayout page={page} contentHtml={contentHtml} hubPosts={hubPosts} />
+        <GNTPageLayout
+          page={page}
+          contentHtml={contentHtml}
+          hubPosts={hubPosts}
+          directoryItems={directoryItems}
+        />
       ) : (
         <article className="max-w-3xl mx-auto">
           {/* ---- BREADCRUMBS ---- */}
