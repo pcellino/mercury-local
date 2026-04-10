@@ -152,8 +152,8 @@ export default function GrandNationalTodayHome({
                 {formatDateShort(lead.pub_date)}
               </p>
             </div>
-            {/* Image column */}
-            <div className="md:col-span-5">
+            {/* Image column — self-center so it aligns with the headline, not the beat label */}
+            <div className="md:col-span-5 md:self-center">
               <Link href={`/${lead.beat}/${lead.slug}`}>
                 {lead.hero_image_url ? (
                   <div className="relative mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">

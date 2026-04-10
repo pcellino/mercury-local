@@ -148,8 +148,8 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* Lead image or beat illustration */}
-            <div className="md:col-span-5">
+            {/* Lead image or beat illustration — self-center so it aligns with the headline */}
+            <div className="md:col-span-5 md:self-center">
               <Link href={`/${lead.beat}/${lead.slug}`}>
                 <div className="relative mx-auto max-w-[88%] aspect-[2/1] overflow-hidden">
                   {lead.hero_image_url ? (
