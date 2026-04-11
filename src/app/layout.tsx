@@ -510,7 +510,7 @@ export default async function RootLayout({
                       ? ""
                       : "A Mercury Local property."
                     : slug === "charlotte-mercury"
-                    ? "Independent local journalism. Mercury Local is our hyper-local platform."
+                    ? "Independent local journalism. The flagship of the Charlotte Mercury media infrastructure."
                     : "A Mercury Local publication. Independent, local journalism."}
                 </p>
               </div>

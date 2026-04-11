@@ -234,7 +234,7 @@ export default function Status() {
         </h2>
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium">Mercury Local — Production</p>
+            <p className="text-sm font-medium">Charlotte Mercury Atlas — Production</p>
             <p className="text-[12px] text-[var(--color-text-muted)] mt-0.5">View build logs, deployment history, and domain settings</p>
           </div>
           <a

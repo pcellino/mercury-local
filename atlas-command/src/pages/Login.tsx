@@ -31,10 +31,10 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold tracking-tight">
-            <span className="text-[var(--color-accent-hover)]">ATLAS</span>{' '}
-            <span className="text-[var(--color-text-muted)] font-normal">Command</span>
+            <span className="text-[var(--color-accent-hover)]">Charlotte Mercury</span>{' '}
+            <span className="text-[var(--color-text-muted)] font-normal">Atlas</span>
           </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">Mercury Local Operations Dashboard</p>
+          <p className="text-sm text-[var(--color-text-muted)] mt-1">Operations Dashboard</p>
         </div>
 
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6">

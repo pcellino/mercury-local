@@ -86,7 +86,7 @@ export default function Compare() {
           <GitCompare size={20} className="text-[var(--color-accent-hover)]" />
           Compare Publications
         </h1>
-        <p className="text-sm text-[var(--color-text-muted)] mt-0.5">Side-by-side performance across all Mercury Local publications</p>
+        <p className="text-sm text-[var(--color-text-muted)] mt-0.5">Side-by-side performance across all Charlotte Mercury publications</p>
       </div>
 
       {/* Scorecard row */}
