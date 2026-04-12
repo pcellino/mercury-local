@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Page, Post } from "@/lib/types";
-import type { DirectoryItem } from "@/lib/queries";
+import type { DirectoryItem, SeriesGuideRelatedPage } from "@/lib/queries";
 import { decodeHtmlEntities, formatDate } from "@/lib/content";
 import PostCard from "./PostCard";
 
@@ -12,6 +12,12 @@ export interface GNTLayoutProps {
   contentHtml: string;
   hubPosts: Post[];
   directoryItems?: DirectoryItem[];
+  seriesGuideContext?: {
+    trackGuides: SeriesGuideRelatedPage[];
+    driverProfiles: SeriesGuideRelatedPage[];
+    teamProfiles: SeriesGuideRelatedPage[];
+    latestPosts: Post[];
+  };
 }
 
 /** Strip "— Type" suffix from titles for display */
@@ -411,13 +417,108 @@ function TrackGuideLayout({ page, contentHtml, hubPosts }: GNTLayoutProps) {
 }
 
 // -------------------------------------------------------
-// SERIES GUIDE LAYOUT — Reference + TOC feel
+// Helper: extract TOC entries from rendered HTML
 // -------------------------------------------------------
-function SeriesGuideLayout({ page, contentHtml }: GNTLayoutProps) {
+interface TocEntry {
+  id: string;
+  text: string;
+  level: number;
+}
+
+function extractToc(html: string): TocEntry[] {
+  const entries: TocEntry[] = [];
+  const re = /<h([23])\b[^>]*>(.*?)<\/h[23]>/gi;
+  let match;
+  while ((match = re.exec(html)) !== null) {
+    const level = parseInt(match[1], 10);
+    const text = match[2].replace(/<[^>]*>/g, "").trim();
+    if (text) {
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      entries.push({ id, text, level });
+    }
+  }
+  return entries;
+}
+
+/** Inject id attributes on h2/h3 tags so the TOC links work */
+function injectHeadingIds(html: string): string {
+  return html.replace(/<h([23])\b([^>]*)>(.*?)<\/h[23]>/gi, (_match, level, attrs, inner) => {
+    const text = inner.replace(/<[^>]*>/g, "").trim();
+    const id = text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    return `<h${level}${attrs} id="${id}">${inner}</h${level}>`;
+  });
+}
+
+/** Strip page-type suffixes for display */
+function displayPageName(title: string): string {
+  return title
+    .replace(/\s*[—–-]\s*(Driver Profile|Team Profile|Track Guide|Series Guide).*$/i, "")
+    .trim();
+}
+
+// -------------------------------------------------------
+// Sub-Nav Links config for series guide pages
+// -------------------------------------------------------
+interface SubNavLink {
+  label: string;
+  href: string;
+}
+
+function getSeriesSubNav(slug: string): SubNavLink[] {
+  if (slug === "oreilly-auto-parts-series-guide") {
+    return [
+      { label: "Guide", href: "/page/oreilly-auto-parts-series-guide" },
+      { label: "Schedule", href: "/page/oreilly-auto-parts-series-2026-schedule" },
+      { label: "Standings", href: "/standings" },
+      { label: "Drivers", href: "/page/driver-directory" },
+      { label: "Teams", href: "/page/team-directory" },
+    ];
+  }
+  if (slug === "cars-tour-guide") {
+    return [
+      { label: "Guide", href: "/page/cars-tour-guide" },
+      { label: "Schedule", href: "/page/cars-tour-2026-schedule" },
+      { label: "Standings", href: "/standings" },
+      { label: "Drivers", href: "/page/driver-directory" },
+      { label: "Teams", href: "/page/team-directory" },
+    ];
+  }
+  if (slug === "virginia-triple-crown-guide") {
+    return [
+      { label: "Guide", href: "/page/virginia-triple-crown-guide" },
+      { label: "Standings", href: "/standings" },
+      { label: "Drivers", href: "/page/driver-directory" },
+      { label: "Tracks", href: "/page/driver-directory" },
+    ];
+  }
+  // Fallback
+  return [
+    { label: "Guide", href: `/page/${slug}` },
+    { label: "Standings", href: "/standings" },
+    { label: "Drivers", href: "/page/driver-directory" },
+    { label: "Teams", href: "/page/team-directory" },
+  ];
+}
+
+// -------------------------------------------------------
+// SERIES GUIDE LAYOUT — Full hub experience
+// -------------------------------------------------------
+function SeriesGuideLayout({ page, contentHtml, seriesGuideContext }: GNTLayoutProps) {
   const name = decodeHtmlEntities(page.title);
+  const enrichedHtml = injectHeadingIds(contentHtml);
+  const toc = extractToc(enrichedHtml);
+  const subNav = getSeriesSubNav(page.slug);
+  const ctx = seriesGuideContext;
 
   return (
     <div className="gnt-page gnt-series-guide">
+      {/* ---- HERO ---- */}
       <div className="gnt-hero gnt-hero-gradient gnt-hero-center">
         <div className="gnt-container">
           <div className="gnt-section-label">Complete Series Guide</div>
@@ -428,14 +529,172 @@ function SeriesGuideLayout({ page, contentHtml }: GNTLayoutProps) {
         </div>
       </div>
 
+      {/* ---- SERIES SUB-NAV ---- */}
+      <nav className="gnt-series-nav" aria-label="Series navigation">
+        <div className="gnt-container">
+          <div className="gnt-series-nav-inner">
+            {subNav.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`gnt-series-nav-link${link.href === `/page/${page.slug}` ? " gnt-series-nav-active" : ""}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* ---- TWO-COLUMN: MAIN + SIDEBAR ---- */}
       <div className="gnt-container">
-        <div className="gnt-wide-content">
-          <div
-            className="gnt-article-content article-content font-serif"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
+        <div className="gnt-two-col gnt-series-body">
+          {/* MAIN CONTENT */}
+          <div className="gnt-main">
+            <div
+              className="gnt-article-content article-content font-serif"
+              dangerouslySetInnerHTML={{ __html: enrichedHtml }}
+            />
+          </div>
+
+          {/* SIDEBAR */}
+          <aside className="gnt-sidebar gnt-series-sidebar">
+            {/* TABLE OF CONTENTS */}
+            {toc.length > 2 && (
+              <div className="gnt-sidebar-card gnt-toc-card">
+                <h3 className="gnt-sidebar-heading">In This Guide</h3>
+                <nav className="gnt-toc-nav">
+                  {toc.filter(e => e.level === 2).map((entry) => (
+                    <a
+                      key={entry.id}
+                      href={`#${entry.id}`}
+                      className="gnt-toc-link"
+                    >
+                      {entry.text}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+            )}
+
+            {/* LATEST COVERAGE */}
+            {ctx && ctx.latestPosts.length > 0 && (
+              <div className="gnt-sidebar-card">
+                <h3 className="gnt-sidebar-heading">Latest Coverage</h3>
+                {ctx.latestPosts.slice(0, 5).map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/${post.beat}/${post.slug}`}
+                    className="gnt-story-link"
+                  >
+                    <h4>{decodeHtmlEntities(post.title)}</h4>
+                    <span className="gnt-story-meta">
+                      {post.pub_date && formatDate(post.pub_date)}
+                    </span>
+                  </Link>
+                ))}
+                <div className="gnt-sidebar-more">
+                  <Link href="/racing" className="gnt-sidebar-more-link">
+                    All Coverage &rarr;
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* QUICK LINKS */}
+            <div className="gnt-sidebar-card">
+              <h3 className="gnt-sidebar-heading">Quick Links</h3>
+              <div className="gnt-quick-links">
+                <Link href="/page/driver-directory" className="gnt-quick-link">Driver Directory</Link>
+                <Link href="/page/team-directory" className="gnt-quick-link">Team Directory</Link>
+                <Link href="/page/schedules" className="gnt-quick-link">Schedules</Link>
+                <Link href="/standings" className="gnt-quick-link">Standings</Link>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
+
+      {/* ---- EXPLORE SECTION: CARD GRIDS ---- */}
+      {ctx && (
+        <div className="gnt-explore-section">
+          <div className="gnt-container">
+            {/* Track Guides */}
+            {ctx.trackGuides.length > 0 && (
+              <div className="gnt-explore-group">
+                <h2 className="gnt-explore-heading">Track Guides</h2>
+                <div className="gnt-explore-grid">
+                  {ctx.trackGuides.map((pg) => (
+                    <Link
+                      key={pg.slug}
+                      href={`/page/${pg.slug}`}
+                      className="gnt-explore-card"
+                    >
+                      <span className="gnt-explore-badge">Track Guide</span>
+                      <h3 className="gnt-explore-name">{displayPageName(pg.title)}</h3>
+                      {pg.meta_description && (
+                        <p className="gnt-explore-desc">
+                          {pg.meta_description.length > 100
+                            ? pg.meta_description.slice(0, 97) + "..."
+                            : pg.meta_description}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Driver Profiles */}
+            {ctx.driverProfiles.length > 0 && (
+              <div className="gnt-explore-group">
+                <h2 className="gnt-explore-heading">Driver Profiles</h2>
+                <div className="gnt-explore-grid gnt-explore-grid-sm">
+                  {ctx.driverProfiles.slice(0, 12).map((pg) => (
+                    <Link
+                      key={pg.slug}
+                      href={`/page/${pg.slug}`}
+                      className="gnt-explore-card gnt-explore-card-compact"
+                    >
+                      <h3 className="gnt-explore-name">{displayPageName(pg.title)}</h3>
+                      <span className="gnt-explore-badge">Driver</span>
+                    </Link>
+                  ))}
+                  {ctx.driverProfiles.length > 12 && (
+                    <Link href="/page/driver-directory" className="gnt-explore-card gnt-explore-card-more">
+                      <span className="gnt-explore-more-text">View All {ctx.driverProfiles.length} Drivers &rarr;</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Team Profiles */}
+            {ctx.teamProfiles.length > 0 && (
+              <div className="gnt-explore-group">
+                <h2 className="gnt-explore-heading">Team Profiles</h2>
+                <div className="gnt-explore-grid gnt-explore-grid-sm">
+                  {ctx.teamProfiles.slice(0, 12).map((pg) => (
+                    <Link
+                      key={pg.slug}
+                      href={`/page/${pg.slug}`}
+                      className="gnt-explore-card gnt-explore-card-compact"
+                    >
+                      <h3 className="gnt-explore-name">{displayPageName(pg.title)}</h3>
+                      <span className="gnt-explore-badge">Team</span>
+                    </Link>
+                  ))}
+                  {ctx.teamProfiles.length > 12 && (
+                    <Link href="/page/team-directory" className="gnt-explore-card gnt-explore-card-more">
+                      <span className="gnt-explore-more-text">View All {ctx.teamProfiles.length} Teams &rarr;</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -725,7 +984,7 @@ function HubPageLayout({ page, contentHtml, hubPosts }: GNTLayoutProps) {
 // -------------------------------------------------------
 export default function GNTPageLayout(props: GNTLayoutProps) {
   const { page } = props;
-  switch (page.page_type) {
+  switch (page.page_type as string) {
     case "driver_profile":
       return <DriverProfileLayout {...props} />;
     case "team_profile":

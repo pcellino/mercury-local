@@ -739,3 +739,63 @@ export async function getRelatedPosts(
 
   return tagRelated;
 }
+
+// -------------------------------------------------------
+// Series Guide Context — related pages + latest posts for series guide pages
+// -------------------------------------------------------
+
+export interface SeriesGuideRelatedPage {
+  slug: string;
+  title: string;
+  meta_description: string | null;
+  page_type: string | null;
+}
+
+export async function getSeriesGuideContext(
+  publicationId: string,
+  limit = 5
+): Promise<{
+  trackGuides: SeriesGuideRelatedPage[];
+  driverProfiles: SeriesGuideRelatedPage[];
+  teamProfiles: SeriesGuideRelatedPage[];
+  latestPosts: Post[];
+}> {
+  // Fetch all related page types in parallel
+  const [trackRes, driverRes, teamRes, postRes] = await Promise.all([
+    supabase
+      .from("pages")
+      .select("slug, title, meta_description, page_type")
+      .eq("publication_id", publicationId)
+      .eq("page_type", "track_guide")
+      .eq("status", "published")
+      .order("title"),
+    supabase
+      .from("pages")
+      .select("slug, title, meta_description, page_type")
+      .eq("publication_id", publicationId)
+      .eq("page_type", "driver_profile")
+      .eq("status", "published")
+      .order("title"),
+    supabase
+      .from("pages")
+      .select("slug, title, meta_description, page_type")
+      .eq("publication_id", publicationId)
+      .eq("page_type", "team_profile")
+      .eq("status", "published")
+      .order("title"),
+    supabase
+      .from("posts")
+      .select("*")
+      .eq("publication_id", publicationId)
+      .eq("status", "published")
+      .order("pub_date", { ascending: false })
+      .limit(limit),
+  ]);
+
+  return {
+    trackGuides: (trackRes.data || []) as SeriesGuideRelatedPage[],
+    driverProfiles: (driverRes.data || []) as SeriesGuideRelatedPage[],
+    teamProfiles: (teamRes.data || []) as SeriesGuideRelatedPage[],
+    latestPosts: (postRes.data || []) as Post[],
+  };
+}

@@ -851,6 +851,247 @@
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
+/* ========== SERIES GUIDE — Sub-Nav, TOC, Explore Cards ========== */
+
+/* --- Series Sub-Navigation Bar --- */
+.gnt-series-nav {
+  background: var(--gnt-surface);
+  border-top: 1px solid var(--gnt-rule);
+  border-bottom: 2px solid var(--gnt-gold);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.gnt-series-nav-inner {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gnt-series-nav-inner::-webkit-scrollbar {
+  display: none;
+}
+.gnt-series-nav-link {
+  display: block;
+  padding: 0.875rem 1.25rem;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gnt-muted) !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.gnt-series-nav-link:hover {
+  color: var(--gnt-gold-bright) !important;
+  border-bottom-color: var(--gnt-gold);
+}
+.gnt-series-nav-active {
+  color: var(--gnt-gold) !important;
+  border-bottom-color: var(--gnt-gold);
+}
+
+/* --- Series Guide Body — wider main column --- */
+.gnt-series-body {
+  grid-template-columns: 3fr 1fr;
+  gap: 3rem;
+}
+
+/* --- Series Sidebar — sticky on scroll --- */
+.gnt-series-sidebar {
+  position: sticky;
+  top: 60px;
+  align-self: start;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gnt-rule) transparent;
+}
+
+/* --- Table of Contents Card --- */
+.gnt-toc-card {
+  background: var(--gnt-bg);
+}
+.gnt-toc-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.gnt-toc-link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--gnt-muted) !important;
+  text-decoration: none !important;
+  border-left: 2px solid transparent;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+.gnt-toc-link:hover {
+  color: var(--gnt-gold-bright) !important;
+  border-left-color: var(--gnt-gold);
+  background: rgba(197, 166, 116, 0.05);
+}
+
+/* --- Sidebar "More" link --- */
+.gnt-sidebar-more {
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--gnt-rule);
+}
+.gnt-sidebar-more-link {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gnt-gold) !important;
+  text-decoration: none !important;
+  transition: color 0.2s;
+}
+.gnt-sidebar-more-link:hover {
+  color: var(--gnt-gold-bright) !important;
+}
+
+/* --- Explore Section (below the fold) --- */
+.gnt-explore-section {
+  background: var(--gnt-surface);
+  border-top: 2px solid var(--gnt-gold);
+  padding: 3rem 0 4rem;
+  margin-top: 1rem;
+}
+.gnt-explore-group {
+  margin-bottom: 2.5rem;
+}
+.gnt-explore-group:last-child {
+  margin-bottom: 0;
+}
+.gnt-explore-heading {
+  font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gnt-text-bright);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gnt-rule);
+}
+
+/* --- Explore Card Grid --- */
+.gnt-explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.gnt-explore-grid-sm {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+.gnt-explore-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--gnt-bg);
+  border: 1px solid var(--gnt-rule);
+  border-radius: 6px;
+  padding: 1.25rem;
+  text-decoration: none !important;
+  transition: all 0.25s var(--gnt-ease);
+  box-shadow: var(--gnt-shadow-sm);
+  overflow: hidden;
+}
+.gnt-explore-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gnt-gold), var(--gnt-accent));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.gnt-explore-card:hover {
+  border-color: var(--gnt-gold);
+  box-shadow: var(--gnt-shadow-gold), 0 6px 20px rgba(0,0,0,0.25);
+  transform: translateY(-2px);
+}
+.gnt-explore-card:hover::before {
+  opacity: 1;
+}
+.gnt-explore-card-compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  gap: 0.75rem;
+}
+.gnt-explore-card-compact .gnt-explore-name {
+  font-size: 0.9375rem;
+  margin: 0;
+}
+.gnt-explore-card-compact .gnt-explore-badge {
+  margin: 0;
+  flex-shrink: 0;
+}
+.gnt-explore-card-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(197, 166, 116, 0.06);
+  border-style: dashed;
+}
+.gnt-explore-card-more:hover {
+  background: rgba(197, 166, 116, 0.12);
+}
+.gnt-explore-more-text {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gnt-gold);
+}
+
+/* --- Explore Card Elements --- */
+.gnt-explore-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(197, 166, 116, 0.12);
+  color: var(--gnt-gold);
+  border-radius: 3px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+.gnt-explore-name {
+  font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--gnt-text) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  margin: 0 0 0.375rem;
+}
+.gnt-explore-desc {
+  font-size: 0.8125rem;
+  color: var(--gnt-muted);
+  line-height: 1.45;
+  margin: auto 0 0;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
   .gnt-title-xl {
@@ -894,6 +1135,32 @@
   }
   .gnt-stat-value {
     font-size: 0.75rem;
+  }
+  /* Series guide responsive */
+  .gnt-series-body {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .gnt-series-sidebar {
+    position: static;
+    max-height: none;
+  }
+  .gnt-toc-card {
+    display: none;
+  }
+  .gnt-series-nav-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.6875rem;
+  }
+  .gnt-explore-grid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+  .gnt-explore-grid-sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gnt-explore-section {
+    padding: 2rem 0 3rem;
   }
 }
 @media (min-width: 901px) and (max-width: 1200px) {

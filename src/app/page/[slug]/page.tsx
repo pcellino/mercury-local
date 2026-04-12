@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicationFromRequest } from "@/lib/publication";
-import { getPageBySlug, getBeatsForPublication, getHubPosts, getPagesByType } from "@/lib/queries";
+import { getPageBySlug, getBeatsForPublication, getHubPosts, getPagesByType, getSeriesGuideContext } from "@/lib/queries";
 import {
   sanitizeContent,
   formatDate,
@@ -115,6 +115,12 @@ export default async function StaticPage({ params }: PageProps) {
     ? await getPagesByType(publication.id, directoryItemType)
     : undefined;
 
+  // If this is a series guide, fetch related pages + latest posts
+  const isSeriesGuide = isGNT && page.page_type === "series_guide";
+  const seriesGuideContext = isSeriesGuide
+    ? await getSeriesGuideContext(publication.id, 5)
+    : undefined;
+
   // JSON-LD structured data
   const pageJsonLd = generatePageJsonLd(page, publication);
   const breadcrumbJsonLd = generatePageBreadcrumbJsonLd(page, publication);
@@ -143,6 +149,7 @@ export default async function StaticPage({ params }: PageProps) {
           contentHtml={contentHtml}
           hubPosts={hubPosts}
           directoryItems={directoryItems}
+          seriesGuideContext={seriesGuideContext}
         />
       ) : (
         <article className="max-w-3xl mx-auto">
