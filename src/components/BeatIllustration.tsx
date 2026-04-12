@@ -14,7 +14,7 @@ export default function BeatIllustration({ beat, className = "" }: BeatIllustrat
     "government", "police", "education", "elections", "business",
     "community", "opinion", "culture", "sports", "development",
     "wellness", "lifestyle", "dining",
-    "racing", "features", "standings", "vtc",
+    "news", "features", "standings", "vtc",
   ];
   const src = validBeats.includes(slug)
     ? `/beats/${slug}.svg`

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 const PRIMARY_NAV = [
-  { href: "/racing", label: "Racing" },
+  { href: "/news", label: "News" },
   { href: "/features", label: "Features" },
   { href: "/standings", label: "Standings" },
   { href: "/page/schedules", label: "Schedules" },
@@ -22,7 +22,7 @@ const MORE_LINKS = [
 ];
 
 const MOBILE_NAV = [
-  { href: "/racing", label: "Racing", section: "main" },
+  { href: "/news", label: "News", section: "main" },
   { href: "/features", label: "Features", section: "main" },
   { href: "/standings", label: "Standings", section: "main" },
   { href: "/page/schedules", label: "Schedules", section: "main" },

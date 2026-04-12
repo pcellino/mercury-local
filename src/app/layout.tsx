@@ -457,7 +457,7 @@ export default async function RootLayout({
                     <Link href="/page/virginia-triple-crown-guide" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Virginia Triple Crown</Link>
                     <Link href="/page/schedules" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Race Schedules</Link>
                     <Link href="/standings" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Standings &amp; Stats</Link>
-                    <Link href="/racing" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Latest News</Link>
+                    <Link href="/news" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Latest News</Link>
                     <Link href="/features" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Features</Link>
                     <Link href="/opinion" className="text-sm font-sans text-gnt-text hover:text-gnt-accent transition-colors no-underline">Columns</Link>
                   </div>

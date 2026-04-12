@@ -193,7 +193,7 @@ export const PETER_CELLINO_BEATS: BeatConfig[] = [
 ];
 
 export const GNT_BEATS: BeatConfig[] = [
-  { slug: "racing", label: "Racing", description: "NASCAR O'Reilly Auto Parts Series and CARS Tour coverage" },
+  { slug: "news", label: "News", description: "Race recaps, previews, results, and analysis — NASCAR O'Reilly Auto Parts Series and CARS Tour coverage" },
   { slug: "features", label: "Features", description: "Driver profiles, track features, and long-form storytelling" },
   { slug: "opinion", label: "Opinion", description: "Columns, commentary, and the Speedway perspective" },
   { slug: "standings", label: "Standings", description: "Championship standings, trackers, and season stats" },

@@ -12,7 +12,7 @@ const ALL_BEATS = new Set([
   "wellness", "lifestyle", "dining",
   "dispatches", "notes",
   // Grand National Today
-  "racing", "features", "standings", "vtc",
+  "news", "features", "standings", "vtc",
 ]);
 
 // System routes that are never legacy slugs.

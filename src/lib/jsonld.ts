@@ -209,7 +209,7 @@ function detectPageSchemaType(slug: string): "Person" | "Place" | "SportsOrganiz
   if (slug === "jr-motorsports" || slug.endsWith("-motorsports") || slug.endsWith("-racing")) return "SportsOrganization";
   // Driver profiles: known slugs that are person names (no beat prefix, no utility slug)
   // We detect by checking if the slug is a simple name pattern (no common utility words)
-  const utilityPrefixes = ["about", "contact", "privacy", "terms", "advertise", "staff", "partners", "features", "opinion", "racing", "schedules", "standings", "media"];
+  const utilityPrefixes = ["about", "contact", "privacy", "terms", "advertise", "staff", "partners", "features", "opinion", "news", "schedules", "standings", "media"];
   const hubSlugs = ["dining", "wellness", "lifestyle", "business", "government", "community", "education", "elections", "police", "ballantyne", "vtc"];
   const directorySlugs = ["driver-directory", "team-directory"];
   if (utilityPrefixes.includes(slug) || hubSlugs.includes(slug) || directorySlugs.includes(slug)) return "WebPage";
