@@ -9,6 +9,7 @@ import BeatDropdownNav from "@/components/BeatDropdownNav";
 import SimpleNav from "@/components/SimpleNav";
 import BetaBanner from "@/components/BetaBanner";
 import GNTHeader from "@/components/GNTHeader";
+import SubscribeForm from "@/components/SubscribeForm";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -432,7 +433,7 @@ export default async function RootLayout({
             {/* GNT custom footer content */}
             {isGNT ? (
               <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
                 {/* Column 1 — Description */}
                 <div>
                   <p className="font-condensed font-bold text-2xl uppercase tracking-wide text-gnt-text">
@@ -483,6 +484,10 @@ export default async function RootLayout({
                       TheSportsmanShow.com <span className="opacity-50 text-xs">&#x2197;</span>
                     </a>
                   </div>
+                </div>
+                {/* Column 4 — Newsletter */}
+                <div>
+                  <SubscribeForm variant="gnt" />
                 </div>
               </div>
               {/* Bottom copyright row */}
@@ -646,6 +651,13 @@ export default async function RootLayout({
                     : `Covering what matters in ${publication.region || "your community"}. Built on shoe-leather reporting, not algorithms.`}
                 </p>
               </div>
+
+              {/* Newsletter signup — Charlotte Mercury only */}
+              {slug === "charlotte-mercury" && (
+                <div>
+                  <SubscribeForm variant="mercury" publicationName={publication.name} />
+                </div>
+              )}
             </div>
 
             <div className="mt-10 pt-6 border-t border-mercury-rule text-xs text-mercury-muted font-sans flex flex-col md:flex-row justify-between">
