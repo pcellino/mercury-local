@@ -507,7 +507,55 @@ function getSeriesSubNav(slug: string): SubNavLink[] {
 }
 
 // -------------------------------------------------------
-// SERIES GUIDE LAYOUT — Full hub experience
+// Helper: split rendered HTML into sections at <h2> boundaries
+// -------------------------------------------------------
+interface ContentSection {
+  id: string;
+  title: string;
+  html: string;
+  hasTable: boolean;
+  isShort: boolean; // < 300 chars of text content
+}
+
+function splitIntoSections(html: string): ContentSection[] {
+  // Split on <h2> tags, keeping the tag in the section
+  const parts = html.split(/(?=<h2\b)/i);
+  const sections: ContentSection[] = [];
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+
+    // Extract title from h2
+    const h2Match = trimmed.match(/<h2[^>]*(?:id="([^"]*)")?[^>]*>(.*?)<\/h2>/i);
+    const title = h2Match ? h2Match[2].replace(/<[^>]*>/g, "").trim() : "";
+    const id = h2Match?.[1] || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+    // Check characteristics
+    const hasTable = /<table\b/i.test(trimmed);
+    const textOnly = trimmed.replace(/<[^>]*>/g, "");
+    const isShort = textOnly.length < 300;
+
+    sections.push({ id, title, html: trimmed, hasTable, isShort });
+  }
+
+  return sections;
+}
+
+/** Classify a section for layout purposes */
+type SectionKind = "intro" | "data" | "callout" | "explore" | "normal";
+
+function classifySection(s: ContentSection): SectionKind {
+  const t = s.title.toLowerCase();
+  if (t.startsWith("what is") || t.includes("divisions") || t.includes("format")) return "intro";
+  if (s.hasTable || t.includes("winners") || t.includes("champions") || t.includes("standings") || t.includes("results") || t.includes("schedule") || t.includes("prize")) return "data";
+  if (t.includes("how to watch") || t.includes("why it matters")) return "callout";
+  if (t.startsWith("explore")) return "explore";
+  return "normal";
+}
+
+// -------------------------------------------------------
+// SERIES GUIDE LAYOUT — Section-based rendering
 // -------------------------------------------------------
 function SeriesGuideLayout({ page, contentHtml, seriesGuideContext }: GNTLayoutProps) {
   const name = decodeHtmlEntities(page.title);
@@ -515,6 +563,66 @@ function SeriesGuideLayout({ page, contentHtml, seriesGuideContext }: GNTLayoutP
   const toc = extractToc(enrichedHtml);
   const subNav = getSeriesSubNav(page.slug);
   const ctx = seriesGuideContext;
+
+  // Split content into sections and classify them
+  const sections = splitIntoSections(enrichedHtml);
+  const classified = sections.map((s) => ({ ...s, kind: classifySection(s) }));
+
+  // Group adjacent data sections for side-by-side rendering
+  // Group adjacent callout sections for side-by-side rendering
+  type RenderBlock =
+    | { type: "intro"; sections: (ContentSection & { kind: SectionKind })[] }
+    | { type: "data-pair"; sections: (ContentSection & { kind: SectionKind })[] }
+    | { type: "callout-pair"; sections: (ContentSection & { kind: SectionKind })[] }
+    | { type: "single"; section: ContentSection & { kind: SectionKind } };
+
+  const blocks: RenderBlock[] = [];
+  let i = 0;
+
+  // Gather intro sections into one block
+  const introSections: typeof classified = [];
+  while (i < classified.length && classified[i].kind === "intro") {
+    introSections.push(classified[i]);
+    i++;
+  }
+  if (introSections.length > 0) {
+    blocks.push({ type: "intro", sections: introSections });
+  }
+
+  // Process remaining sections
+  while (i < classified.length) {
+    const current = classified[i];
+
+    // Skip "Explore" section — replaced by card grid
+    if (current.kind === "explore") {
+      i++;
+      continue;
+    }
+
+    // Try to pair adjacent data sections
+    if (current.kind === "data" && i + 1 < classified.length && classified[i + 1].kind === "data") {
+      blocks.push({ type: "data-pair", sections: [current, classified[i + 1]] });
+      i += 2;
+      continue;
+    }
+
+    // Try to pair adjacent callout sections
+    if (current.kind === "callout" && i + 1 < classified.length && classified[i + 1].kind === "callout") {
+      blocks.push({ type: "callout-pair", sections: [current, classified[i + 1]] });
+      i += 2;
+      continue;
+    }
+
+    // Single callout still gets callout treatment
+    if (current.kind === "callout") {
+      blocks.push({ type: "callout-pair", sections: [current] });
+      i++;
+      continue;
+    }
+
+    blocks.push({ type: "single", section: current });
+    i++;
+  }
 
   return (
     <div className="gnt-page gnt-series-guide">
@@ -546,73 +654,125 @@ function SeriesGuideLayout({ page, contentHtml, seriesGuideContext }: GNTLayoutP
         </div>
       </nav>
 
-      {/* ---- TWO-COLUMN: MAIN + SIDEBAR ---- */}
-      <div className="gnt-container">
-        <div className="gnt-two-col gnt-series-body">
-          {/* MAIN CONTENT */}
-          <div className="gnt-main">
-            <div
-              className="gnt-article-content article-content font-serif"
-              dangerouslySetInnerHTML={{ __html: enrichedHtml }}
-            />
+      {/* ---- TOC BAR (horizontal, below sub-nav) ---- */}
+      {toc.length > 3 && (
+        <div className="gnt-toc-bar">
+          <div className="gnt-container">
+            <nav className="gnt-toc-bar-inner">
+              <span className="gnt-toc-bar-label">Jump to:</span>
+              {toc.filter(e => e.level === 2).slice(0, 8).map((entry) => (
+                <a key={entry.id} href={`#${entry.id}`} className="gnt-toc-bar-link">
+                  {entry.text}
+                </a>
+              ))}
+            </nav>
           </div>
+        </div>
+      )}
 
-          {/* SIDEBAR */}
-          <aside className="gnt-sidebar gnt-series-sidebar">
-            {/* TABLE OF CONTENTS */}
-            {toc.length > 2 && (
-              <div className="gnt-sidebar-card gnt-toc-card">
-                <h3 className="gnt-sidebar-heading">In This Guide</h3>
-                <nav className="gnt-toc-nav">
-                  {toc.filter(e => e.level === 2).map((entry) => (
-                    <a
-                      key={entry.id}
-                      href={`#${entry.id}`}
-                      className="gnt-toc-link"
-                    >
-                      {entry.text}
-                    </a>
-                  ))}
-                </nav>
-              </div>
-            )}
-
-            {/* LATEST COVERAGE */}
-            {ctx && ctx.latestPosts.length > 0 && (
-              <div className="gnt-sidebar-card">
-                <h3 className="gnt-sidebar-heading">Latest Coverage</h3>
-                {ctx.latestPosts.slice(0, 5).map((post) => (
-                  <Link
-                    key={post.id}
-                    href={`/${post.beat}/${post.slug}`}
-                    className="gnt-story-link"
-                  >
-                    <h4>{decodeHtmlEntities(post.title)}</h4>
-                    <span className="gnt-story-meta">
-                      {post.pub_date && formatDate(post.pub_date)}
-                    </span>
-                  </Link>
-                ))}
-                <div className="gnt-sidebar-more">
-                  <Link href="/racing" className="gnt-sidebar-more-link">
-                    All Coverage &rarr;
-                  </Link>
+      {/* ---- SECTION-BASED CONTENT ---- */}
+      <div className="gnt-sg-content">
+        {blocks.map((block, blockIdx) => {
+          // --- INTRO BLOCK: two-column with infobox sidebar ---
+          if (block.type === "intro") {
+            return (
+              <div key={blockIdx} className="gnt-sg-intro">
+                <div className="gnt-container">
+                  <div className="gnt-sg-intro-grid">
+                    <div className="gnt-sg-intro-main article-content font-serif">
+                      {block.sections.map((s, si) => (
+                        <div key={si} dangerouslySetInnerHTML={{ __html: s.html }} />
+                      ))}
+                    </div>
+                    <aside className="gnt-sg-infobox">
+                      <h3 className="gnt-sidebar-heading">Quick Reference</h3>
+                      <div className="gnt-quick-links">
+                        {subNav.filter(l => l.label !== "Guide").map((link) => (
+                          <Link key={link.href} href={link.href} className="gnt-quick-link">
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                      {/* Latest Coverage in infobox */}
+                      {ctx && ctx.latestPosts.length > 0 && (
+                        <div className="gnt-sg-infobox-coverage">
+                          <h3 className="gnt-sidebar-heading">Latest</h3>
+                          {ctx.latestPosts.slice(0, 3).map((post) => (
+                            <Link
+                              key={post.id}
+                              href={`/${post.beat}/${post.slug}`}
+                              className="gnt-story-link"
+                            >
+                              <h4>{decodeHtmlEntities(post.title)}</h4>
+                              <span className="gnt-story-meta">
+                                {post.pub_date && formatDate(post.pub_date)}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </aside>
+                  </div>
                 </div>
               </div>
-            )}
+            );
+          }
 
-            {/* QUICK LINKS */}
-            <div className="gnt-sidebar-card">
-              <h3 className="gnt-sidebar-heading">Quick Links</h3>
-              <div className="gnt-quick-links">
-                <Link href="/page/driver-directory" className="gnt-quick-link">Driver Directory</Link>
-                <Link href="/page/team-directory" className="gnt-quick-link">Team Directory</Link>
-                <Link href="/page/schedules" className="gnt-quick-link">Schedules</Link>
-                <Link href="/standings" className="gnt-quick-link">Standings</Link>
+          // --- DATA PAIR: side-by-side tables ---
+          if (block.type === "data-pair") {
+            return (
+              <div key={blockIdx} className="gnt-sg-data-band">
+                <div className="gnt-container">
+                  <div className={`gnt-sg-data-grid gnt-sg-data-grid-${block.sections.length}`}>
+                    {block.sections.map((s, si) => (
+                      <div
+                        key={si}
+                        className="gnt-sg-data-cell article-content font-serif"
+                        dangerouslySetInnerHTML={{ __html: s.html }}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </aside>
-        </div>
+            );
+          }
+
+          // --- CALLOUT PAIR: styled callout cards ---
+          if (block.type === "callout-pair") {
+            return (
+              <div key={blockIdx} className="gnt-sg-callout-band">
+                <div className="gnt-container">
+                  <div className={`gnt-sg-callout-grid gnt-sg-callout-grid-${block.sections.length}`}>
+                    {block.sections.map((s, si) => (
+                      <div
+                        key={si}
+                        className="gnt-sg-callout-card article-content font-serif"
+                        dangerouslySetInnerHTML={{ __html: s.html }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // --- SINGLE (normal): full-width section ---
+          if (block.type === "single") {
+            const s = block.section;
+            return (
+              <div key={blockIdx} className="gnt-sg-section">
+                <div className="gnt-container">
+                  <div
+                    className="gnt-sg-section-inner article-content font-serif"
+                    dangerouslySetInnerHTML={{ __html: s.html }}
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })}
       </div>
 
       {/* ---- EXPLORE SECTION: CARD GRIDS ---- */}

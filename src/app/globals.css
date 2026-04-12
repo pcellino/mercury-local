@@ -851,7 +851,7 @@
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-/* ========== SERIES GUIDE — Sub-Nav, TOC, Explore Cards ========== */
+/* ========== SERIES GUIDE — Sub-Nav, Section Layouts, Explore Cards ========== */
 
 /* --- Series Sub-Navigation Bar --- */
 .gnt-series-nav {
@@ -895,48 +895,156 @@
   border-bottom-color: var(--gnt-gold);
 }
 
-/* --- Series Guide Body — wider main column --- */
-.gnt-series-body {
-  grid-template-columns: 3fr 1fr;
-  gap: 3rem;
-}
-
-/* --- Series Sidebar — sticky on scroll --- */
-.gnt-series-sidebar {
-  position: sticky;
-  top: 60px;
-  align-self: start;
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--gnt-rule) transparent;
-}
-
-/* --- Table of Contents Card --- */
-.gnt-toc-card {
+/* --- Horizontal TOC Bar (below sub-nav) --- */
+.gnt-toc-bar {
   background: var(--gnt-bg);
+  border-bottom: 1px solid var(--gnt-rule);
+  padding: 0.625rem 0;
+  overflow: hidden;
 }
-.gnt-toc-nav {
+.gnt-toc-bar-inner {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  align-items: center;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
-.gnt-toc-link {
-  display: block;
-  padding: 0.5rem 0.75rem;
+.gnt-toc-bar-inner::-webkit-scrollbar {
+  display: none;
+}
+.gnt-toc-bar-label {
   font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gnt-muted);
+  white-space: nowrap;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+.gnt-toc-bar-link {
+  display: block;
+  padding: 0.375rem 0.75rem;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.6875rem;
   font-weight: 500;
   color: var(--gnt-muted) !important;
   text-decoration: none !important;
-  border-left: 2px solid transparent;
+  white-space: nowrap;
+  border-radius: 3px;
   transition: all 0.2s;
-  line-height: 1.4;
 }
-.gnt-toc-link:hover {
+.gnt-toc-bar-link:hover {
   color: var(--gnt-gold-bright) !important;
-  border-left-color: var(--gnt-gold);
-  background: rgba(197, 166, 116, 0.05);
+  background: rgba(197, 166, 116, 0.08);
+}
+
+/* --- Series Guide Section Content Wrapper --- */
+.gnt-sg-content {
+  /* sections stack vertically with alternating backgrounds */
+}
+
+/* --- INTRO SECTION: two-column with infobox --- */
+.gnt-sg-intro {
+  padding: 2.5rem 0 2rem;
+  border-bottom: 1px solid var(--gnt-rule);
+}
+.gnt-sg-intro-grid {
+  display: grid;
+  grid-template-columns: 5fr 2fr;
+  gap: 3rem;
+}
+.gnt-sg-intro-main h2 {
+  margin-top: 0;
+}
+.gnt-sg-infobox {
+  background: var(--gnt-surface);
+  border: 1px solid var(--gnt-rule);
+  border-radius: 8px;
+  padding: 1.5rem;
+  align-self: start;
+  position: sticky;
+  top: 110px;
+}
+.gnt-sg-infobox-coverage {
+  margin-top: 1.25rem;
+  padding-top: 0.5rem;
+}
+
+/* --- DATA BAND: side-by-side tables --- */
+.gnt-sg-data-band {
+  background: var(--gnt-surface);
+  border-top: 1px solid var(--gnt-rule);
+  border-bottom: 1px solid var(--gnt-rule);
+  padding: 2rem 0 2.5rem;
+}
+.gnt-sg-data-grid {
+  display: grid;
+  gap: 2.5rem;
+}
+.gnt-sg-data-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.gnt-sg-data-grid-1 {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+}
+.gnt-sg-data-cell {
+  min-width: 0; /* prevent table overflow */
+}
+.gnt-sg-data-cell table {
+  width: 100%;
+}
+.gnt-sg-data-cell h2 {
+  margin-top: 0;
+}
+
+/* --- CALLOUT BAND: styled callout cards --- */
+.gnt-sg-callout-band {
+  padding: 2rem 0 2.5rem;
+  border-bottom: 1px solid var(--gnt-rule);
+}
+.gnt-sg-callout-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+.gnt-sg-callout-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.gnt-sg-callout-grid-1 {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+}
+.gnt-sg-callout-card {
+  background: var(--gnt-surface);
+  border: 1px solid var(--gnt-rule);
+  border-left: 3px solid var(--gnt-gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1.75rem 2rem;
+  box-shadow: var(--gnt-shadow-sm);
+}
+.gnt-sg-callout-card h2 {
+  font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gnt-gold);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* --- NORMAL SECTION: full width --- */
+.gnt-sg-section {
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--gnt-rule);
+}
+.gnt-sg-section-inner {
+  max-width: 860px;
+}
+.gnt-sg-section-inner h2 {
+  margin-top: 0;
 }
 
 /* --- Sidebar "More" link --- */
@@ -964,7 +1072,6 @@
   background: var(--gnt-surface);
   border-top: 2px solid var(--gnt-gold);
   padding: 3rem 0 4rem;
-  margin-top: 1rem;
 }
 .gnt-explore-group {
   margin-bottom: 2.5rem;
@@ -1137,15 +1244,22 @@
     font-size: 0.75rem;
   }
   /* Series guide responsive */
-  .gnt-series-body {
+  .gnt-sg-intro-grid {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 1.5rem;
   }
-  .gnt-series-sidebar {
+  .gnt-sg-infobox {
     position: static;
-    max-height: none;
   }
-  .gnt-toc-card {
+  .gnt-sg-data-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .gnt-sg-callout-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .gnt-toc-bar {
     display: none;
   }
   .gnt-series-nav-link {
